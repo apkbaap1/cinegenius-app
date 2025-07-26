@@ -1,0 +1,6 @@
+{
+  "name": "CineGenius: AI Filmmaking Assistant",
+  "description": "An AI-powered application to assist filmmakers with script breakdown, scheduling, and storyboarding. Paste your script and let the AI handle the pre-production planning, including generating reference images and suggesting camera shots.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
