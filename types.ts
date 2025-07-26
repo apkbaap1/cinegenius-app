@@ -42,6 +42,7 @@ export interface Shot {
     description: string;
     imageUrl?: string;
     isLoadingImage?: boolean;
+    imageError?: string;
 }
 
 export interface CameraSuggestion {
