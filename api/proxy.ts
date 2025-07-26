@@ -258,7 +258,7 @@ async function _generateShotList({ scene, language }: { scene: Scene; language: 
 }
 
 async function _generateImageForShot({ shot, scene }: { shot: Shot; scene: Scene; language: Language; }): Promise<string> {
-    const prompt = `cinematic film still, ${shot.description}. Setting is ${scene.setting}, ${scene.timeOfDay}. Camera Shot: ${shot.shotType}, Lens: ${shot.lens}. dramatic lighting, photorealistic, 8k.`;
+    const prompt = `cinematic film still of ${shot.description}. Setting: ${scene.setting}, ${scene.timeOfDay}. Camera: ${shot.shotType}, ${shot.lens}. Photorealistic with dramatic lighting.`;
     
     const response = await ai.models.generateImages({
         model: 'imagen-3.0-generate-002',
@@ -269,7 +269,8 @@ async function _generateImageForShot({ shot, scene }: { shot: Shot; scene: Scene
     if (response.generatedImages && response.generatedImages.length > 0 && response.generatedImages[0].image.imageBytes) {
         return `data:image/jpeg;base64,${response.generatedImages[0].image.imageBytes}`;
     } else {
-        throw new Error("Image generation failed or returned no images.");
+        // Provide a more specific error if no images are returned, which can be due to safety filters.
+        throw new Error("Image generation failed. The prompt may have been blocked by safety policies or the service is temporarily unavailable.");
     }
 }
 
