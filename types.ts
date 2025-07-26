@@ -1,4 +1,3 @@
-
 export type Language = 'English' | 'Spanish' | 'French' | 'German' | 'Japanese' | 'Chinese';
 
 export interface Scene {
@@ -96,4 +95,15 @@ export interface ContinuityAnalysis {
     characterContinuity: CharacterContinuityIssue[];
     costumeContinuity: CostumeContinuityIssue[];
     editingContinuity: EditingContinuityIssue[];
+}
+
+// Added for frontend service to understand file parts without google/genai import
+export interface InlineData {
+    mimeType: string;
+    data: string;
+}
+
+export interface Part {
+    text?: string;
+    inlineData?: InlineData;
 }
