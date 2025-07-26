@@ -258,7 +258,20 @@ async function _generateShotList({ scene, language }: { scene: Scene; language: 
 }
 
 async function _generateImageForShot({ shot, scene }: { shot: Shot; scene: Scene; language: Language; }): Promise<string> {
-    const prompt = `cinematic film still of ${shot.description}. Setting: ${scene.setting}, ${scene.timeOfDay}. Camera: ${shot.shotType}, ${shot.lens}. Photorealistic with dramatic lighting.`;
+    // Sanitize the description to improve prompt safety.
+    // Replace known character names with generic placeholders to avoid potential safety flags on names.
+    let cleanDescription = shot.description;
+    if (scene.characters && scene.characters.length > 0) {
+        scene.characters.forEach((char, index) => {
+            // Use a simple regex to avoid issues with special characters in names
+            const regex = new RegExp(char.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+            cleanDescription = cleanDescription.replace(regex, `Person ${index + 1}`);
+        });
+    }
+    // Remove quotation marks which can sometimes be misinterpreted in prompts.
+    cleanDescription = cleanDescription.replace(/"/g, '');
+
+    const prompt = `cinematic film still of ${cleanDescription}. Setting: ${scene.setting}, ${scene.timeOfDay}. Camera: ${shot.shotType}, ${shot.lens}. Photorealistic with dramatic lighting.`;
     
     const response = await ai.models.generateImages({
         model: 'imagen-3.0-generate-002',
