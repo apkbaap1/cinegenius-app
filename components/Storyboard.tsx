@@ -1,9 +1,8 @@
-
 import React, { useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { ScriptAnalysis, Language, Scene, Shot } from '../types';
 import { UI_TEXT } from '../constants';
 import { generateShotList, generateImageForShot } from '../services/geminiService';
-import { CameraIcon, SparklesIcon } from './icons';
+import { CameraIcon, SparklesIcon, XCircleIcon } from './icons';
 
 interface StoryboardProps {
   analysis: ScriptAnalysis;
@@ -22,10 +21,11 @@ const Storyboard: React.FC<StoryboardProps> = ({ analysis, language, shots, setS
           const shot = shotsToProcess[i];
           try {
               const imageUrl = await generateImageForShot(shot, scene, language);
-              setShots(prev => prev.map(s => s.shotNumber === shot.shotNumber ? { ...s, imageUrl, isLoadingImage: false } : s));
+              setShots(prev => prev.map(s => s.shotNumber === shot.shotNumber ? { ...s, imageUrl, isLoadingImage: false, imageError: undefined } : s));
           } catch (err) {
+              const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
               console.error(`Failed to generate image for shot ${shot.shotNumber}`, err);
-              setShots(prev => prev.map(s => s.shotNumber === shot.shotNumber ? { ...s, imageUrl: 'error', isLoadingImage: false } : s));
+              setShots(prev => prev.map(s => s.shotNumber === shot.shotNumber ? { ...s, imageUrl: 'error', isLoadingImage: false, imageError: errorMessage } : s));
           }
       }
   }, [language, setShots]);
@@ -105,8 +105,10 @@ const Storyboard: React.FC<StoryboardProps> = ({ analysis, language, shots, setS
                         <p className="mt-2 text-sm">Generating Image...</p>
                     </div>
                  ) : shot.imageUrl === 'error' ? (
-                     <div className="flex flex-col items-center justify-center text-red-400">
-                        <p>Image Error</p>
+                     <div className="flex flex-col items-center justify-center text-red-400 p-4 text-center">
+                        <XCircleIcon className="w-10 h-10 mb-2" />
+                        <p className="font-semibold">Image Error</p>
+                        {shot.imageError && <p className="text-xs mt-1 text-red-500 max-w-full break-words">{shot.imageError}</p>}
                      </div>
                  ) : (
                     <img src={shot.imageUrl} alt={shot.description} className="w-full h-full object-cover" />
