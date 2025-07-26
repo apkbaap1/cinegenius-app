@@ -1,30 +1,36 @@
 import type { ScriptAnalysis, Language, ScheduleDay, Scene, Shot, ProductionBible, ContinuityAnalysis, Part } from '../types';
 
 async function apiCall<T>(action: string, payload: any): Promise<T> {
+    let response: Response;
     try {
-        const response = await fetch('/api/proxy', {
+        response = await fetch('/api/proxy', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, payload })
         });
-
-        if (!response.ok) {
-            let errorMessage = `API request for '${action}' failed with status ${response.status}`;
-            try {
-                const errorBody = await response.json();
-                errorMessage = errorBody.message || errorMessage;
-            } catch (e) {
-                // Body might not be JSON, fall back to status text
-                errorMessage = `${errorMessage}: ${response.statusText}`;
-            }
-            throw new Error(errorMessage);
-        }
-
-        return response.json() as Promise<T>;
     } catch (error) {
-        console.error(`Error during API call for action '${action}':`, error);
-        // Re-throw a more user-friendly error
+        console.error(`Network error during API call for action '${action}':`, error);
         throw new Error(`There was a problem communicating with the AI service. Please try again. (Action: ${action})`);
+    }
+
+    if (!response.ok) {
+        let errorMessage = `API request for '${action}' failed with status ${response.status}`;
+        try {
+            const errorBody = await response.json();
+            // Use the specific message from the backend.
+            errorMessage = errorBody.message || errorMessage;
+        } catch (e) {
+            // Body might not be JSON, fall back to status text
+            errorMessage = `${errorMessage}: ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+    }
+
+    try {
+        return await response.json() as Promise<T>;
+    } catch(e) {
+        console.error(`Error parsing JSON response for action '${action}':`, e);
+        throw new Error(`The AI service returned an unexpected response. (Action: ${action})`);
     }
 }
 
