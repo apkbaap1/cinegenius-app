@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
-import { ScriptAnalysis, Language, ScheduleDay, Shot, ProductionBible, ContinuityAnalysis } from '../types';
+import { ScriptAnalysis, Language, ScheduleDay, Shot, ProductionBible, ContinuityAnalysis, ConversationTurn } from '../types';
 import { UI_TEXT } from '../constants';
 import SceneBreakdown from './SceneBreakdown';
 import Scheduler from './Scheduler';
 import Storyboard from './Storyboard';
 import ProductionGuide from './ProductionGuide';
 import Continuity from './Continuity';
-import { ClapperboardIcon, CalendarIcon, CameraIcon, BookOpenIcon, DownloadIcon, ChainIcon } from './icons';
+import ScriptAssistant from './ScriptAssistant';
+import { ClapperboardIcon, CalendarIcon, CameraIcon, BookOpenIcon, DownloadIcon, ChainIcon, BotIcon } from './icons';
 import { downloadAnalysisAsPDF } from '../utils/pdfGenerator';
 
 
@@ -16,7 +17,7 @@ interface DashboardProps {
   language: Language;
 }
 
-type Tab = 'breakdown' | 'scheduler' | 'storyboard' | 'guide' | 'continuity';
+type Tab = 'breakdown' | 'scheduler' | 'storyboard' | 'guide' | 'continuity' | 'assistant';
 
 const Dashboard: React.FC<DashboardProps> = ({ analysis, language }) => {
   const [activeTab, setActiveTab] = useState<Tab>('breakdown');
@@ -25,6 +26,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analysis, language }) => {
   const [shots, setShots] = useState<Shot[]>([]);
   const [sceneGuides, setSceneGuides] = useState<Map<number, ProductionBible>>(new Map());
   const [continuityReport, setContinuityReport] = useState<ContinuityAnalysis | null>(null);
+  const [conversation, setConversation] = useState<ConversationTurn[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownloadPdf = async () => {
@@ -36,6 +38,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analysis, language }) => {
           shots,
           sceneGuides,
           continuityReport,
+          conversation,
         });
       } catch (error) {
           console.error("Failed to generate PDF", error);
@@ -57,6 +60,8 @@ const Dashboard: React.FC<DashboardProps> = ({ analysis, language }) => {
         return <ProductionGuide analysis={analysis} language={language} sceneGuides={sceneGuides} setSceneGuides={setSceneGuides} />;
       case 'continuity':
         return <Continuity analysis={analysis} language={language} continuityReport={continuityReport} setContinuityReport={setContinuityReport} />;
+      case 'assistant':
+        return <ScriptAssistant analysis={analysis} language={language} conversation={conversation} setConversation={setConversation} />;
       default:
         return null;
     }
@@ -68,6 +73,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analysis, language }) => {
       { id: 'storyboard', label: UI_TEXT.storyboard[language], icon: CameraIcon },
       { id: 'guide', label: UI_TEXT.productionGuide[language], icon: BookOpenIcon },
       { id: 'continuity', label: UI_TEXT.continuity[language], icon: ChainIcon },
+      { id: 'assistant', label: UI_TEXT.scriptAssistant[language], icon: BotIcon },
   ];
 
   return (
@@ -87,7 +93,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analysis, language }) => {
             </div>
         </div>
       <div className="mb-8 border-b border-base-300">
-        <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+        <nav className="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
           {tabs.map(tab => (
             <button
               key={tab.id}
@@ -96,7 +102,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analysis, language }) => {
                 activeTab === tab.id
                   ? 'border-brand-primary text-brand-primary'
                   : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
-              } group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+              } group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors flex-shrink-0`}
             >
               <tab.icon className="-ml-0.5 mr-2 h-5 w-5" />
               <span>{tab.label}</span>
