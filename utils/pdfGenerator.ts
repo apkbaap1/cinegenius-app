@@ -1,10 +1,7 @@
 
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { ScriptAnalysis, ScheduleDay, Shot, ProductionBible, ContinuityAnalysis } from '../types';
-
-// The import of 'jspdf-autotable' is intended to handle type augmentation.
-// The manual 'declare module' block below was removed to resolve a module error.
+import { ScriptAnalysis, ScheduleDay, Shot, ProductionBible, ContinuityAnalysis, ConversationTurn } from '../types';
 
 interface PdfData {
     analysis: ScriptAnalysis;
@@ -12,6 +9,7 @@ interface PdfData {
     shots: Shot[];
     sceneGuides: Map<number, ProductionBible>;
     continuityReport: ContinuityAnalysis | null;
+    conversation: ConversationTurn[];
 }
 
 // Helper function to add headers
@@ -30,7 +28,7 @@ const addPageIfNeeded = (doc: jsPDF, currentY: number) => {
     return currentY;
 };
 
-export const downloadAnalysisAsPDF = async ({ analysis, schedule, shots, sceneGuides, continuityReport }: PdfData) => {
+export const downloadAnalysisAsPDF = async ({ analysis, schedule, shots, sceneGuides, continuityReport, conversation }: PdfData) => {
     const doc = new jsPDF();
 
     // --- TITLE PAGE ---
@@ -229,6 +227,33 @@ export const downloadAnalysisAsPDF = async ({ analysis, schedule, shots, sceneGu
             doc.text(descriptionLines, 105, y + 12);
 
             y += imgHeight + 10;
+        }
+    }
+    
+    // --- SCRIPT ASSISTANT CONVERSATION ---
+    if (conversation && conversation.length > 0) {
+        doc.addPage();
+        addHeader(doc, 'Script Assistant Log');
+        let conversationY = 30;
+
+        for (const turn of conversation) {
+            if (turn.role !== 'loading') {
+                conversationY = addPageIfNeeded(doc, conversationY);
+                doc.setFontSize(11);
+                const isUser = turn.role === 'user';
+                doc.setTextColor(isUser ? '#7c3aed' : '#1f2937');
+                doc.setFont(undefined, 'bold');
+                doc.text(isUser ? 'You:' : 'Assistant:', 14, conversationY);
+                conversationY += 6;
+
+                conversationY = addPageIfNeeded(doc, conversationY);
+                doc.setFontSize(9);
+                doc.setTextColor('#374151');
+                doc.setFont(undefined, 'normal');
+                const contentLines = doc.splitTextToSize(turn.content, 180);
+                doc.text(contentLines, 16, conversationY);
+                conversationY += (contentLines.length * 4) + 8;
+            }
         }
     }
 
