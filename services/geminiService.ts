@@ -1,60 +1,45 @@
 import type { ScriptAnalysis, Language, ScheduleDay, Scene, Shot, ProductionBible, ContinuityAnalysis, Part } from '../types';
 
-async function apiCall<T>(action: string, payload: any): Promise<T> {
-    let response: Response;
-    try {
-        response = await fetch('/api/proxy', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, payload })
-        });
-    } catch (error) {
-        console.error(`Network error during API call for action '${action}':`, error);
-        throw new Error(`There was a problem communicating with the AI service. Please try again. (Action: ${action})`);
-    }
+async function callProxy<T>(action: string, payload: any): Promise<T> {
+  const response = await fetch('/api/proxy', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ action, payload }),
+  });
 
-    if (!response.ok) {
-        let errorMessage = `API request for '${action}' failed with status ${response.status}`;
-        try {
-            const errorBody = await response.json();
-            // Use the specific message from the backend.
-            errorMessage = errorBody.message || errorMessage;
-        } catch (e) {
-            // Body might not be JSON, fall back to status text
-            errorMessage = `${errorMessage}: ${response.statusText}`;
-        }
-        throw new Error(errorMessage);
-    }
-
-    try {
-        return await response.json() as Promise<T>;
-    } catch(e) {
-        console.error(`Error parsing JSON response for action '${action}':`, e);
-        throw new Error(`The AI service returned an unexpected response. (Action: ${action})`);
-    }
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'An unknown server error occurred' }));
+    throw new Error(errorData.message || `API call failed with status: ${response.status}`);
+  }
+  return response.json();
 }
 
-
-export async function parseScript(content: string | Part, language: Language): Promise<ScriptAnalysis> {
-    return apiCall('parseScript', { content, language });
+export function parseScript(content: string | Part, language: Language): Promise<ScriptAnalysis> {
+  return callProxy('parseScript', { content, language });
 }
 
-export async function generateSchedule(analysis: ScriptAnalysis, language: Language): Promise<ScheduleDay[]> {
-    return apiCall('generateSchedule', { analysis, language });
+export function generateSchedule(analysis: ScriptAnalysis, language: Language): Promise<ScheduleDay[]> {
+  return callProxy('generateSchedule', { analysis, language });
 }
 
-export async function generateShotList(scene: Scene, language: Language): Promise<Shot[]> {
-    return apiCall('generateShotList', { scene, language });
+export function generateShotList(scene: Scene, language: Language): Promise<Shot[]> {
+  return callProxy('generateShotList', { scene, language });
 }
 
-export async function generateImageForShot(shot: Shot, scene: Scene, language: Language): Promise<string> {
-    return apiCall('generateImageForShot', { shot, scene, language });
+export function generateImageForShot(shot: Shot, scene: Scene, language: Language): Promise<string> {
+  return callProxy('generateImageForShot', { shot, scene, language });
 }
 
-export async function generateSceneProductionGuide(scene: Scene, language: Language): Promise<ProductionBible> {
-    return apiCall('generateSceneProductionGuide', { scene, language });
+export function generateSceneProductionGuide(scene: Scene, language: Language): Promise<ProductionBible> {
+  return callProxy('generateSceneProductionGuide', { scene, language });
 }
 
-export async function generateContinuityReport(analysis: ScriptAnalysis, language: Language): Promise<ContinuityAnalysis> {
-    return apiCall('generateContinuityReport', { analysis, language });
+export function generateContinuityReport(analysis: ScriptAnalysis, language: Language): Promise<ContinuityAnalysis> {
+  return callProxy('generateContinuityReport', { analysis, language });
+}
+
+export function askScriptQuestion(analysis: ScriptAnalysis, question: string, language: Language): Promise<string> {
+  return callProxy('askScriptQuestion', { analysis, question, language });
 }
