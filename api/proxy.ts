@@ -21,7 +21,7 @@ if (!process.env.API_KEY) {
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 
-// --- SCHEMAS (moved from original geminiService) ---
+// --- SCHEMAS ---
 
 const SCRIPT_ANALYSIS_SCHEMA = {
     type: Type.OBJECT,
@@ -202,6 +202,16 @@ const CONTINUITY_ANALYSIS_SCHEMA = {
     required: ["characterContinuity", "costumeContinuity", "editingContinuity"]
 };
 
+const parseJSONResponse = <T>(text: string, action: string): T => {
+    if (!text) throw new Error(`Received an empty response from the AI for ${action}.`);
+    try {
+        const cleanText = text.replace(/^```json/, '').replace(/```$/, '').trim();
+        return JSON.parse(cleanText) as T;
+    } catch (e) {
+        console.error(`Failed to parse JSON for ${action}:`, text);
+        throw new Error(`The AI returned an invalid format for ${action}.`);
+    }
+}
 
 // --- API Logic Functions ---
 
@@ -222,9 +232,7 @@ async function _parseScript({ content, language }: { content: string | Part; lan
         config: { systemInstruction, responseMimeType: "application/json", responseSchema: SCRIPT_ANALYSIS_SCHEMA }
     });
     
-    const text = response.text.trim();
-    if (!text) throw new Error("Received an empty response from the AI for script analysis.");
-    try { return JSON.parse(text) as ScriptAnalysis; } catch(e) { throw new Error("The AI returned an invalid format for script analysis."); }
+    return parseJSONResponse<ScriptAnalysis>(response.text, 'script analysis');
 }
 
 async function _generateSchedule({ analysis, language }: { analysis: ScriptAnalysis; language: Language; }): Promise<ScheduleDay[]> {
@@ -237,9 +245,7 @@ async function _generateSchedule({ analysis, language }: { analysis: ScriptAnaly
         config: { systemInstruction, responseMimeType: "application/json", responseSchema: SCHEDULE_SCHEMA }
     });
 
-    const text = response.text.trim();
-    if (!text) throw new Error("Received an empty response from the AI for scheduling.");
-    try { return JSON.parse(text) as ScheduleDay[]; } catch(e) { throw new Error("The AI returned an invalid format for the schedule."); }
+    return parseJSONResponse<ScheduleDay[]>(response.text, 'scheduling');
 }
 
 async function _generateShotList({ scene, language }: { scene: Scene; language: Language; }): Promise<Shot[]> {
@@ -251,10 +257,8 @@ async function _generateShotList({ scene, language }: { scene: Scene; language: 
         contents: prompt,
         config: { systemInstruction, responseMimeType: "application/json", responseSchema: SHOT_LIST_SCHEMA }
     });
-
-    const text = response.text.trim();
-    if (!text) throw new Error("Received an empty response from the AI for the shot list.");
-    try { return JSON.parse(text) as Shot[]; } catch(e) { throw new Error("The AI returned an invalid format for the shot list."); }
+    
+    return parseJSONResponse<Shot[]>(response.text, 'the shot list');
 }
 
 async function _generateImageForShot({ shot, scene }: { shot: Shot; scene: Scene; language: Language; }): Promise<string> {
@@ -297,9 +301,7 @@ async function _generateSceneProductionGuide({ scene, language }: { scene: Scene
         config: { systemInstruction, responseMimeType: "application/json", responseSchema: PRODUCTION_BIBLE_SCHEMA }
     });
 
-    const text = response.text.trim();
-    if (!text) throw new Error("Received an empty response from the AI for the scene production guide.");
-    try { return JSON.parse(text) as ProductionBible; } catch(e) { throw new Error("The AI returned an invalid format for the scene production guide."); }
+    return parseJSONResponse<ProductionBible>(response.text, 'the scene production guide');
 }
 
 async function _generateContinuityReport({ analysis, language }: { analysis: ScriptAnalysis; language: Language; }): Promise<ContinuityAnalysis> {
@@ -318,9 +320,24 @@ async function _generateContinuityReport({ analysis, language }: { analysis: Scr
         config: { systemInstruction, responseMimeType: "application/json", responseSchema: CONTINUITY_ANALYSIS_SCHEMA }
     });
 
+    return parseJSONResponse<ContinuityAnalysis>(response.text, 'the continuity analysis');
+}
+
+async function _askScriptQuestion({ analysis, question, language }: { analysis: ScriptAnalysis; question: string; language: Language; }): Promise<string> {
+    const systemInstruction = `You are an intelligent filmmaking assistant called CineGenius. The user has provided a script which has been analyzed into the following JSON data. Your task is to answer the user's questions based on this data. Be helpful, concise, and provide creative insights where appropriate. If a question cannot be answered from the data, state that clearly and politely. Answer in markdown format when it makes sense (e.g., for lists). Respond in ${language}.
+
+Here is the script analysis data:
+${JSON.stringify(analysis)}`;
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: question,
+        config: { systemInstruction }
+    });
+    
     const text = response.text.trim();
-    if (!text) throw new Error("Received an empty response from the AI for continuity analysis.");
-    try { return JSON.parse(text) as ContinuityAnalysis; } catch(e) { throw new Error("The AI returned an invalid format for the continuity analysis."); }
+    if (!text) throw new Error("Received an empty response from the AI assistant.");
+    return text;
 }
 
 
@@ -353,6 +370,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 break;
             case 'generateContinuityReport':
                 result = await _generateContinuityReport(payload);
+                break;
+            case 'askScriptQuestion':
+                result = await _askScriptQuestion(payload);
                 break;
             default:
                 return res.status(400).json({ message: `Invalid action: ${action}` });
