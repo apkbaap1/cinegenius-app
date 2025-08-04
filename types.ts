@@ -108,3 +108,8 @@ export interface Part {
     text?: string;
     inlineData?: InlineData;
 }
+
+export interface ConversationTurn {
+  role: 'user' | 'assistant' | 'loading';
+  content: string;
+}
