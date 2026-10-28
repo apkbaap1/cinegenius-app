@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  #copy { left: 140px; top: 90px; }
+  #copy .headline { font-size: 72px; margin-top: 16px; }
+  #board { left: 140px; top: 320px; width: 1640px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+  .day h4 { font-family: "Mono", monospace; font-size: 22px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+  .day h4 b { color: var(--text); font-weight: 500; }
+  .strip { height: 92px; border-radius: 12px; margin-bottom: 14px; display: flex; align-items: center; gap: 18px; padding: 0 22px; color: #12141a; font-weight: 700; font-size: 24px; }
+  .strip .sc { font-family: "Mono", monospace; font-size: 22px; background: rgba(0,0,0,0.14); border-radius: 8px; padding: 6px 10px; }
+  .strip .loc { flex: 1; line-height: 1.2; }
+  .strip .loc small { display: block; font-weight: 500; font-size: 18px; opacity: 0.7; }
+  .strip .pg { font-family: "Mono", monospace; font-size: 20px; opacity: 0.75; }
+  .d { background: #ffd98a; }
+  .n { background: #7fa8ff; }
+  .e { background: #c9b8ff; }
+  #stats { left: 140px; top: 905px; display: flex; gap: 70px; }
+  .stat { font-size: 22px; color: var(--muted); font-weight: 500; }
+  .stat b { display: block; font-size: 56px; color: var(--text); font-weight: 800; letter-spacing: -0.02em; }
+</style>
+</head>
+<body>
+<div id="copy" class="abs">
+  <div class="step" id="step">03 · Schedule</div>
+  <div class="headline" id="head">A shoot plan, <em>built for you.</em></div>
+</div>
+<div id="board" class="abs"></div>
+<div id="stats" class="abs">
+  <div class="stat"><b data-to="3">0</b>shoot days</div>
+  <div class="stat"><b data-to="9">0</b>scenes</div>
+  <div class="stat"><b data-to="8">0</b>locations</div>
+  <div class="stat"><b data-to="11">0</b>cast calls</div>
+</div>
+<script type="module">
+import { span, outCubic, enter, fontsReady } from "./shared.js";
+
+const DAYS = [
+  ["Day 1", "Mon", [["1", "EXT. Harbor pier", "Night · Maya, Daniel", "2 ⅛", "n"], ["4", "EXT. Harbor pier", "Night · Maya", "⅞", "n"], ["9", "INT. Sedan", "Night · Daniel", "1 ⅜", "n"]]],
+  ["Day 2", "Tue", [["2", "INT. Diner", "Day · Maya, Rosa", "3", "d"], ["5", "INT. Diner kitchen", "Day · Rosa", "1", "d"], ["7", "EXT. Diner lot", "Dusk · Maya", "⅝", "e"]]],
+  ["Day 3", "Wed", [["3", "INT. Maya's flat", "Day · Maya", "2 ½", "d"], ["6", "INT. Stairwell", "Day · Maya, Daniel", "1 ¼", "d"], ["8", "EXT. Rooftop", "Dusk · Daniel", "1", "e"]]],
+];
+const board = document.getElementById("board");
+const strips = [];
+DAYS.forEach(([day, dow, rows], di) => {
+  const col = document.createElement("div");
+  col.className = "day";
+  col.innerHTML = `<h4><b>${day}</b><span>${dow}</span></h4>`;
+  rows.forEach(([sc, loc, who, pg, kind], ri) => {
+    const s = document.createElement("div");
+    s.className = "strip " + kind;
+    s.innerHTML = `<span class="sc">${sc}</span><span class="loc">${loc}<small>${who}</small></span><span class="pg">${pg} pg</span>`;
+    col.appendChild(s);
+    strips.push([s, 0.5 + ri * 0.35 + di * 0.18]);
+  });
+  board.appendChild(col);
+});
+const heads = [...board.querySelectorAll("h4")];
+const nums = [...document.querySelectorAll("#stats b")];
+const [step, head] = ["step", "head"].map((id) => document.getElementById(id));
+
+window.film = {
+  duration: 5,
+  ready: fontsReady(),
+  frame(t) {
+    enter(step, t, 0.05);
+    enter(head, t, 0.15, 0.6, 50);
+    heads.forEach((h, i) => enter(h, t, 0.3 + i * 0.1, 0.5, 20));
+    strips.forEach(([s, at]) => {
+      const p = outCubic(span(t, at, at + 0.55));
+      s.style.opacity = Math.min(1, p * 1.5);
+      s.style.transform = `translateX(${(1 - p) * 700}px) rotate(${(1 - p) * 4}deg)`;
+    });
+    const c = outCubic(span(t, 2.2, 3.6));
+    nums.forEach((b, i) => {
+      enter(b.parentElement, t, 2.1 + i * 0.08, 0.5, 20);
+      b.textContent = Math.round(c * +b.dataset.to);
+    });
+  },
+};
+</script>
+</body>
+</html>

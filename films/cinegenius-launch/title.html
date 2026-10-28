@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  #wrap { left: 0; top: 0; width: 1920px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  #flash { inset: 0; background: radial-gradient(circle at 50% 46%, rgba(255,181,71,0.35), transparent 55%); }
+  #lockup { display: flex; align-items: center; gap: 40px; }
+  #mark { width: 168px; height: 168px; }
+  #word { font-size: 156px; font-weight: 800; letter-spacing: -0.045em; line-height: 1; display: flex; }
+  #word span { display: inline-block; }
+  #word .g { color: var(--amber); }
+  #tag { font-size: 46px; font-weight: 500; margin-top: 46px; letter-spacing: -0.01em; }
+  #feat { margin-top: 26px; font-family: "Mono", monospace; font-size: 24px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+  #feat b { color: var(--amber); font-weight: 500; padding: 0 12px; }
+</style>
+</head>
+<body>
+<div id="flash" class="abs"></div>
+<div id="wrap" class="abs">
+  <div id="lockup">
+    <svg id="mark" viewBox="0 0 100 100">
+      <rect x="10" y="38" width="80" height="52" rx="8" fill="#ffb547"/>
+      <g id="clap"><rect x="10" y="20" width="80" height="16" rx="4" fill="#eef1f6"/>
+        <path d="M24 20 l-8 16 M42 20 l-8 16 M60 20 l-8 16 M78 20 l-8 16" stroke="#0b0d12" stroke-width="6"/></g>
+      <path d="M50 50 l3.5 8 l8.5 1 l-6.5 5.5 l2 8.5 l-7.5 -4.5 l-7.5 4.5 l2 -8.5 l-6.5 -5.5 l8.5 -1 z" fill="#0b0d12"/>
+    </svg>
+    <div id="word"></div>
+  </div>
+  <div id="tag">Your AI pre-production crew.</div>
+  <div id="feat">Breakdown<b>·</b>Schedule<b>·</b>Storyboard</div>
+</div>
+<script type="module">
+import { span, outCubic, outBack, enter, fontsReady } from "./shared.js";
+
+const word = document.getElementById("word");
+const letters = [..."CineGenius"].map((ch, i) => {
+  const s = document.createElement("span");
+  s.textContent = ch;
+  if (i >= 4) s.className = "g";
+  word.appendChild(s);
+  return s;
+});
+const [mark, clap, tag, feat, flash] = ["mark", "clap", "tag", "feat", "flash"].map((id) => document.getElementById(id));
+
+window.film = {
+  duration: 4,
+  ready: fontsReady(),
+  frame(t) {
+    const m = span(t, 0, 0.55);
+    mark.style.transform = `scale(${outBack(m)}) rotate(${(1 - outCubic(m)) * -20}deg)`;
+    mark.style.opacity = Math.min(1, m * 3);
+    // The clapper snaps shut at 0.35 s, on the music's hit.
+    const c = span(t, 0.1, 0.35);
+    clap.style.transformOrigin = "10px 36px";
+    clap.style.transform = `rotate(${-28 * (1 - c * c)}deg)`;
+    flash.style.opacity = (1 - span(t, 0.35, 1.6)) * (t >= 0.35 ? 1 : 0);
+
+    letters.forEach((s, i) => {
+      const p = span(t, 0.3 + i * 0.04, 0.8 + i * 0.04);
+      s.style.opacity = outCubic(p);
+      s.style.transform = `translateY(${(1 - outCubic(p)) * 60}px)`;
+    });
+    enter(tag, t, 1.0, 0.7, 30);
+    enter(feat, t, 1.4, 0.7, 20);
+    const lock = document.getElementById("lockup");
+    lock.style.transform = `scale(${1 + 0.02 * span(t, 0.5, 4)})`;
+  },
+};
+</script>
+</body>
+</html>
