@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  #copy { left: 140px; top: 380px; width: 640px; }
+  #copy .headline { margin: 22px 0 26px; }
+  #paper {
+    left: 900px; top: 70px; width: 860px; height: 940px; background: var(--paper);
+    border-radius: 6px; box-shadow: 0 40px 120px rgba(0,0,0,0.55);
+    padding: 80px 90px; color: #1d1d1d; font-family: "Script", monospace; font-size: 25px; line-height: 1.5;
+    transform-origin: 50% 60%;
+  }
+  .ln { white-space: pre-wrap; min-height: 1.5em; }
+  .heading { font-weight: 700; margin-top: 18px; }
+  .character { padding-left: 260px; margin-top: 18px; }
+  .dialogue { padding-left: 140px; padding-right: 120px; }
+  .action { margin-top: 18px; }
+  #caret { display: inline-block; width: 13px; height: 28px; background: var(--amber); vertical-align: -5px; margin-left: 2px; }
+  #page-no { right: 60px; top: 40px; font-size: 20px; color: #888; }
+</style>
+</head>
+<body>
+<div id="copy" class="abs">
+  <div class="step" id="step">01 · Script</div>
+  <div class="headline" id="head">Paste your<br><em>script.</em></div>
+  <div class="sub" id="sub">Any format. Any length.</div>
+</div>
+<div id="paper" class="abs"><div id="page-no" class="abs">1.</div><div id="lines"></div></div>
+<script type="module">
+import { span, outCubic, enter, fontsReady } from "./shared.js";
+
+const SCRIPT = [
+  ["heading", "FADE IN:"],
+  ["heading", "EXT. HARBOR PIER - NIGHT"],
+  ["action", "Rain hammers the boards. MAYA (30s), soaked trench coat, grips a brass KEY."],
+  ["action", "At the far end, a black SEDAN idles, headlights cutting the fog."],
+  ["character", "MAYA"],
+  ["dialogue", "You said you'd come alone."],
+  ["character", "DANIEL (O.S.)"],
+  ["dialogue", "I lied."],
+];
+const total = SCRIPT.reduce((n, [, s]) => n + s.length, 0);
+const linesEl = document.getElementById("lines");
+const nodes = SCRIPT.map(([cls]) => {
+  const d = document.createElement("div");
+  d.className = "ln " + cls;
+  linesEl.appendChild(d);
+  return d;
+});
+const caret = document.createElement("span");
+caret.id = "caret";
+
+const paper = document.getElementById("paper");
+const [step, head, sub] = ["step", "head", "sub"].map((id) => document.getElementById(id));
+
+window.film = {
+  duration: 5,
+  ready: fontsReady(),
+  frame(t) {
+    enter(step, t, 0.1);
+    enter(head, t, 0.25, 0.7, 60);
+    enter(sub, t, 0.6);
+
+    const pin = outCubic(span(t, 0, 0.8));
+    paper.style.opacity = pin;
+    paper.style.transform = `translateY(${(1 - pin) * 80}px) rotate(${1.2 - 1.2 * pin + 0.4}deg) scale(${1 + 0.03 * span(t, 0, 5)})`;
+
+    // Typing: characters revealed linearly from 0.5s to 4.0s.
+    let shown = Math.floor(total * span(t, 0.5, 4.0));
+    SCRIPT.forEach(([, s], i) => {
+      nodes[i].textContent = s.slice(0, Math.max(0, Math.min(s.length, shown)));
+      shown -= s.length;
+    });
+    // Caret sits at the end of the line being typed; blinks only after typing ends.
+    const typing = t < 4.0;
+    caret.style.opacity = typing || Math.floor(t * 2.5) % 2 === 0 ? 1 : 0;
+    const target = nodes.find((n, i) => n.textContent.length < SCRIPT[i][1].length) || nodes[nodes.length - 1];
+    target.appendChild(caret);
+  },
+};
+</script>
+</body>
+</html>

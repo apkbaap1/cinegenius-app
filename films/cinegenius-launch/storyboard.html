@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  #copy { left: 140px; top: 90px; }
+  #copy .headline { font-size: 72px; margin-top: 16px; }
+  #grid { left: 140px; top: 310px; width: 1640px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px 40px; }
+  .shot .frame { height: 290px; background: #f3efe6; border-radius: 10px; overflow: hidden; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.45); }
+  .shot svg { width: 100%; height: 100%; display: block; }
+  .shot svg * { fill: none; stroke: #2a2a2a; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .shot svg .soft { stroke: #9a9488; stroke-width: 1.4; }
+  .shot svg .hi { stroke: #e08a10; stroke-width: 2.6; }
+  .meta { display: flex; gap: 14px; align-items: baseline; margin-top: 14px; }
+  .meta .id { font-family: "Mono", monospace; color: var(--amber); font-size: 22px; }
+  .meta .ty { font-weight: 700; font-size: 26px; }
+  .meta .lens { margin-left: auto; font-family: "Mono", monospace; color: var(--muted); font-size: 20px; }
+</style>
+</head>
+<body>
+<div id="copy" class="abs">
+  <div class="step" id="step">04 · Storyboard</div>
+  <div class="headline" id="head">Every shot, <em>sketched.</em></div>
+</div>
+<div id="grid" class="abs"></div>
+<script type="module">
+import { span, outCubic, enter, fontsReady } from "./shared.js";
+
+// Each sketch is drawn in a 320×180 box.
+const rain = (n, seed) => Array.from({ length: n }, (_, i) => {
+  const x = (i * 53 + seed * 31) % 320, y = (i * 37 + seed * 17) % 150;
+  return `<path class="soft" d="M${x} ${y} l-6 18"/>`;
+}).join("");
+const SHOTS = [
+  ["1A", "Wide", "24mm", `
+    <path class="soft" d="M0 92 H320"/>
+    <path d="M40 180 L150 92 M280 180 L170 92 M70 156 H250 M100 132 H220 M125 112 H195"/>
+    <path d="M70 156 V60 M70 60 q12 -6 22 0"/><path class="hi" d="M92 60 l-8 22 h16 z"/>
+    <path d="M158 104 v-14 m0 0 a4 4 0 1 1 0.1 0 M154 96 l4 -2 l4 2"/>
+    <path d="M185 98 h30 v-9 l-6 -6 h-16 l-8 8 z"/><path class="hi" d="M185 94 L110 120 M185 97 L120 135"/>
+    ${rain(10, 1)}`],
+  ["1B", "Medium close-up", "50mm", `
+    <path d="M160 48 a30 34 0 1 0 0.1 0 M118 180 q10 -70 42 -66 q32 -4 42 66"/>
+    <path d="M134 120 l26 30 l26 -30 M146 110 l14 22 l14 -22"/>
+    <path d="M148 74 h8 M166 74 h8 M156 94 q4 3 8 0"/>
+    <path class="soft" d="M96 0 V180 M224 0 V180"/>${rain(14, 2)}`],
+  ["1C", "Insert · Key", "100mm", `
+    <path d="M40 150 q60 -40 120 -30 q40 6 70 30 M60 170 q60 -36 120 -26"/>
+    <path class="hi" d="M120 92 a18 18 0 1 0 0.1 0 M138 92 H230 M200 92 v12 M214 92 v8 M226 92 v12"/>
+    <path class="hi" d="M114 92 a6 6 0 1 0 0.1 0"/>${rain(6, 3)}`],
+  ["1D", "POV · Sedan", "35mm", `
+    <path class="soft" d="M0 120 H320"/>
+    <path d="M70 130 v-26 l26 -26 h128 l26 26 v26 z M96 78 l14 -14 h100 l14 14"/>
+    <path class="hi" d="M102 112 a12 12 0 1 0 0.1 0 M218 112 a12 12 0 1 0 0.1 0"/>
+    <path class="hi" d="M90 112 L0 160 M110 120 L40 180 M230 112 L320 160 M210 120 L280 180"/>${rain(12, 4)}`],
+  ["1E", "Over the shoulder", "50mm", `
+    <path d="M0 180 V70 q30 -50 80 -40 q40 10 50 60 q10 40 0 90"/>
+    <path d="M226 74 v40 m0 -40 a8 8 0 1 1 0.1 0 M214 96 l12 -6 l12 6 M218 140 l8 -26 l8 26"/>
+    <path class="soft" d="M140 120 H320"/>${rain(10, 5)}`],
+  ["1F", "Close-up · Maya", "85mm", `
+    <path d="M160 24 q56 0 58 70 q0 60 -58 80 q-58 -20 -58 -80 q2 -70 58 -70"/>
+    <path d="M128 84 q12 -8 24 0 M168 84 q12 -8 24 0 M140 88 a4 4 0 1 0 0.1 0 M180 88 a4 4 0 1 0 0.1 0"/>
+    <path d="M160 96 v24 l-8 6 M146 140 q14 8 28 0"/><path class="hi" d="M186 104 q2 10 -2 18"/>${rain(8, 6)}`],
+];
+const grid = document.getElementById("grid");
+const shots = SHOTS.map(([id, ty, lens, svg], i) => {
+  const el = document.createElement("div");
+  el.className = "shot";
+  el.innerHTML = `<div class="frame"><svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">${svg}</svg></div>
+    <div class="meta"><span class="id">${id}</span><span class="ty">${ty}</span><span class="lens">${lens}</span></div>`;
+  grid.appendChild(el);
+  const paths = [...el.querySelectorAll("path")];
+  paths.forEach((p) => { p.setAttribute("pathLength", "1"); p.style.strokeDasharray = "1 1"; });
+  return [el, paths, 0.3 + i * 0.32];
+});
+const [step, head] = ["step", "head"].map((id) => document.getElementById(id));
+
+window.film = {
+  duration: 5,
+  ready: fontsReady(),
+  frame(t) {
+    enter(step, t, 0.05);
+    enter(head, t, 0.15, 0.6, 50);
+    shots.forEach(([el, paths, at]) => {
+      const p = outCubic(span(t, at, at + 0.5));
+      el.style.opacity = p;
+      el.style.transform = `translateY(${(1 - p) * 50}px) scale(${0.94 + 0.06 * p})`;
+      // Strokes draw on one after another over 1.4 s.
+      paths.forEach((path, k) => {
+        const a = at + 0.15 + (k / paths.length) * 1.0;
+        path.style.strokeDashoffset = 1 - outCubic(span(t, a, a + 0.4));
+      });
+    });
+  },
+};
+</script>
+</body>
+</html>

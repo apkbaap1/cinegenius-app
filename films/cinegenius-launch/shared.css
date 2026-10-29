@@ -1,0 +1,36 @@
+@font-face { font-family: "Inter"; src: url(fonts/Inter-Regular.otf); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url(fonts/Inter-Medium.otf); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url(fonts/Inter-Bold.otf); font-weight: 700; }
+@font-face { font-family: "Inter"; src: url(fonts/Inter-ExtraBold.otf); font-weight: 800; }
+@font-face { font-family: "Script"; src: url(fonts/LiberationMono-Regular.ttf); font-weight: 400; }
+@font-face { font-family: "Script"; src: url(fonts/LiberationMono-Bold.ttf); font-weight: 700; }
+@font-face { font-family: "Mono"; src: url(fonts/JetBrainsMono-Medium.ttf); font-weight: 500; }
+
+:root {
+  --ink: #0b0d12;
+  --panel: #151a24;
+  --line: #262d3b;
+  --text: #eef1f6;
+  --muted: #8a93a6;
+  --amber: #ffb547;
+  --coral: #ff6b6b;
+  --teal: #4fd1c5;
+  --violet: #a594ff;
+  --paper: #f6f1e7;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: transparent; }
+body { font-family: "Inter", sans-serif; color: var(--text); position: relative; }
+
+.abs { position: absolute; }
+
+.step {
+  font-family: "Mono", monospace; font-size: 22px; letter-spacing: 0.18em;
+  color: var(--amber); text-transform: uppercase;
+}
+.headline {
+  font-weight: 800; font-size: 84px; line-height: 1.02; letter-spacing: -0.03em;
+}
+.headline em { font-style: normal; color: var(--amber); }
+.sub { font-size: 30px; line-height: 1.4; color: var(--muted); font-weight: 500; }

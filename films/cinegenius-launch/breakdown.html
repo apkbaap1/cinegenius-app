@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  #copy { left: 140px; top: 90px; }
+  #copy .headline { font-size: 72px; margin-top: 16px; }
+  #script {
+    left: 140px; top: 330px; width: 780px; height: 640px; background: var(--paper); color: #1d1d1d;
+    border-radius: 6px; padding: 56px 64px; font-family: "Script", monospace; font-size: 23px; line-height: 1.55;
+    overflow: hidden; box-shadow: 0 30px 90px rgba(0,0,0,0.5);
+  }
+  #script p { margin-bottom: 18px; }
+  .b { font-weight: 700; }
+  .character { padding-left: 230px; margin-bottom: 0 !important; }
+  .dialogue { padding-left: 120px; }
+  .tag { padding: 0 3px; border-radius: 4px; background-repeat: no-repeat; background-position: left center; background-size: 0% 100%; }
+  .cast { background-image: linear-gradient(rgba(255,107,107,0.55), rgba(255,107,107,0.55)); }
+  .prop { background-image: linear-gradient(rgba(255,181,71,0.65), rgba(255,181,71,0.65)); }
+  .fx { background-image: linear-gradient(rgba(79,209,197,0.6), rgba(79,209,197,0.6)); }
+  .loc { background-image: linear-gradient(rgba(165,148,255,0.6), rgba(165,148,255,0.6)); }
+  #scan { left: 0; width: 100%; height: 90px; background: linear-gradient(transparent, rgba(255,181,71,0.22), transparent); border-bottom: 2px solid rgba(255,181,71,0.7); }
+
+  #cards { left: 990px; top: 330px; width: 790px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 26px 28px; height: 308px; }
+  .card h3 { font-size: 20px; font-family: "Mono", monospace; letter-spacing: 0.14em; text-transform: uppercase; display: flex; justify-content: space-between; margin-bottom: 20px; }
+  .card h3 .count { color: var(--muted); }
+  .chip { display: flex; align-items: center; gap: 14px; font-size: 26px; font-weight: 500; background: rgba(255,255,255,0.04); border-radius: 12px; padding: 14px 18px; margin-bottom: 12px; }
+  .chip i { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+  .chip small { color: var(--muted); font-size: 20px; margin-left: auto; }
+</style>
+</head>
+<body>
+<div id="copy" class="abs">
+  <div class="step" id="step">02 · Breakdown</div>
+  <div class="headline" id="head">AI tags <em>every element.</em></div>
+</div>
+
+<div id="script" class="abs">
+  <div id="scan" class="abs"></div>
+  <p class="b"><span class="tag loc" data-k="0">EXT. HARBOR PIER - NIGHT</span></p>
+  <p><span class="tag fx" data-k="1">Rain</span> hammers the boards. <span class="tag cast" data-k="2">MAYA</span> (30s), soaked <span class="tag prop" data-k="3">trench coat</span>, grips a <span class="tag prop" data-k="4">brass KEY</span>.</p>
+  <p>At the far end, a black <span class="tag fx" data-k="5">SEDAN</span> idles, headlights cutting the fog.</p>
+  <p class="character">MAYA</p>
+  <p class="dialogue">You said you'd come alone.</p>
+  <p class="character"><span class="tag cast" data-k="6">DANIEL</span> (O.S.)</p>
+  <p class="dialogue">I lied.</p>
+</div>
+
+<div id="cards" class="abs">
+  <div class="card" data-c="0"><h3><span style="color:var(--coral)">Cast</span><span class="count">0</span></h3>
+    <div class="chip" data-k="2"><i style="background:var(--coral)"></i>Maya<small>Lead · 30s</small></div>
+    <div class="chip" data-k="6"><i style="background:var(--coral)"></i>Daniel<small>Voice O.S.</small></div>
+  </div>
+  <div class="card" data-c="1"><h3><span style="color:var(--amber)">Props &amp; Wardrobe</span><span class="count">0</span></h3>
+    <div class="chip" data-k="3"><i style="background:var(--amber)"></i>Trench coat<small>Wet ×2</small></div>
+    <div class="chip" data-k="4"><i style="background:var(--amber)"></i>Brass key<small>Hero</small></div>
+  </div>
+  <div class="card" data-c="2"><h3><span style="color:var(--teal)">Vehicles &amp; FX</span><span class="count">0</span></h3>
+    <div class="chip" data-k="1"><i style="background:var(--teal)"></i>Rain rig<small>SFX</small></div>
+    <div class="chip" data-k="5"><i style="background:var(--teal)"></i>Sedan<small>Picture car</small></div>
+  </div>
+  <div class="card" data-c="3"><h3><span style="color:var(--violet)">Locations</span><span class="count">0</span></h3>
+    <div class="chip" data-k="0"><i style="background:var(--violet)"></i>Harbor pier<small>Ext · Night</small></div>
+  </div>
+</div>
+
+<script type="module">
+import { span, outCubic, outBack, enter, fontsReady } from "./shared.js";
+
+const HIT = [0.8, 1.15, 1.5, 1.85, 2.2, 2.6, 3.0]; // when element k is found
+const tags = [...document.querySelectorAll("#script .tag")];
+const chips = [...document.querySelectorAll(".chip")];
+const cards = [...document.querySelectorAll(".card")];
+const scan = document.getElementById("scan");
+const scriptEl = document.getElementById("script");
+const [step, head] = ["step", "head"].map((id) => document.getElementById(id));
+
+window.film = {
+  duration: 5,
+  ready: fontsReady(),
+  frame(t) {
+    enter(step, t, 0.05);
+    enter(head, t, 0.15, 0.6, 50);
+    const sp = outCubic(span(t, 0, 0.6));
+    scriptEl.style.opacity = sp;
+    scriptEl.style.transform = `translateX(${(1 - sp) * -60}px)`;
+
+    const sy = span(t, 0.5, 3.4);
+    scan.style.top = `${-60 + sy * 640}px`;
+    scan.style.opacity = sy > 0 && sy < 1 ? 1 : 0;
+
+    tags.forEach((el) => {
+      const p = outCubic(span(t, HIT[el.dataset.k], HIT[el.dataset.k] + 0.3));
+      el.style.backgroundSize = `${p * 100}% 100%`;
+    });
+    chips.forEach((el) => {
+      const p = span(t, HIT[el.dataset.k] + 0.15, HIT[el.dataset.k] + 0.6);
+      el.style.opacity = outCubic(p);
+      el.style.transform = `translateX(${(1 - outCubic(p)) * -40}px) scale(${0.9 + 0.1 * outBack(p)})`;
+    });
+    cards.forEach((card, i) => {
+      const p = outCubic(span(t, 0.2 + i * 0.1, 0.8 + i * 0.1));
+      card.style.opacity = p;
+      card.style.transform = `translateY(${(1 - p) * 40}px)`;
+      const n = [...card.querySelectorAll(".chip")].filter((c) => t >= HIT[c.dataset.k] + 0.15).length;
+      card.querySelector(".count").textContent = n;
+    });
+  },
+};
+</script>
+</body>
+</html>
