@@ -1,0 +1,35 @@
+@font-face { font-family: "Inter"; src: url(fonts/Inter-Medium.otf); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url(fonts/Inter-Bold.otf); font-weight: 700; }
+@font-face { font-family: "Inter"; src: url(fonts/Inter-ExtraBold.otf); font-weight: 800; }
+@font-face { font-family: "Telugu"; src: url(fonts/NotoSansTelugu-Medium.ttf); font-weight: 500; }
+@font-face { font-family: "Telugu"; src: url(fonts/NotoSansTelugu-Bold.ttf); font-weight: 700; }
+@font-face { font-family: "Telugu"; src: url(fonts/NotoSansTelugu-ExtraBold.ttf); font-weight: 800; }
+@font-face { font-family: "Mono"; src: url(fonts/JetBrainsMono-Medium.ttf); font-weight: 500; }
+
+:root {
+  --ink: #0a0c11;
+  --glass: rgba(16, 19, 27, 0.86);
+  --line: rgba(255, 255, 255, 0.12);
+  --text: #f2f4f8;
+  --muted: #9aa3b5;
+  --gold: #ffc531;
+  --green: #3ddc84;
+  --blue: #6aa8ff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow: hidden; background: transparent; }
+body { font-family: "Inter", "Telugu", sans-serif; color: var(--text); position: relative; }
+.abs { position: absolute; }
+
+/* a full-frame graphics shot: its own dark backdrop */
+.stage { width: 1080px; height: 1920px; background: radial-gradient(120% 70% at 50% 30%, #1b2030 0%, var(--ink) 65%); }
+.stage::before {
+  content: ""; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+.card { background: var(--glass); border: 1px solid var(--line); border-radius: 36px; box-shadow: 0 30px 80px rgba(0,0,0,0.55); backdrop-filter: blur(18px); }
+.kicker { font-family: "Mono", monospace; font-size: 30px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
+.mono { font-family: "Mono", monospace; }

@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  #top { left: 90px; top: 300px; width: 900px; }
+  #top h1 { margin-top: 22px; font-size: 96px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.02; }
+  #top h1 em { font-style: normal; color: var(--gold); }
+  #term { left: 60px; top: 640px; width: 960px; height: 560px; overflow: hidden; }
+  #bar { height: 76px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 14px; padding: 0 30px; }
+  #bar i { width: 20px; height: 20px; border-radius: 50%; background: #ff5f57; }
+  #bar i:nth-child(2) { background: #febc2e; } #bar i:nth-child(3) { background: #28c840; }
+  #bar span { margin-left: 18px; color: var(--muted); font-size: 26px; }
+  #body { padding: 46px 40px; font-family: "Mono", monospace; font-size: 38px; line-height: 1.6; }
+  .p { color: var(--green); }
+  #cmd { word-break: break-all; }
+  #caret { display: inline-block; width: 22px; height: 44px; background: var(--gold); vertical-align: -8px; }
+  .out { color: var(--muted); }
+  #ok { color: var(--green); font-weight: 500; }
+</style>
+</head>
+<body class="stage">
+<div id="top" class="abs">
+  <div class="kicker" id="k">Step 1 · Install</div>
+  <h1 id="h">One command.<br><em>That's it.</em></h1>
+</div>
+<div id="term" class="abs card">
+  <div id="bar"><i></i><i></i><i></i><span>Terminal</span></div>
+  <div id="body">
+    <div><span class="p">$ </span><span id="cmd"></span><span id="caret"></span></div>
+    <div class="out" id="o1">◇ Cloning repository…</div>
+    <div id="ok">✓ Installed 1 skill · openfilm</div>
+  </div>
+</div>
+<script type="module">
+import { span, enter, typed, fontsReady } from "./shared.js";
+const $ = (id) => document.getElementById(id);
+const CMD = "npx skills add openfilm/openfilm";
+
+window.film = {
+  duration: 6.6,
+  ready: fontsReady(),
+  frame(t) {
+    enter($("k"), t, 0.05);
+    enter($("h"), t, 0.15, { dist: 60 });
+    enter($("term"), t, 0.35, { dist: 80 });
+    // Typed in step with the voice saying it (2.3 s to 5.9 s).
+    $("cmd").textContent = typed(CMD, t, 2.3, 5.9);
+    $("caret").style.opacity = t > 6.0 ? 0 : Math.floor(t * 3) % 2 && (t < 2.3 || t > 5.9) ? 0.15 : 1;
+    enter($("o1"), t, 6.0, { dur: 0.2, dist: 10 });
+    enter($("ok"), t, 6.25, { dur: 0.25, dist: 10 });
+  },
+};
+</script>
+</body>
+</html>

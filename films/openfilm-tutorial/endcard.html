@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  #wrap { left: 0; top: 470px; width: 1080px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  #icon { width: 190px; height: 190px; }
+  #word { margin-top: 40px; font-size: 132px; font-weight: 800; letter-spacing: -0.045em; }
+  #word em { font-style: normal; color: var(--gold); }
+  #tag { margin-top: 22px; font-size: 46px; font-weight: 500; color: var(--muted); }
+  #cmd { margin-top: 70px; padding: 30px 44px; border-radius: 28px; font-family: "Mono", monospace; font-size: 38px; }
+  #cmd span { color: var(--green); }
+</style>
+</head>
+<body class="stage">
+<div id="wrap" class="abs">
+  <svg id="icon" viewBox="0 0 100 100">
+    <rect x="8" y="14" width="84" height="72" rx="16" fill="#ffc531"/>
+    <g fill="#0a0c11"><rect x="16" y="22" width="8" height="8" rx="2"/><rect x="16" y="46" width="8" height="8" rx="2"/><rect x="16" y="70" width="8" height="8" rx="2"/>
+      <rect x="76" y="22" width="8" height="8" rx="2"/><rect x="76" y="46" width="8" height="8" rx="2"/><rect x="76" y="70" width="8" height="8" rx="2"/>
+      <path d="M42 36 L62 50 L42 64 Z"/></g>
+  </svg>
+  <div id="word">Open<em>Film</em></div>
+  <div id="tag">Make videos by asking Claude.</div>
+  <div id="cmd" class="card"><span>$</span> npx skills add openfilm/openfilm</div>
+</div>
+<script type="module">
+import { span, outCubic, outBack, enter, fontsReady } from "./shared.js";
+const $ = (id) => document.getElementById(id);
+window.film = {
+  duration: 3,
+  ready: fontsReady(),
+  frame(t) {
+    const m = span(t, 0, 0.4);
+    $("icon").style.opacity = Math.min(1, m * 3);
+    $("icon").style.transform = `scale(${outBack(m)})`;
+    enter($("word"), t, 0.1, { dist: 50 });
+    enter($("tag"), t, 0.4, { dist: 30 });
+    enter($("cmd"), t, 0.7, { dist: 30 });
+    $("wrap").style.transform = `scale(${1 + 0.02 * span(t, 0, 3)})`;
+    document.body.style.opacity = 1 - outCubic(span(t, 2.6, 3));
+  },
+};
+</script>
+</body>
+</html>

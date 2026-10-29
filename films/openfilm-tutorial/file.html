@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  html, body { width: 960px; height: 170px; }
+  #chip { left: 0; top: 10px; height: 150px; padding: 0 44px 0 30px; display: flex; align-items: center; gap: 28px; }
+  #doc { width: 86px; height: 104px; border-radius: 14px; background: var(--gold); position: relative; }
+  #doc::after { content: "</>"; position: absolute; inset: 0; display: grid; place-items: center; font-family: "Mono", monospace; font-size: 30px; color: #14161c; }
+  b { font-family: "Mono", monospace; font-size: 54px; font-weight: 500; }
+  small { display: block; font-size: 30px; color: var(--muted); font-weight: 500; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div id="chip" class="abs card"><div id="doc"></div><div><b>film.html</b><small>every shot, one file</small></div></div>
+<script type="module">
+import { enter, fontsReady } from "./shared.js";
+const chip = document.getElementById("chip");
+window.film = {
+  duration: 1.9, width: 960, height: 170,
+  ready: fontsReady(),
+  frame(t) { enter(chip, t, 0, { end: 1.9, dist: 30 }); },
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  #top { left: 90px; top: 300px; width: 900px; }
+  #top h1 { margin-top: 22px; font-size: 96px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.02; }
+  #top h1 em { font-style: normal; color: var(--gold); }
+  #chat { left: 60px; top: 640px; width: 960px; height: 560px; padding: 34px 40px; }
+  #who { display: flex; align-items: center; gap: 18px; font-size: 32px; font-weight: 700; color: var(--muted); }
+  #who i { width: 46px; height: 46px; border-radius: 14px; background: #d97757; }
+  #msg { margin-top: 40px; margin-left: auto; max-width: 760px; width: fit-content; padding: 28px 36px; border-radius: 34px 34px 10px 34px;
+    background: var(--gold); color: #14161c; font-family: "Telugu", "Inter", sans-serif; font-size: 48px; font-weight: 700; }
+  #reply { margin-top: 36px; display: flex; align-items: center; gap: 18px; font-size: 38px; color: var(--muted); font-weight: 500; }
+  #dots i { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: var(--gold); margin-right: 10px; }
+  #input { position: absolute; left: 40px; right: 40px; bottom: 34px; height: 104px; border-radius: 52px; border: 1px solid var(--line);
+    background: rgba(255,255,255,0.04); display: flex; align-items: center; padding: 0 40px; font-family: "Telugu", "Inter", sans-serif; font-size: 42px; color: var(--muted); }
+  #caret { display: inline-block; width: 4px; height: 50px; background: var(--gold); margin-left: 4px; vertical-align: -8px; }
+  #typing { color: var(--text); }
+</style>
+</head>
+<body class="stage">
+<div id="top" class="abs">
+  <div class="kicker" id="k">Step 2 · Ask</div>
+  <h1 id="h">Tell Claude<br><em>what you want.</em></h1>
+</div>
+<div id="chat" class="abs card">
+  <div id="who"><i></i>Claude</div>
+  <div id="msg">నాకు ఒక launch video చేయి.</div>
+  <div id="reply"><span id="dots"><i></i><i></i><i></i></span>Writing shots, adding music…</div>
+  <div id="input"><span id="ph">Ask Claude…</span><span id="typing"></span><span id="caret"></span></div>
+</div>
+<script type="module">
+import { span, outCubic, enter, typed, fontsReady } from "./shared.js";
+const $ = (id) => document.getElementById(id);
+const MSG = "నాకు ఒక launch video చేయి.";
+const dots = [...document.querySelectorAll("#dots i")];
+
+window.film = {
+  duration: 4.05,
+  ready: fontsReady(),
+  frame(t) {
+    enter($("k"), t, 0.05);
+    enter($("h"), t, 0.15, { dist: 60 });
+    enter($("chat"), t, 0.3, { dist: 80 });
+    // Typed while the voice says it (2.2 s to 3.6 s), then sent.
+    const sent = t >= 3.65;
+    const text = sent ? "" : typed(MSG, t, 2.2, 3.6);
+    $("typing").textContent = text;
+    $("ph").style.display = text || sent ? "none" : "inline";
+    $("caret").style.opacity = sent ? 0 : Math.floor(t * 3) % 2 ? 0.25 : 1;
+    const m = outCubic(span(t, 3.65, 3.85));
+    $("msg").style.opacity = m;
+    $("msg").style.transform = `translateY(${(1 - m) * 260}px) scale(${0.9 + 0.1 * m})`;
+    enter($("reply"), t, 3.85, { dur: 0.15, dist: 10 });
+    dots.forEach((d, i) => { d.style.opacity = 0.3 + 0.7 * Math.max(0, Math.sin((t * 6) - i * 0.9)); });
+  },
+};
+</script>
+</body>
+</html>

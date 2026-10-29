@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  html, body { width: 960px; height: 440px; }
+  #box { left: 0; top: 10px; width: 960px; padding: 30px 40px 20px; }
+  .kicker { font-size: 26px; margin-bottom: 10px; }
+  .row { display: flex; align-items: center; gap: 24px; font-size: 46px; font-weight: 700; padding: 20px 0; }
+  .row + .row { border-top: 1px solid var(--line); }
+  .row .dot { width: 22px; height: 22px; border-radius: 50%; }
+  .row span { flex: 1; }
+  .tog { width: 104px; height: 58px; border-radius: 29px; background: rgba(255,255,255,0.14); position: relative; }
+  .tog::after { content: ""; position: absolute; top: 7px; left: 7px; width: 44px; height: 44px; border-radius: 50%; background: #fff; transform: translateX(var(--x, 0px)); }
+</style>
+</head>
+<body>
+<div id="box" class="abs card">
+  <div class="kicker">Studio · Settings · Providers</div>
+  <div class="row" data-at="1.25"><i class="dot" style="background:#ff9f43"></i><span>ElevenLabs</span><div class="tog"></div></div>
+  <div class="row" data-at="2.1"><i class="dot" style="background:#e9edf5"></i><span>OpenAI</span><div class="tog"></div></div>
+  <div class="row" data-at="2.95"><i class="dot" style="background:#6aa8ff"></i><span>Google</span><div class="tog"></div></div>
+</div>
+<script type="module">
+import { span, outCubic, enter, fontsReady } from "./shared.js";
+const box = document.getElementById("box");
+const rows = [...document.querySelectorAll(".row")];
+window.film = {
+  duration: 4.4, width: 960, height: 440,
+  ready: fontsReady(),
+  frame(t) {
+    enter(box, t, 0, { end: 4.4, dist: 30 });
+    rows.forEach((r) => {
+      const at = +r.dataset.at;
+      r.style.opacity = 0.35 + 0.65 * span(t, at - 0.1, at + 0.15);
+      const on = outCubic(span(t, at, at + 0.25));
+      const tog = r.querySelector(".tog");
+      tog.style.setProperty("--x", `${on * 46}px`);
+      tog.style.background = on > 0.5 ? "var(--green)" : "rgba(255,255,255,0.14)";
+    });
+  },
+};
+</script>
+</body>
+</html>

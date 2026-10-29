@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  #head { left: 90px; top: 250px; width: 900px; font-size: 104px; font-weight: 800; line-height: 1.02; letter-spacing: -0.035em; }
+  #head em { font-style: normal; color: var(--gold); }
+  #video { left: 290px; top: 560px; width: 500px; height: 520px; border-radius: 40px; overflow: hidden;
+    background: linear-gradient(160deg, #2b3550, #141824); border: 1px solid var(--line); box-shadow: 0 40px 100px rgba(0,0,0,0.6); }
+  #ring { left: 170px; top: 180px; width: 160px; height: 160px; }
+  #play { left: 170px; top: 180px; width: 160px; height: 160px; border-radius: 50%; background: var(--gold); display: grid; place-items: center; }
+  #play::after { content: ""; border-left: 52px solid #12141a; border-top: 32px solid transparent; border-bottom: 32px solid transparent; margin-left: 14px; }
+  #bars { left: 40px; bottom: 40px; width: 420px; height: 14px; border-radius: 7px; background: rgba(255,255,255,0.12); overflow: hidden; }
+  #bars i { display: block; height: 100%; background: var(--gold); width: 0; }
+  #ask { left: 90px; top: 1140px; width: 900px; height: 132px; padding: 0 40px; display: flex; align-items: center; gap: 22px; font-size: 44px; font-weight: 500; }
+  #ask .q { flex: 1; white-space: nowrap; }
+  #caret { display: inline-block; width: 4px; height: 50px; background: var(--gold); vertical-align: -8px; margin-left: 4px; }
+  #send { width: 76px; height: 76px; border-radius: 50%; background: var(--gold); display: grid; place-items: center; flex: none; }
+  #send::after { content: ""; border-bottom: 26px solid #12141a; border-left: 18px solid transparent; border-right: 18px solid transparent; margin-top: -6px; }
+</style>
+</head>
+<body class="stage">
+<div id="head" class="abs">Make a video.<br><em>Just ask.</em></div>
+<div id="video" class="abs">
+  <svg id="ring" class="abs" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="6"/>
+    <circle id="arc" cx="50" cy="50" r="44" fill="none" stroke="#ffc531" stroke-width="6" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" transform="rotate(-90 50 50)"/></svg>
+  <div id="play" class="abs"></div>
+  <div id="bars" class="abs"><i id="fill"></i></div>
+</div>
+<div id="ask" class="abs card"><span class="q"><span id="q"></span><span id="caret"></span></span><span id="send"></span></div>
+<script type="module">
+import { span, outCubic, outBack, enter, typed, fontsReady } from "./shared.js";
+const $ = (id) => document.getElementById(id);
+const Q = "make me a launch video";
+
+window.film = {
+  duration: 4.65,
+  ready: fontsReady(),
+  frame(t) {
+    // The headline is up from the first frame: it is the thumbnail.
+    enter($("head"), t, -1);
+    enter($("ask"), t, 0.15);
+    $("q").textContent = typed(Q, t, 0.35, 1.5);
+    $("caret").style.opacity = t < 1.7 ? (Math.floor(t * 3) % 2 ? 0.2 : 1) : 0;
+    const press = span(t, 1.55, 1.75);
+    $("send").style.transform = `scale(${1 - 0.15 * Math.sin(Math.PI * press)})`;
+
+    // The video card rises once the request is sent, renders, then shows play.
+    const v = span(t, 1.7, 2.3);
+    $("video").style.opacity = outCubic(v);
+    $("video").style.transform = `translateY(${(1 - outCubic(v)) * 120}px) scale(${0.85 + 0.15 * outBack(v)})`;
+    const r = outCubic(span(t, 2.0, 3.3));
+    $("arc").style.strokeDashoffset = 1 - r;
+    $("fill").style.width = `${r * 100}%`;
+    const done = span(t, 3.3, 3.6);
+    $("ring").style.opacity = 1 - done;
+    $("play").style.opacity = done;
+    $("play").style.transform = `scale(${0.5 + 0.5 * outBack(done)})`;
+  },
+};
+</script>
+</body>
+</html>

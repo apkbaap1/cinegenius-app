@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  html, body { width: 960px; height: 170px; }
+  #strap { left: 0; top: 10px; height: 150px; padding: 0 46px; display: flex; align-items: center; gap: 26px; overflow: hidden; }
+  #strap::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background: var(--gold); }
+  #dot { width: 26px; height: 26px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 0 rgba(61,220,132,0.5); }
+  b { font-size: 54px; font-weight: 800; letter-spacing: -0.02em; }
+  small { display: block; font-family: "Mono", monospace; font-size: 26px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); margin-top: 6px; }
+</style>
+</head>
+<body>
+<div id="strap" class="abs card"><div id="dot"></div><div><b>OpenFilm Studio</b><small>Live preview</small></div></div>
+<script type="module">
+import { enter, fontsReady } from "./shared.js";
+const strap = document.getElementById("strap"), dot = document.getElementById("dot");
+window.film = {
+  duration: 2.6, width: 960, height: 170,
+  ready: fontsReady(),
+  frame(t) {
+    enter(strap, t, 0, { end: 2.6, dist: 30 });
+    const pulse = (t * 1.4) % 1;
+    dot.style.boxShadow = `0 0 0 ${pulse * 22}px rgba(61,220,132,${0.5 * (1 - pulse)})`;
+  },
+};
+</script>
+</body>
+</html>

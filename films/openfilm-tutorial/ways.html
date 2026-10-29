@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  html, body { width: 960px; height: 330px; }
+  #box { left: 0; top: 10px; width: 960px; padding: 32px 40px; }
+  .kicker { font-size: 26px; margin-bottom: 18px; }
+  .row { display: flex; align-items: center; gap: 26px; font-size: 46px; font-weight: 700; padding: 16px 0; }
+  .row i { width: 70px; height: 70px; border-radius: 22px; background: rgba(255,197,49,0.16); color: var(--gold); font-style: normal;
+    display: grid; place-items: center; font-family: "Mono", monospace; font-size: 38px; flex: none; }
+  .row + .row { border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<div id="box" class="abs card">
+  <div class="kicker">2 ways to edit</div>
+  <div class="row" id="r1"><i>1</i>Drag clips on the timeline</div>
+  <div class="row" id="r2"><i>2</i>Or just tell Claude</div>
+</div>
+<script type="module">
+import { enter, fontsReady } from "./shared.js";
+const $ = (id) => document.getElementById(id);
+window.film = {
+  duration: 4.6, width: 960, height: 330,
+  ready: fontsReady(),
+  frame(t) {
+    enter($("box"), t, 0, { end: 4.6, dist: 30 });
+    enter($("r1"), t, 0.1, { dist: 20 });
+    enter($("r2"), t, 2.8, { dist: 20 });
+  },
+};
+</script>
+</body>
+</html>

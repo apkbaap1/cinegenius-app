@@ -1,0 +1,4 @@
+*.mp4
+!assets/*.mp4
+.film/cache/
+.film/opened
