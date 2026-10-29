@@ -50,7 +50,17 @@ node tools/soundfetch.mjs get harp rooms   # the owner already said yes to these
 
 Follow the anidoodle skill (`.claude/skills/anidoodle/SKILL.md`), with these standing decisions:
 
-- **Style** `folkTale` (gouache and watercolour over pencil; depth is the medium). 16:9, 1920x1080.
+- **Style: SOFT TOON, from 2026-10-30** (the owner's choice, replacing `folkTale`). The look of a
+  3D feature-animation character, painted in 2D: oversized glossy eyes, a bulb nose, big curly
+  hair/fur and beards, soft rounded volumes under one warm key light (high left) with a cool rim,
+  skin that glows warm at thin edges, and a background drawn sharp then blurred (depth of field,
+  never disc bokeh). Build every character and prop with `src/canvas-core/pt/toonKit.ts`
+  (`vol`, `eye`, `nose`, `clumps`, `contact`, `blob`); `pt/toonMonkey.ts` is the worked character
+  and `toonLook.ts` (rendered in `looks/soft-toon-look.png`) the approved look: match it. Animals
+  stay animals (the stories are fables) but take the caricature canon: head about 40-45 % of the
+  body, eyes about a third of the face width, friendly arched brows by default. 16:9, 1920x1080.
+  The older `folkTale` modules (`pt/monkey.ts`, `pt/croc.ts`, `pt/river.ts`) are day-one history:
+  do not use them for new films.
 - **fps 24, bpm 90** (one beat = 16 frames, one bar = 64). 24 fps keeps a 6-7 minute render near
   35-40 minutes on 4 cores (day one drew ~270 ms a frame; 30 fps would push a 7-minute film past an hour).
 - **Approval gates are pre-agreed for the daily run**: the owner approved the look and the music
@@ -66,7 +76,7 @@ Follow the anidoodle skill (`.claude/skills/anidoodle/SKILL.md`), with these sta
   `node tools/music.mjs check ... --fit --seconds <len>` must PASS, novelty included. Never reuse
   `monkeyCrocScore.ts`'s motifs.
 - **Text**: title and moral as PNGs from `node pipeline/text.cjs <id> "<Telugu>"` (Gurajada font,
-  OFL), revealed with `reveal()` on a quiet patch of sky or a torn cream card. Never `fillText`.
+  OFL), revealed with `reveal()` on a soft rounded card (a `vol()` panel) over the blurred background. Never `fillText`.
 - **Dead air**: the gate measures at 270 px wide. Quiet narration stretches need real action: a
   character idles (scratches, looks around, breathes), wind in the trees, birds crossing, the river
   current (`CURRENT` in `monkeyCroc.ts`). Test a range with `render.mjs --from F --to T` and
