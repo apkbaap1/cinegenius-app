@@ -4,42 +4,57 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="shared.css">
 <style>
-  #wrap { left: 0; top: 470px; width: 1080px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-  #icon { width: 190px; height: 190px; }
-  #word { margin-top: 40px; font-size: 132px; font-weight: 800; letter-spacing: -0.045em; }
-  #word em { font-style: normal; color: var(--gold); }
-  #tag { margin-top: 22px; font-size: 46px; font-weight: 500; color: var(--muted); }
-  #cmd { margin-top: 70px; padding: 30px 44px; border-radius: 28px; font-family: "Mono", monospace; font-size: 38px; }
-  #cmd span { color: var(--green); }
+  #wrap { left: 0; top: 380px; width: 1080px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .kicker { font-size: 32px; }
+  #head { margin-top: 34px; font-size: 128px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+  #box { margin-top: 56px; width: 900px; height: 150px; border-radius: 75px; padding: 0 26px 0 46px; display: flex; align-items: center; gap: 24px; }
+  #avatar { width: 84px; height: 84px; border-radius: 50%; background: linear-gradient(135deg, #ffc531, #ff7a59); flex: none; }
+  #field { flex: 1; text-align: left; font-size: 60px; font-weight: 800; white-space: nowrap; }
+  #field .ph { color: var(--muted); font-weight: 500; font-size: 44px; }
+  #caret { display: inline-block; width: 5px; height: 64px; background: var(--gold); vertical-align: -10px; margin-left: 6px; }
+  #post { padding: 22px 34px; border-radius: 50px; background: var(--gold); color: #14161c; font-size: 38px; font-weight: 800; flex: none; }
+  #dm { margin-top: 70px; display: flex; align-items: center; gap: 26px; font-size: 50px; font-weight: 700; }
+  #plane { width: 74px; height: 74px; flex: none; }
+  #te { margin-top: 18px; font-family: "Telugu", "Inter", sans-serif; font-size: 44px; font-weight: 500; color: var(--muted); }
 </style>
 </head>
 <body class="stage">
 <div id="wrap" class="abs">
-  <svg id="icon" viewBox="0 0 100 100">
-    <rect x="8" y="14" width="84" height="72" rx="16" fill="#ffc531"/>
-    <g fill="#0a0c11"><rect x="16" y="22" width="8" height="8" rx="2"/><rect x="16" y="46" width="8" height="8" rx="2"/><rect x="16" y="70" width="8" height="8" rx="2"/>
-      <rect x="76" y="22" width="8" height="8" rx="2"/><rect x="76" y="46" width="8" height="8" rx="2"/><rect x="76" y="70" width="8" height="8" rx="2"/>
-      <path d="M42 36 L62 50 L42 64 Z"/></g>
-  </svg>
-  <div id="word">Open<em>Film</em></div>
-  <div id="tag">Make videos by asking Claude.</div>
-  <div id="cmd" class="card"><span>$</span> npx skills add openfilm/openfilm</div>
+  <div class="kicker" id="k">Want the full process?</div>
+  <div id="head">Comment</div>
+  <div id="box" class="card"><div id="avatar"></div><div id="field"><span id="typed"></span><span class="ph" id="ph">Add a comment…</span><span id="caret"></span></div><div id="post">Post</div></div>
+  <div id="dm">
+    <svg id="plane" viewBox="0 0 24 24" fill="none" stroke="#ffc531" stroke-width="2" stroke-linejoin="round"><path d="M22 2 L11 13 M22 2 L15 22 L11 13 L2 9 Z"/></svg>
+    <span>I'll DM you the entire process.</span>
+  </div>
+  <div id="te">మొత్తం process మీకు DM చేస్తాను.</div>
 </div>
 <script type="module">
-import { span, outCubic, outBack, enter, fontsReady } from "./shared.js";
+import { span, outCubic, outBack, enter, typed, fontsReady } from "./shared.js";
 const $ = (id) => document.getElementById(id);
+const WORD = "OpenFilm";
+
 window.film = {
-  duration: 3,
+  duration: 4,
   ready: fontsReady(),
   frame(t) {
-    const m = span(t, 0, 0.4);
-    $("icon").style.opacity = Math.min(1, m * 3);
-    $("icon").style.transform = `scale(${outBack(m)})`;
-    enter($("word"), t, 0.1, { dist: 50 });
-    enter($("tag"), t, 0.4, { dist: 30 });
-    enter($("cmd"), t, 0.7, { dist: 30 });
-    $("wrap").style.transform = `scale(${1 + 0.02 * span(t, 0, 3)})`;
-    document.body.style.opacity = 1 - outCubic(span(t, 2.6, 3));
+    enter($("k"), t, 0.05);
+    enter($("head"), t, 0.1, { dist: 60 });
+    enter($("box"), t, 0.3, { dist: 40 });
+    // The keyword types into the comment box, then Post is pressed.
+    const text = typed(WORD, t, 0.75, 1.45);
+    $("typed").textContent = text;
+    $("ph").style.display = text ? "none" : "inline";
+    $("caret").style.opacity = t > 1.7 ? 0 : Math.floor(t * 3) % 2 ? 0.25 : 1;
+    const press = span(t, 1.6, 1.85);
+    $("post").style.transform = `scale(${1 - 0.12 * Math.sin(Math.PI * press)})`;
+    $("box").style.borderColor = t >= 1.7 ? "rgba(255,197,49,0.9)" : "";
+    enter($("dm"), t, 1.9, { dist: 30 });
+    const fly = outBack(span(t, 1.9, 2.4));
+    $("plane").style.transform = `translate(${(1 - fly) * -40}px, ${(1 - fly) * 40}px) rotate(${(1 - fly) * -30}deg)`;
+    enter($("te"), t, 2.2, { dist: 20 });
+    $("wrap").style.transform = `scale(${1 + 0.02 * span(t, 0, 4)})`;
+    document.body.style.opacity = 1 - outCubic(span(t, 3.7, 4));
   },
 };
 </script>
