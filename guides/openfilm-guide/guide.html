@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OpenFilm with Claude — Install &amp; Edit Guide</title>
+<style>
+  @font-face { font-family: "Inter"; src: url(fonts/Inter-Regular.otf); font-weight: 400; }
+  @font-face { font-family: "Inter"; src: url(fonts/Inter-Medium.otf); font-weight: 500; }
+  @font-face { font-family: "Inter"; src: url(fonts/Inter-Bold.otf); font-weight: 700; }
+  @font-face { font-family: "Inter"; src: url(fonts/Inter-ExtraBold.otf); font-weight: 800; }
+  @font-face { font-family: "Mono"; src: url(fonts/JetBrainsMono-Medium.ttf); font-weight: 500; }
+
+  @page { size: A4; margin: 0; }
+  :root {
+    --ink: #0f1115; --text: #1d212b; --muted: #5d6576; --line: #e4e6ec; --soft: #f5f6f9;
+    --gold: #f5b301; --gold-soft: #fff6dc; --dark: #0b0d12; --green: #19a463;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Inter", sans-serif; color: var(--text); font-size: 10.5pt; line-height: 1.55; background: #888; }
+
+  .page { width: 210mm; height: 297mm; padding: 20mm 18mm 24mm; position: relative; overflow: hidden; background: #fff; page-break-after: always; margin: 0 auto; }
+  .page:last-child { page-break-after: auto; }
+
+  /* every page carries the handle */
+  .foot { position: absolute; left: 18mm; right: 18mm; bottom: 10mm; display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--line); padding-top: 3.5mm; font-size: 8.5pt; color: var(--muted); }
+  .handle { display: inline-flex; align-items: center; gap: 2mm; font-weight: 700; color: var(--ink); }
+  .ig { width: 4.2mm; height: 4.2mm; border-radius: 1.3mm; background: linear-gradient(45deg, #f9ce34, #ee2a7b 55%, #6228d7); position: relative; }
+  .ig::before { content: ""; position: absolute; inset: 1mm; border: 0.45mm solid #fff; border-radius: 50%; }
+  .top { position: absolute; top: 9mm; right: 18mm; font-size: 8pt; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .kicker { font-family: "Mono", monospace; font-size: 8.5pt; letter-spacing: 0.16em; text-transform: uppercase; color: #b07f00; }
+  h1 { font-size: 26pt; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--ink); margin: 2mm 0 4mm; }
+  h2 { font-size: 13.5pt; font-weight: 800; letter-spacing: -0.01em; color: var(--ink); margin: 7mm 0 2.5mm; }
+  h3 { font-size: 11pt; font-weight: 700; color: var(--ink); margin-bottom: 1.5mm; }
+  p { margin-bottom: 2.5mm; }
+  .lead { font-size: 12pt; color: var(--muted); max-width: 150mm; }
+  em.hl { font-style: normal; background: var(--gold-soft); padding: 0 1mm; border-radius: 1mm; }
+  code { font-family: "Mono", monospace; font-size: 9pt; background: var(--soft); border: 1px solid var(--line); border-radius: 1.2mm; padding: 0.2mm 1.2mm; }
+
+  .term { background: var(--dark); color: #e8ebf2; border-radius: 3mm; padding: 4.5mm 5mm; font-family: "Mono", monospace; font-size: 9.5pt; line-height: 1.7; margin: 2.5mm 0 3.5mm; }
+  .term .p { color: #3ddc84; } .term .c { color: #7d8597; } .term .bar { display: flex; gap: 1.6mm; margin-bottom: 2.5mm; }
+  .term .bar i { width: 2.4mm; height: 2.4mm; border-radius: 50%; background: #ff5f57; } .term .bar i:nth-child(2) { background: #febc2e; } .term .bar i:nth-child(3) { background: #28c840; }
+
+  .steps { display: grid; gap: 4mm; }
+  .step { display: grid; grid-template-columns: 11mm 1fr; gap: 4mm; align-items: start; }
+  .num { width: 11mm; height: 11mm; border-radius: 3mm; background: var(--ink); color: var(--gold); font-weight: 800; font-size: 13pt; display: grid; place-items: center; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .box { border: 1px solid var(--line); border-radius: 3mm; padding: 4mm 4.5mm; background: #fff; }
+  .box.soft { background: var(--soft); border-color: transparent; }
+  .box.gold { background: var(--gold-soft); border-color: #f3dc94; }
+  .p-tight h2 { margin-top: 5mm; }
+  .tight { gap: 3mm; } .tight .box { padding: 3mm 4mm; font-size: 9.8pt; }
+  .box ul { padding-left: 4.5mm; } .box li { margin-bottom: 1mm; }
+
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 3mm; font-size: 9.5pt; }
+  th { text-align: left; font-size: 8pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 2mm 2.5mm; border-bottom: 1.5px solid var(--ink); }
+  td { padding: 2.2mm 2.5mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:first-child { font-weight: 700; color: var(--ink); white-space: nowrap; }
+
+  .chat { display: grid; gap: 2mm; margin: 2mm 0 3mm; }
+  .bubble { justify-self: end; background: var(--gold); color: #14161c; font-weight: 700; border-radius: 4mm 4mm 1mm 4mm; padding: 2.4mm 4mm; font-size: 10pt; max-width: 130mm; }
+
+  .tree { font-family: "Mono", monospace; font-size: 9pt; line-height: 1.75; background: var(--soft); border-radius: 3mm; padding: 4mm 5mm; }
+  .tree .c { color: var(--muted); }
+
+  .note { border-left: 1.2mm solid var(--gold); background: var(--gold-soft); padding: 3mm 4mm; border-radius: 0 2mm 2mm 0; font-size: 9.8pt; margin: 3mm 0; }
+
+  /* cover */
+  .cover { background: var(--dark); color: #fff; padding: 0; }
+  .cover .glow { position: absolute; width: 170mm; height: 170mm; border-radius: 50%; filter: blur(30mm); }
+  .cover .g1 { left: -50mm; top: -40mm; background: rgba(245,179,1,0.30); }
+  .cover .g2 { right: -70mm; bottom: 10mm; background: rgba(80,140,255,0.22); }
+  .cover .inner { position: absolute; inset: 0; padding: 30mm 20mm; display: flex; flex-direction: column; }
+  .cover .logo { width: 22mm; height: 22mm; }
+  .cover .kicker { color: var(--gold); margin-top: 40mm; }
+  .cover h1 { color: #fff; font-size: 44pt; line-height: 1.02; letter-spacing: -0.04em; margin: 5mm 0 7mm; }
+  .cover h1 span { color: var(--gold); }
+  .cover .lead { color: #b9c0cf; font-size: 13.5pt; max-width: 140mm; }
+  .cover .pill { margin-top: 12mm; align-self: flex-start; font-family: "Mono", monospace; font-size: 11pt; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 3mm; padding: 4mm 5.5mm; }
+  .cover .pill b { color: #3ddc84; font-weight: 500; }
+  .cover .toc { margin-top: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm 6mm; font-size: 9.5pt; color: #b9c0cf; }
+  .cover .toc b { color: var(--gold); font-family: "Mono", monospace; margin-right: 2mm; }
+  .cover .foot { border-top-color: rgba(255,255,255,0.15); color: #8b93a5; }
+  .cover .handle { color: #fff; }
+
+  .cta { background: var(--dark); color: #fff; border-radius: 4mm; padding: 4.5mm 6mm; margin-top: 5mm; display: flex; align-items: center; justify-content: space-between; gap: 6mm; }
+  .cta b { font-size: 12pt; }
+  .cta h2 { color: #fff; margin: 0 0 2mm; font-size: 17pt; }
+  .cta p { color: #b9c0cf; margin: 0; }
+  .cta .big { margin-top: 0; font-size: 14pt; font-weight: 800; }
+  .cta .big span { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- 1 · cover -->
+<section class="page cover">
+  <div class="glow g1"></div><div class="glow g2"></div>
+  <div class="inner">
+    <svg class="logo" viewBox="0 0 100 100"><rect x="8" y="14" width="84" height="72" rx="16" fill="#f5b301"/>
+      <g fill="#0b0d12"><rect x="16" y="22" width="8" height="8" rx="2"/><rect x="16" y="46" width="8" height="8" rx="2"/><rect x="16" y="70" width="8" height="8" rx="2"/>
+      <rect x="76" y="22" width="8" height="8" rx="2"/><rect x="76" y="46" width="8" height="8" rx="2"/><rect x="76" y="70" width="8" height="8" rx="2"/><path d="M42 36 L62 50 L42 64 Z"/></g></svg>
+    <div class="kicker">Practical guide · 2026 edition</div>
+    <h1>Make videos<br>by <span>asking Claude.</span></h1>
+    <p class="lead">How to install OpenFilm, create your first video, and edit it — by dragging clips in Studio or by simply telling Claude what to change.</p>
+    <div class="pill"><b>$</b> npx skills add openfilm/openfilm</div>
+    <div class="toc">
+      <div><b>01</b>What is OpenFilm</div><div><b>02</b>What you need</div><div><b>03</b>Install in 1 command</div>
+      <div><b>04</b>Your first video</div><div><b>05</b>OpenFilm Studio</div><div><b>06</b>Editing, two ways</div>
+      <div><b>07</b>Voice, music, captions</div><div><b>08</b>Export &amp; share</div><div><b>09</b>Tips &amp; fixes</div>
+    </div>
+  </div>
+  <div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>Follow for more AI tools, explained simply</span></div>
+</section>
+
+<!-- 2 · what it is / requirements -->
+<section class="page">
+  <div class="top">OpenFilm × Claude</div>
+  <div class="kicker">01 · What is OpenFilm</div>
+  <h1>A video editor that Claude can drive.</h1>
+  <p class="lead">OpenFilm is a skill for Claude. Once it's installed, you describe the video you want and Claude builds it — every shot, the music and the cuts — and opens it in an editor where you can watch and change everything.</p>
+
+  <div class="grid2" style="margin-top:6mm">
+    <div class="box soft"><h3>How it works</h3>
+      <p>A film is one web page, <code>film.html</code>. Each shot is its own small page drawn in code, and footage, pictures and sound are clips placed on a timeline.</p>
+      <p style="margin:0">Because it's all plain files, Claude can read and change any part of it precisely.</p></div>
+    <div class="box soft"><h3>What you can make</h3>
+      <ul><li>Launch and promo videos</li><li>Explainers and tutorials</li><li>Reels and Shorts (9:16)</li><li>Motion graphics and title cards</li><li>Edits of your own footage</li></ul></div>
+  </div>
+
+  <div class="kicker" style="margin-top:9mm">02 · What you need</div>
+  <h2>Before you start</h2>
+  <table>
+    <tr><th>Requirement</th><th>Why</th><th>Notes</th></tr>
+    <tr><td>Claude Code</td><td>Claude runs the skill and does the editing</td><td>Terminal, desktop app or IDE extension</td></tr>
+    <tr><td>Node.js</td><td>Provides <code>npx</code>, which installs and runs OpenFilm</td><td>Current LTS from nodejs.org</td></tr>
+    <tr><td>A modern browser</td><td>OpenFilm Studio opens in your browser</td><td>Chrome, Edge, Safari or Firefox</td></tr>
+    <tr><td>Internet (first run)</td><td>Downloads OpenFilm and a render browser</td><td>The render browser is ~115 MB, once</td></tr>
+    <tr><td>Your own API key <span style="font-weight:500;color:var(--muted)">(optional)</span></td><td>Only for AI voice-over, music, images or video</td><td>ElevenLabs, OpenAI, Google and others</td></tr>
+  </table>
+  <div class="note"><b>Good to know:</b> everything else — shots, animation, title cards, edits — works with no extra keys. Claude can even generate simple music and sound effects in code.</div>
+
+  <div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>2</span></div>
+</section>
+
+<!-- 3 · install + first video -->
+<section class="page">
+  <div class="top">OpenFilm × Claude</div>
+  <div class="kicker">03 · Install</div>
+  <h1>One command. That's it.</h1>
+  <p>Open a terminal in the folder of your project (or any folder you like) and run:</p>
+  <div class="term"><div class="bar"><i></i><i></i><i></i></div>
+    <span class="p">$</span> npx skills add openfilm/openfilm<br>
+    <span class="c">◇ Cloning repository…</span><br>
+    <span class="p">✓</span> Installed 1 skill · openfilm</div>
+  <p>This adds the skill to the project (<code>.agents/skills/openfilm</code>) and links it for Claude Code (<code>.claude/skills/openfilm</code>). Start, or restart, Claude Code in that folder and the skill is available.</p>
+  <div class="note"><b>Tip:</b> commit these files to your repository so the skill comes with the project on every machine and every session.</div>
+
+  <div class="kicker" style="margin-top:9mm">04 · Your first video</div>
+  <h2>Just ask Claude</h2>
+  <p>Describe what you want in plain words — any language works. Be specific about length, shape and style:</p>
+  <div class="chat">
+    <div class="bubble">Make a 20-second launch video for my app, 16:9, dark and cinematic.</div>
+    <div class="bubble">Make a vertical 9:16 Reel explaining what an AI agent is, with captions.</div>
+    <div class="bubble">నాకు ఒక launch video చేయి.</div>
+  </div>
+  <div class="steps" style="margin-top:4mm">
+    <div class="step"><div class="num">1</div><div><h3>Claude creates a project</h3>A new folder named after your film, with <code>film.html</code> inside.</div></div>
+    <div class="step"><div class="num">2</div><div><h3>It writes every shot</h3>Each shot becomes its own page; footage, pictures and sound go in <code>assets/</code>.</div></div>
+    <div class="step"><div class="num">3</div><div><h3>It checks its own work</h3>Claude looks at a contact sheet of the whole film and fixes anything off before showing you.</div></div>
+  </div>
+
+  <div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>3</span></div>
+</section>
+
+<!-- 4 · studio + project structure -->
+<section class="page">
+  <div class="top">OpenFilm × Claude</div>
+  <div class="kicker">05 · OpenFilm Studio</div>
+  <h1>Watch every change land, live.</h1>
+  <p class="lead">Studio is OpenFilm's editor. It opens in your browser with a preview on top and a timeline below, and it updates the moment Claude changes the film.</p>
+
+  <h2>Opening Studio</h2>
+  <p>Claude opens it for you when it starts a film. To open it yourself:</p>
+  <div class="term"><span class="p">$</span> npx -y openfilm@latest open my-film <span class="c"># a new film gets its own folder</span><br>
+    <span class="p">$</span> npx -y openfilm@latest open <span class="c"># reopen the film you're in, or the last one</span></div>
+  <p>It prints Studio's address; open it in your browser and keep it open while you work with Claude.</p>
+
+  <h2>What's in a project</h2>
+  <div class="tree">
+    my-film/<br>
+    ├── film.html <span class="c">&nbsp;&nbsp;&nbsp;&nbsp;← the film: tracks of clips on a timeline</span><br>
+    ├── title.html <span class="c">&nbsp;&nbsp;&nbsp;← one shot, drawn in code</span><br>
+    ├── shot-2.html <span class="c">&nbsp;&nbsp;← another shot</span><br>
+    ├── assets/ <span class="c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← video, pictures and sound</span><br>
+    └── .film/ <span class="c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← Studio's own settings — leave it alone</span></div>
+
+  <h2>Reading the timeline</h2>
+  <div class="grid2">
+    <div class="box"><h3>Tracks</h3>Each row is a track. Tracks higher up are drawn on top — titles above footage, background at the bottom.</div>
+    <div class="box"><h3>Clips</h3>A clip is a shot page, a video, a picture or a sound. Clips on one track never overlap.</div>
+    <div class="box"><h3>Locked tracks</h3>Lock a track in Studio and Claude won't touch anything on it. Use this to protect your own edits.</div>
+    <div class="box"><h3>Hidden &amp; muted</h3>Hide a track to stop it showing, or mute it to silence it, without deleting anything.</div>
+  </div>
+
+  <div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>4</span></div>
+</section>
+
+<!-- 5 · editing -->
+<section class="page">
+  <div class="top">OpenFilm × Claude</div>
+  <div class="kicker">06 · Editing, two ways</div>
+  <h1>Drag it, or just say it.</h1>
+  <div class="grid2" style="margin-top:4mm">
+    <div class="box gold"><h3>① In Studio</h3>
+      <ul><li>Drag a clip to move it in time</li><li>Drag a clip's edges to trim it</li><li>Move clips between tracks</li><li>Edit text and elements on the picture</li></ul></div>
+    <div class="box gold"><h3>② Tell Claude</h3>
+      <ul><li>Describe the change in plain words</li><li>Claude changes only what you asked</li><li>Your Studio edits are kept</li><li>Watch it update live in Studio</li></ul></div>
+  </div>
+
+  <h2>Things you can ask for</h2>
+  <div class="chat">
+    <div class="bubble">Make the title stay on screen longer.</div>
+    <div class="bubble">Swap shots 2 and 3.</div>
+    <div class="bubble">Speed up the intro.</div>
+    <div class="bubble">Cut the part where I repeat myself in clip 4.</div>
+    <div class="bubble">Make the captions bigger and move the logo to the top right.</div>
+  </div>
+
+  <h2>What changes under the hood</h2>
+  <p>Every request becomes a small, precise change in <code>film.html</code>. Knowing these helps you ask for exactly what you want:</p>
+  <table>
+    <tr><th>Setting</th><th>What it controls</th><th>Example</th></tr>
+    <tr><td>Trim</td><td>Which seconds of a clip play</td><td><code>clip.mp4#t=2,8</code> plays 2 s to 8 s</td></tr>
+    <tr><td>at</td><td>Where a clip starts in the film</td><td><code>at="12.5"</code></td></tr>
+    <tr><td>speed</td><td>Faster or slower, 0.25× to 4×</td><td><code>speed="1.5"</code></td></tr>
+    <tr><td>volume</td><td>A clip's loudness (1 = original)</td><td><code>volume="0.3"</code> for music under voice</td></tr>
+    <tr><td>Position</td><td>Where a clip sits and its size</td><td><code>left</code>, <code>top</code>, <code>width</code>, <code>rotate</code></td></tr>
+  </table>
+  <div class="note"><b>No quality loss:</b> trimming never cuts or re-encodes your footage. Every clip is the same original file with its own in and out points.</div>
+
+  <div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>5</span></div>
+</section>
+
+<!-- 6 · voice/music/captions + export -->
+<section class="page">
+  <div class="top">OpenFilm × Claude</div>
+  <div class="kicker">07 · Voice, music &amp; captions</div>
+  <h1>Add sound with your own keys.</h1>
+  <p>AI voice-over, music, sound effects, transcripts and images come from services you connect with your own API key.</p>
+  <div class="steps" style="margin:4mm 0">
+    <div class="step"><div class="num">1</div><div><h3>Open Settings</h3>In Studio, click the OpenFilm logo at the top left.</div></div>
+    <div class="step"><div class="num">2</div><div><h3>Connect a provider</h3>Under <b>Providers</b>, add your key for a service.</div></div>
+    <div class="step"><div class="num">3</div><div><h3>Pick models</h3>Under <b>Services</b>, choose which model makes each kind of media.</div></div>
+  </div>
+  <table>
+    <tr><th>You want</th><th>Services that make it</th></tr>
+    <tr><td>Voice-over</td><td>ElevenLabs, OpenAI, Google, Microsoft Azure, Groq, Xiaomi MiMo</td></tr>
+    <tr><td>Music &amp; sound effects</td><td>ElevenLabs, fal.ai</td></tr>
+    <tr><td>Transcripts / captions</td><td>ElevenLabs, OpenAI, Google, Groq, Doubao, Xiaomi MiMo</td></tr>
+    <tr><td>Images &amp; video</td><td>OpenAI, Google, fal.ai · image search: Pexels, Pixabay</td></tr>
+  </table>
+  <div class="note"><b>Already have a voice-over?</b> Just give Claude the file. It places it on the timeline and times the captions to your words. Captions are styled in Studio — size, colour, position and a word-by-word highlight.</div>
+
+  <div class="kicker" style="margin-top:8mm">08 · Export &amp; share</div>
+  <h2>Get your MP4</h2>
+  <div class="grid2">
+    <div class="box soft"><h3>From Studio</h3>Use <b>Export</b> to save the finished video, with subtitles burned in if you want them.</div>
+    <div class="box soft"><h3>Or ask Claude</h3>"Render the video" — it saves an MP4 next to <code>film.html</code>.</div>
+  </div>
+  <div class="term"><span class="p">$</span> npx -y openfilm@latest render <span class="c"># 30 fps MP4 beside film.html</span><br>
+    <span class="p">$</span> npx -y openfilm@latest render --subtitles <span class="c"># captions burned in</span></div>
+
+  <div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>6</span></div>
+</section>
+
+<!-- 7 · tips + troubleshooting + cheat sheet -->
+<section class="page p-tight">
+  <div class="top">OpenFilm × Claude</div>
+  <div class="kicker">09 · Tips &amp; fixes</div>
+  <h1>Work faster, avoid surprises.</h1>
+  <h2>Pro tips</h2>
+  <div class="grid2 tight">
+    <div class="box"><h3>Say the shape first</h3>"9:16 for Reels" or "16:9 for YouTube" before anything else — the layout depends on it.</div>
+    <div class="box"><h3>One request at a time</h3>Small, clear changes are easier to check and undo than one long list.</div>
+    <div class="box"><h3>Lock what you love</h3>Lock a track in Studio once it's perfect, so later changes can't touch it.</div>
+    <div class="box"><h3>Name your clips</h3>"Clip 4", "the title", "the intro" — Claude follows the names you use.</div>
+  </div>
+
+  <h2>Troubleshooting</h2>
+  <table>
+    <tr><th>Problem</th><th>Fix</th></tr>
+    <tr><td>Skill not found</td><td>Restart Claude Code in the folder where you ran the install command.</td></tr>
+    <tr><td>Studio didn't open</td><td>Run <code>npx -y openfilm@latest open</code> and open the printed address yourself.</td></tr>
+    <tr><td>"Not connected" for voice/music</td><td>Add your key in Studio → Settings → Providers.</td></tr>
+    <tr><td>A clip won't play in the preview</td><td>Ask Claude to check it; some generated videos need a one-time re-encode for the browser.</td></tr>
+    <tr><td>Telugu/Hindi captions look broken</td><td>Install a font for that script (e.g. Noto Sans Telugu) and restart Studio.</td></tr>
+  </table>
+
+  <h2>Cheat sheet</h2>
+  <div class="term">
+    <span class="p">$</span> npx skills add openfilm/openfilm <span class="c">&nbsp;&nbsp;&nbsp;&nbsp;# install the skill</span><br>
+    <span class="p">$</span> npx -y openfilm@latest open my-film <span class="c"># open or create a film</span><br>
+    <span class="p">$</span> npx -y openfilm@latest look <span class="c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# contact sheet of the film</span><br>
+    <span class="p">$</span> npx -y openfilm@latest render <span class="c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# export an MP4</span></div>
+
+  <div class="cta">
+    <div><b>Found this useful?</b><p>More AI tools explained simply, in Telugu and English.</p></div>
+    <div class="big">Follow <span>@ashokkumar.ai</span></div>
+  </div>
+
+  <div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>7</span></div>
+</section>
+
+</body>
+</html>
