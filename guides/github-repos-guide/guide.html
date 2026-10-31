@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>9 Free Tools That Replace Paid Software</title>
+<style>
+  @font-face { font-family: "Inter"; src: url(fonts/Inter-Regular.otf); font-weight: 400; }
+  @font-face { font-family: "Inter"; src: url(fonts/Inter-Medium.otf); font-weight: 500; }
+  @font-face { font-family: "Inter"; src: url(fonts/Inter-Bold.otf); font-weight: 700; }
+  @font-face { font-family: "Inter"; src: url(fonts/Inter-ExtraBold.otf); font-weight: 800; }
+  @font-face { font-family: "Mono"; src: url(fonts/JetBrainsMono-Medium.ttf); font-weight: 500; }
+
+  @page { size: A4; margin: 0; }
+  :root {
+    --ink: #0f1115; --text: #1d212b; --muted: #5d6576; --line: #e4e6ec; --soft: #f5f6f9;
+    --gold: #f5b301; --gold-soft: #fff6dc; --dark: #0b0d12; --green: #19a463;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Inter", sans-serif; color: var(--text); font-size: 10.5pt; line-height: 1.55; background: #888; }
+
+  .page { width: 210mm; height: 297mm; padding: 20mm 18mm 24mm; position: relative; overflow: hidden; background: #fff; page-break-after: always; margin: 0 auto; }
+  .page:last-child { page-break-after: auto; }
+
+  /* every page carries the handle */
+  .foot { position: absolute; left: 18mm; right: 18mm; bottom: 10mm; display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--line); padding-top: 3.5mm; font-size: 8.5pt; color: var(--muted); }
+  .handle { display: inline-flex; align-items: center; gap: 2mm; font-weight: 700; color: var(--ink); }
+  .ig { width: 4.2mm; height: 4.2mm; border-radius: 1.3mm; background: linear-gradient(45deg, #f9ce34, #ee2a7b 55%, #6228d7); position: relative; }
+  .ig::before { content: ""; position: absolute; inset: 1mm; border: 0.45mm solid #fff; border-radius: 50%; }
+  .top { position: absolute; top: 9mm; right: 18mm; font-size: 8pt; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .kicker { font-family: "Mono", monospace; font-size: 8.5pt; letter-spacing: 0.16em; text-transform: uppercase; color: #b07f00; }
+  h1 { font-size: 26pt; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--ink); margin: 2mm 0 4mm; }
+  h2 { font-size: 13.5pt; font-weight: 800; letter-spacing: -0.01em; color: var(--ink); margin: 7mm 0 2.5mm; }
+  h3 { font-size: 11pt; font-weight: 700; color: var(--ink); margin-bottom: 1.5mm; }
+  p { margin-bottom: 2.5mm; }
+  .lead { font-size: 12pt; color: var(--muted); max-width: 150mm; }
+  em.hl { font-style: normal; background: var(--gold-soft); padding: 0 1mm; border-radius: 1mm; }
+  code { font-family: "Mono", monospace; font-size: 9pt; background: var(--soft); border: 1px solid var(--line); border-radius: 1.2mm; padding: 0.2mm 1.2mm; }
+
+  .term { background: var(--dark); color: #e8ebf2; border-radius: 3mm; padding: 4.5mm 5mm; font-family: "Mono", monospace; font-size: 9.5pt; line-height: 1.7; margin: 2.5mm 0 3.5mm; }
+  .term .p { color: #3ddc84; } .term .c { color: #7d8597; } .term .bar { display: flex; gap: 1.6mm; margin-bottom: 2.5mm; }
+  .term .bar i { width: 2.4mm; height: 2.4mm; border-radius: 50%; background: #ff5f57; } .term .bar i:nth-child(2) { background: #febc2e; } .term .bar i:nth-child(3) { background: #28c840; }
+
+  .steps { display: grid; gap: 4mm; }
+  .step { display: grid; grid-template-columns: 11mm 1fr; gap: 4mm; align-items: start; }
+  .num { width: 11mm; height: 11mm; border-radius: 3mm; background: var(--ink); color: var(--gold); font-weight: 800; font-size: 13pt; display: grid; place-items: center; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .box { border: 1px solid var(--line); border-radius: 3mm; padding: 4mm 4.5mm; background: #fff; }
+  .box.soft { background: var(--soft); border-color: transparent; }
+  .box.gold { background: var(--gold-soft); border-color: #f3dc94; }
+  .p-tight h2 { margin-top: 5mm; }
+  .tight { gap: 3mm; } .tight .box { padding: 3mm 4mm; font-size: 9.8pt; }
+  .box ul { padding-left: 4.5mm; } .box li { margin-bottom: 1mm; }
+
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 3mm; font-size: 9.5pt; }
+  th { text-align: left; font-size: 8pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 2mm 2.5mm; border-bottom: 1.5px solid var(--ink); }
+  td { padding: 2.2mm 2.5mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:first-child { font-weight: 700; color: var(--ink); white-space: nowrap; }
+
+  .chat { display: grid; gap: 2mm; margin: 2mm 0 3mm; }
+  .bubble { justify-self: end; background: var(--gold); color: #14161c; font-weight: 700; border-radius: 4mm 4mm 1mm 4mm; padding: 2.4mm 4mm; font-size: 10pt; max-width: 130mm; }
+
+  .tree { font-family: "Mono", monospace; font-size: 9pt; line-height: 1.75; background: var(--soft); border-radius: 3mm; padding: 4mm 5mm; }
+  .tree .c { color: var(--muted); }
+
+  .note { border-left: 1.2mm solid var(--gold); background: var(--gold-soft); padding: 3mm 4mm; border-radius: 0 2mm 2mm 0; font-size: 9.8pt; margin: 3mm 0; }
+
+  /* cover */
+  .cover { background: var(--dark); color: #fff; padding: 0; }
+  .cover .glow { position: absolute; width: 170mm; height: 170mm; border-radius: 50%; filter: blur(30mm); }
+  .cover .g1 { left: -50mm; top: -40mm; background: rgba(245,179,1,0.30); }
+  .cover .g2 { right: -70mm; bottom: 10mm; background: rgba(80,140,255,0.22); }
+  .cover .inner { position: absolute; inset: 0; padding: 30mm 20mm; display: flex; flex-direction: column; }
+  .cover .logo { width: 22mm; height: 22mm; }
+  .cover .kicker { color: var(--gold); margin-top: 40mm; }
+  .cover h1 { color: #fff; font-size: 44pt; line-height: 1.02; letter-spacing: -0.04em; margin: 5mm 0 7mm; }
+  .cover h1 span { color: var(--gold); }
+  .cover .lead { color: #b9c0cf; font-size: 13.5pt; max-width: 140mm; }
+  .cover .pill { margin-top: 12mm; align-self: flex-start; font-family: "Mono", monospace; font-size: 11pt; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 3mm; padding: 4mm 5.5mm; }
+  .cover .pill b { color: #3ddc84; font-weight: 500; }
+  .cover .toc { margin-top: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm 6mm; font-size: 9.5pt; color: #b9c0cf; }
+  .cover .toc b { color: var(--gold); font-family: "Mono", monospace; margin-right: 2mm; }
+  .cover .foot { border-top-color: rgba(255,255,255,0.15); color: #8b93a5; }
+  .cover .handle { color: #fff; }
+
+  .cta { background: var(--dark); color: #fff; border-radius: 4mm; padding: 4.5mm 6mm; margin-top: 5mm; display: flex; align-items: center; justify-content: space-between; gap: 6mm; }
+  .cta b { font-size: 12pt; }
+  .cta h2 { color: #fff; margin: 0 0 2mm; font-size: 17pt; }
+  .cta p { color: #b9c0cf; margin: 0; }
+  .cta .big { margin-top: 0; font-size: 14pt; font-weight: 800; }
+  .cta .big span { color: var(--gold); }
+
+  .repo { border: 1px solid var(--line); border-radius: 3.5mm; padding: 4.5mm 5mm; margin-bottom: 4.5mm; break-inside: avoid; }
+  .repo-head { display: flex; align-items: center; gap: 4mm; margin-bottom: 2.5mm; }
+  .mono-tile { width: 13mm; height: 13mm; border-radius: 3.5mm; background: var(--ink); color: var(--gold); font-weight: 800; font-size: 13pt; display: grid; place-items: center; flex: none; }
+  .repo-head h3 { font-size: 14pt; margin: 0; }
+  .repo-head .rep { font-size: 9pt; color: var(--muted); }
+  .repo-head .rep s { color: #d33; }
+  .num-tag { margin-left: auto; font-family: "Mono", monospace; font-size: 9pt; color: #b07f00; }
+  .meta { display: grid; grid-template-columns: 26mm 1fr; gap: 1.2mm 3mm; font-size: 9.6pt; }
+  .meta b { color: var(--ink); }
+  .chip { display: inline-block; font-size: 8pt; font-weight: 700; padding: 0.5mm 2.2mm; border-radius: 10mm; background: var(--gold-soft); color: #8a6300; margin-right: 1.5mm; }
+  .url { font-family: "Mono", monospace; font-size: 8.8pt; color: #0969da; }
+</style>
+
+</head>
+<body>
+<section class="page cover"><div class="glow g1"></div><div class="glow g2"></div><div class="inner">
+<div class="mono-tile" style="width:22mm;height:22mm;font-size:30pt;background:#f5b301;color:#0b0d12;border-radius:6mm">9</div>
+<div class="kicker">Practical guide · 2026 edition</div>
+<h1>9 free tools that<br>replace <span>paid software.</span></h1>
+<p class="lead">Open-source alternatives to Higgsfield, ElevenLabs, Semrush, Notion, Wispr Flow, Asana, Calendly, Intercom and Loom: what each one does, who it's for, and how to get it running.</p>
+<div class="pill"><b>$</b> paid apps → $0 / month</div>
+<div class="toc"><div><b>01</b>Why open source</div><div><b>02</b>What you need</div><div><b>03</b>How to install any repo</div>
+<div><b>04</b>AI &amp; creator tools</div><div><b>05</b>Work &amp; productivity</div><div><b>06</b>Business tools</div>
+<div><b>07</b>Which one first?</div><div><b>08</b>Stay safe</div><div><b>09</b>Cheat sheet</div></div></div>
+<div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>Follow for more AI tools, explained simply</span></div></section>
+
+<section class="page"><div class="top">Free Software Guide</div><div class="kicker">01 · Why open source</div><h1>Same jobs. No subscription.</h1>
+<p class="lead">Open-source software publishes its code openly. You can use it free, run it on your own computer or server, and your data stays with you.</p>
+<table><tr><th>Paid app</th><th>Free alternative</th><th>What it does</th></tr><tr><td>Higgsfield</td><td>Open Higgsfield</td><td>AI image + video studio</td></tr><tr><td>ElevenLabs</td><td>VoiceStudio</td><td>Voice cloning & text-to-speech</td></tr><tr><td>Semrush</td><td>OpenSEO</td><td>Rank tracking, backlinks, site audits</td></tr><tr><td>Notion</td><td>AppFlowy</td><td>Notes, docs, wikis & task boards</td></tr><tr><td>Wispr Flow</td><td>OpenWhispr</td><td>Voice dictation anywhere</td></tr><tr><td>Asana</td><td>OpenProject</td><td>Projects, Gantt charts, time tracking</td></tr><tr><td>Calendly</td><td>Cal.diy</td><td>Scheduling & booking pages</td></tr><tr><td>Intercom</td><td>Chatwoot</td><td>Live chat + email in one inbox</td></tr><tr><td>Loom</td><td>Cap</td><td>Screen recording & sharing</td></tr></table>
+<div class="grid2" style="margin-top:4mm"><div class="box soft"><h3>What you gain</h3><ul><li>No monthly fees</li><li>Your data on your own machine</li><li>No limits set by a pricing plan</li></ul></div>
+<div class="box soft"><h3>What it costs instead</h3><ul><li>A little setup time</li><li>You handle updates and backups</li><li>Some features may differ from the paid app</li></ul></div></div>
+<div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>2</span></div></section>
+
+<section class="page"><div class="top">Free Software Guide</div><div class="kicker">02 · What you need</div><h1>Three ways to run them.</h1>
+<div class="steps" style="margin-top:4mm">
+<div class="step"><div class="num">A</div><div><h3>Desktop app: easiest</h3>Download the installer from the repo's <b>Releases</b> page (or the project website) and install it like any app. <span class="chip">AppFlowy</span><span class="chip">OpenWhispr</span><span class="chip">Cap</span></div></div>
+<div class="step"><div class="num">B</div><div><h3>Docker: for servers and team tools</h3>Install Docker Desktop, then run the project with the Docker Compose file from its README. <span class="chip">OpenProject</span><span class="chip">Chatwoot</span><span class="chip">Cal.diy</span><span class="chip">OpenSEO</span></div></div>
+<div class="step"><div class="num">C</div><div><h3>Run locally from source: for AI tools</h3>Clone the repo and follow its setup steps, usually installing Python or Node.js dependencies. <span class="chip">Open Higgsfield</span><span class="chip">VoiceStudio</span></div></div></div>
+<div class="kicker" style="margin-top:9mm">03 · How to install any repo</div><h2>The universal routine</h2>
+<div class="term"><div class="bar"><i></i><i></i><i></i></div>
+<span class="c"># 1. Get the code</span><br><span class="p">$</span> git clone https://github.com/OWNER/REPO.git<br><span class="p">$</span> cd REPO<br>
+<span class="c"># 2. Server apps: start them with Docker (if the README has a compose file)</span><br><span class="p">$</span> docker compose up -d<br>
+<span class="c"># 3. Then open the address the README gives, e.g. http://localhost:3000</span></div>
+<div class="note"><b>Always follow the README.</b> Every project has its own setup steps, settings and environment variables. The commands above are the common pattern, not exact instructions for every repo.</div>
+<div class="grid2"><div class="box"><h3>Before you install</h3><ul><li><b>Git</b> to clone repos</li><li><b>Docker Desktop</b> for server apps</li><li>Enough disk space and RAM</li><li>A GPU helps for AI voice and video</li></ul></div>
+<div class="box"><h3>Read these first</h3><ul><li><b>README</b>: setup steps</li><li><b>Releases</b>: ready-made installers</li><li><b>License</b>: what you can do with it</li><li><b>Issues</b>: known problems</li></ul></div></div>
+<div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>3</span></div></section>
+
+<section class="page"><div class="top">Free Software Guide</div><div class="kicker">04 · AI &amp; creator tools</div><h1>Create without credits.</h1><div class="repo"><div class="repo-head"><div class="mono-tile">OH</div><div><h3>Open Higgsfield</h3><div class="rep">replaces <s>Higgsfield</s> · AI image + video studio</div></div><div class="num-tag">#01</div></div>
+<p>One prompt bar for image and video generation models, with each model's settings and a gallery of every finished run.</p><div class="meta"><b>Best for</b><span>Creators who generate a lot of AI images and video</span><b>How it runs</b><span>Runs locally; you bring API keys for the models you use</span><b>Repo</b><span class="url">github.com/wide-trace/open-higgsfield</span></div></div><div class="repo"><div class="repo-head"><div class="mono-tile">VS</div><div><h3>VoiceStudio</h3><div class="rep">replaces <s>ElevenLabs</s> · Voice cloning & text-to-speech</div></div><div class="num-tag">#02</div></div>
+<p>Clone a voice from a short sample and generate speech, running on your own machine instead of a paid cloud service.</p><div class="meta"><b>Best for</b><span>Voice-overs and dubbing without a monthly plan</span><b>How it runs</b><span>Runs locally; a GPU makes it much faster</span><b>Repo</b><span class="url">github.com/debpalash/VoiceStudio</span></div></div><div class="repo"><div class="repo-head"><div class="mono-tile">CP</div><div><h3>Cap</h3><div class="rep">replaces <s>Loom</s> · Screen recording & sharing</div></div><div class="num-tag">#09</div></div>
+<p>Record your screen and camera, then share a link or export the video.</p><div class="meta"><b>Best for</b><span>Tutorials, async updates, bug reports</span><b>How it runs</b><span>Desktop app download (macOS / Windows)</span><b>Repo</b><span class="url">github.com/CapSoftware/Cap</span></div></div><div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>4</span></div></section>
+
+<section class="page"><div class="top">Free Software Guide</div><div class="kicker">05 · Work &amp; productivity</div><h1>Plan, write and get work done.</h1><div class="repo"><div class="repo-head"><div class="mono-tile">AF</div><div><h3>AppFlowy</h3><div class="rep">replaces <s>Notion</s> · Notes, docs, wikis & task boards</div></div><div class="num-tag">#04</div></div>
+<p>A Notion-style workspace (pages, databases, kanban boards) where your data stays under your control.</p><div class="meta"><b>Best for</b><span>Personal notes, team wikis, project boards</span><b>How it runs</b><span>Desktop & mobile apps; optional self-hosted sync server</span><b>Repo</b><span class="url">github.com/AppFlowy-IO/AppFlowy</span></div></div><div class="repo"><div class="repo-head"><div class="mono-tile">OW</div><div><h3>OpenWhispr</h3><div class="rep">replaces <s>Wispr Flow</s> · Voice dictation anywhere</div></div><div class="num-tag">#05</div></div>
+<p>Speak and have it typed into any app, using local Whisper speech models so it can even work offline.</p><div class="meta"><b>Best for</b><span>Fast writing, accessibility, multilingual typing</span><b>How it runs</b><span>Desktop app; local models download on first use</span><b>Repo</b><span class="url">github.com/OpenWhispr/openwhispr</span></div></div><div class="repo"><div class="repo-head"><div class="mono-tile">OP</div><div><h3>OpenProject</h3><div class="rep">replaces <s>Asana</s> · Projects, Gantt charts, time tracking</div></div><div class="num-tag">#06</div></div>
+<p>Full project management: tasks, timelines, Gantt charts, boards and time tracking for teams.</p><div class="meta"><b>Best for</b><span>Teams that need planning and reporting</span><b>How it runs</b><span>Self-host (Docker or packages) or a hosted plan</span><b>Repo</b><span class="url">github.com/opf/openproject</span></div></div><div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>5</span></div></section>
+
+<section class="page"><div class="top">Free Software Guide</div><div class="kicker">06 · Business tools</div><h1>Grow and support customers.</h1><div class="repo"><div class="repo-head"><div class="mono-tile">OS</div><div><h3>OpenSEO</h3><div class="rep">replaces <s>Semrush</s> · Rank tracking, backlinks, site audits</div></div><div class="num-tag">#03</div></div>
+<p>Track where your pages rank, see who links to you, and audit your site for SEO problems.</p><div class="meta"><b>Best for</b><span>Bloggers, small businesses, agencies</span><b>How it runs</b><span>Self-host; some data sources may need their own API keys</span><b>Repo</b><span class="url">github.com/every-app/open-seo</span></div></div><div class="repo"><div class="repo-head"><div class="mono-tile">CD</div><div><h3>Cal.diy</h3><div class="rep">replaces <s>Calendly</s> · Scheduling & booking pages</div></div><div class="num-tag">#07</div></div>
+<p>Share a booking link, let people pick a time, and sync bookings with Google and Outlook calendars.</p><div class="meta"><b>Best for</b><span>Consultants, creators, sales calls</span><b>How it runs</b><span>Self-host; connect your calendar accounts</span><b>Repo</b><span class="url">github.com/calcom/cal.diy</span></div></div><div class="repo"><div class="repo-head"><div class="mono-tile">CW</div><div><h3>Chatwoot</h3><div class="rep">replaces <s>Intercom</s> · Live chat + email in one inbox</div></div><div class="num-tag">#08</div></div>
+<p>Website live chat, email and social messages in one shared inbox for your support team.</p><div class="meta"><b>Best for</b><span>Businesses handling customer support</span><b>How it runs</b><span>Self-host with Docker, or a hosted plan</span><b>Repo</b><span class="url">github.com/chatwoot/chatwoot</span></div></div><div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>6</span></div></section>
+
+<section class="page p-tight"><div class="top">Free Software Guide</div><div class="kicker">07 · Which one first?</div><h1>Pick by what you do.</h1>
+<table><tr><th>If you are a…</th><th>Start with</th></tr>
+<tr><td>Content creator</td><td>Cap, Open Higgsfield, VoiceStudio</td></tr><tr><td>Writer or student</td><td>AppFlowy, OpenWhispr</td></tr>
+<tr><td>Freelancer or consultant</td><td>Cal.diy, AppFlowy, Cap</td></tr><tr><td>Small business</td><td>Chatwoot, OpenSEO, Cal.diy</td></tr><tr><td>Team lead</td><td>OpenProject, AppFlowy, Chatwoot</td></tr></table>
+<h2>08 · Stay safe</h2><div class="grid2 tight">
+<div class="box"><h3>Check before you run</h3>Look for recent commits, an active Issues tab and a clear license. Download only from the official repo or website.</div>
+<div class="box"><h3>Protect your keys</h3>Keep API keys in the project's settings or <code>.env</code> file. Never paste them into public code or screenshots.</div>
+<div class="box"><h3>Back up your data</h3>Self-hosted means you own the backups. Export or back up your data folders regularly.</div>
+<div class="box"><h3>Keep it updated</h3>Update from the Releases page, or pull the latest version and restart, to get security fixes.</div></div>
+<h2>09 · Cheat sheet</h2><div class="term"><span class="p">$</span> git clone https://github.com/OWNER/REPO.git <span class="c"># get the code</span><br><span class="p">$</span> docker compose up -d <span class="c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# start a server app</span><br><span class="p">$</span> docker compose pull &amp;&amp; docker compose up -d <span class="c"># update it</span><br><span class="p">$</span> docker compose down <span class="c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# stop it</span></div>
+<div class="cta"><div><b>Found this useful?</b><p>More AI tools explained simply, in Telugu and English.</p></div><div class="big">Follow <span>@ashokkumar.ai</span></div></div>
+<div class="foot"><span class="handle"><i class="ig"></i>@ashokkumar.ai</span><span>7</span></div></section>
+</body>
+</html>
