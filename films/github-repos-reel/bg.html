@@ -17,7 +17,7 @@
 <script type="module">
 const g1 = document.getElementById("g1"), g2 = document.getElementById("g2"), grid = document.getElementById("grid");
 window.film = {
-  duration: 52.7,
+  duration: 53.3,
   frame(t) {
     g1.style.transform = `translate(${-300 + 200 * Math.sin(t * 0.21)}px, ${-200 + 160 * Math.cos(t * 0.17)}px)`;
     g2.style.transform = `translate(${500 + 160 * Math.cos(t * 0.19)}px, ${1100 + 180 * Math.sin(t * 0.23)}px)`;

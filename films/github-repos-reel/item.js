@@ -2,7 +2,7 @@
 import { ITEMS } from "./items.js";
 import { span, outCubic, outBack, enter, typed, fontsReady } from "./shared.js";
 
-const DURATION = 4.8;
+const DURATION = 7;
 
 export function mount(n) {
   const it = ITEMS[n - 1];
