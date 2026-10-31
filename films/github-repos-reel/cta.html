@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="shared.css">
+<style>
+  #wrap { left: 0; top: 200px; width: 1080px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  #head { font-size: 130px; font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
+  #box { margin-top: 50px; width: 920px; height: 150px; border-radius: 75px; padding: 0 26px 0 46px; display: flex; align-items: center; gap: 24px;
+    background: var(--panel); border: 2px solid var(--line); }
+  #avatar { width: 84px; height: 84px; border-radius: 50%; background: url(assets/ashok.jpg) center/cover; flex: none; }
+  #field { flex: 1; text-align: left; font-size: 64px; font-weight: 800; white-space: nowrap; }
+  #field .ph { color: var(--muted); font-weight: 500; font-size: 42px; }
+  #caret { display: inline-block; width: 5px; height: 64px; background: var(--gold); vertical-align: -10px; margin-left: 6px; }
+  #post { padding: 22px 34px; border-radius: 50px; background: var(--gold); color: #12141a; font-size: 38px; font-weight: 800; flex: none; }
+  #word { margin-top: 56px; padding: 10px 60px 22px; border-radius: 40px; background: var(--gold); color: #12141a; font-size: 190px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+  #dm { margin-top: 50px; font-family: "Telugu", "Inter", sans-serif; font-size: 56px; font-weight: 800; }
+  #dm em { font-style: normal; color: var(--gold); }
+  #tiles { margin-top: 44px; display: grid; grid-template-columns: repeat(9, 80px); gap: 14px; }
+  #tiles i { width: 80px; height: 80px; border-radius: 22px; background: var(--gold); color: #12141a; font-style: normal; display: grid; place-items: center; font-size: 28px; font-weight: 800; }
+</style>
+</head>
+<body class="stage">
+<div id="wrap" class="abs">
+  <div id="head">Comment</div>
+  <div id="box"><div id="avatar"></div><div id="field"><span id="typed"></span><span class="ph" id="ph">Add a comment…</span><span id="caret"></span></div><div id="post">Post</div></div>
+  <div id="word">REPO</div>
+  <div id="dm">9 links <em>మీ DM కి</em> పంపిస్తా 📩</div>
+  <div id="tiles"></div>
+</div>
+<script type="module">
+import { ITEMS } from "./items.js";
+import { span, outBack, enter, typed, fontsReady } from "./shared.js";
+const $ = (id) => document.getElementById(id);
+const tiles = ITEMS.map((it) => { const i = document.createElement("i"); i.textContent = it.mono; $("tiles").appendChild(i); return i; });
+
+window.film = {
+  duration: 5.7,
+  ready: fontsReady(),
+  frame(t) {
+    enter($("head"), t, 0, { dist: 60 });
+    enter($("box"), t, 0.15);
+    const text = typed("REPO", t, 0.5, 1.0);
+    $("typed").textContent = text;
+    $("ph").style.display = text ? "none" : "inline";
+    $("caret").style.opacity = t > 1.3 ? 0 : Math.floor(t * 3) % 2 ? 0.25 : 1;
+    const press = span(t, 1.15, 1.35);
+    $("post").style.transform = `scale(${1 - 0.12 * Math.sin(Math.PI * press)})`;
+    enter($("word"), t, 1.3, { pop: true, dist: 0 });
+    $("word").style.transform += ` rotate(${-3 * outBack(span(t, 1.3, 1.7))}deg)`;
+    enter($("dm"), t, 1.8);
+    tiles.forEach((d, i) => enter(d, t, 2.2 + i * 0.07, { pop: true, dist: 20 }));
+    document.body.style.opacity = 1 - span(t, 5.3, 5.7);
+  },
+};
+</script>
+</body>
+</html>

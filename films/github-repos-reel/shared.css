@@ -1,0 +1,25 @@
+@font-face { font-family: "Inter"; src: url(fonts/Inter-Medium.otf); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url(fonts/Inter-Bold.otf); font-weight: 700; }
+@font-face { font-family: "Inter"; src: url(fonts/Inter-ExtraBold.otf); font-weight: 800; }
+@font-face { font-family: "Telugu"; src: url(fonts/NotoSansTelugu-Medium.ttf); font-weight: 500; }
+@font-face { font-family: "Telugu"; src: url(fonts/NotoSansTelugu-Bold.ttf); font-weight: 700; }
+@font-face { font-family: "Telugu"; src: url(fonts/NotoSansTelugu-ExtraBold.ttf); font-weight: 800; }
+@font-face { font-family: "Mono"; src: url(fonts/JetBrainsMono-Medium.ttf); font-weight: 500; }
+
+:root {
+  --ink: #0a0c11;
+  --panel: #141822;
+  --line: rgba(255, 255, 255, 0.12);
+  --text: #f2f4f8;
+  --muted: #98a1b3;
+  --gold: #ffc531;
+  --red: #ff4d4d;
+  --green: #3ddc84;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow: hidden; background: transparent; }
+body { font-family: "Inter", "Telugu", sans-serif; color: var(--text); position: relative; }
+.abs { position: absolute; }
+.mono { font-family: "Mono", monospace; }
+.stage { width: 1080px; height: 1920px; }

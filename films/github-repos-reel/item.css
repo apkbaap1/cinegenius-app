@@ -1,0 +1,40 @@
+#badge { left: 70px; top: 130px; padding: 10px 26px; border-radius: 18px; background: var(--gold); color: #12141a; font-size: 50px; font-weight: 500; }
+#pill { right: 70px; top: 138px; padding: 16px 26px; border-radius: 999px; border: 2px solid var(--line); background: rgba(255,255,255,0.05); font-size: 26px; letter-spacing: 0.08em; }
+#pill span { color: var(--green); }
+
+.tile { top: 270px; width: 300px; height: 300px; border-radius: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.tile small { font-family: "Mono", monospace; font-size: 24px; letter-spacing: 0.18em; }
+#paid { left: 100px; background: #1c212d; border: 3px solid var(--line); }
+#paid b { font-size: 40px; font-weight: 800; text-align: center; padding: 0 20px; line-height: 1.1; }
+#paid small { color: var(--red); }
+#stamp { position: absolute; left: 50%; top: 50%; margin: -40px 0 0 -150px; width: 300px; text-align: center; border: 6px solid var(--red); border-radius: 14px;
+  color: var(--red); font-family: "Mono", monospace; font-size: 40px; font-weight: 500; letter-spacing: 0.06em; padding: 6px 0; background: rgba(10,12,17,0.55); }
+#arrow { left: 450px; top: 390px; width: 160px; height: 60px; }
+#free { left: 680px; background: #12141a; border: 6px solid var(--gold); box-shadow: 0 0 80px rgba(255,197,49,0.25); }
+#free small { color: var(--gold); }
+.mono-badge { width: 150px; height: 150px; border-radius: 40px; background: var(--gold); color: #12141a; display: grid; place-items: center; font-size: 70px; font-weight: 800; letter-spacing: -0.04em; }
+
+#name { left: 0; width: 1080px; top: 625px; text-align: center; font-size: 100px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+#sub { left: 0; width: 1080px; top: 755px; text-align: center; font-size: 36px; font-weight: 500; color: var(--muted); }
+#sub s { color: var(--red); text-decoration-thickness: 4px; }
+
+#card { left: 70px; top: 850px; width: 940px; height: 350px; border-radius: 30px; background: #f4f5f8; color: #1d212b; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.55); }
+#card .bar { height: 76px; background: #e7e9ef; display: flex; align-items: center; gap: 12px; padding: 0 24px; }
+#card .bar i { width: 18px; height: 18px; border-radius: 50%; background: #ff5f57; } #card .bar i:nth-child(2) { background: #febc2e; } #card .bar i:nth-child(3) { background: #28c840; }
+#card .url { margin-left: 16px; flex: 1; height: 48px; border-radius: 24px; background: #fff; display: flex; align-items: center; padding: 0 24px; font-size: 25px; color: #333; white-space: nowrap; overflow: hidden; }
+#card .body { display: flex; gap: 30px; padding: 28px 34px; }
+#card .col { flex: 1.5; display: flex; flex-direction: column; gap: 16px; }
+#card .about { flex: 1; }
+#card .repo { font-size: 26px; color: #0969da; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sk { height: 18px; border-radius: 9px; background: #dfe2e9; }
+.sk:nth-child(3) { width: 82%; } .sk:nth-child(5) { width: 64%; } .sk.short { width: 80%; }
+.star { align-self: flex-start; padding: 10px 22px; border-radius: 12px; border: 2px solid #d0d4dc; background: #fff; font-size: 26px; font-weight: 700; }
+.star span { color: #8a909c; }
+.star.on { background: #fff4cc; border-color: #f0c040; } .star.on span { color: #e8a800; }
+#cursor { left: 690px; top: 120px; width: 54px; height: 54px; }
+#plus { left: 820px; top: 70px; font-size: 34px; color: #e8a800; font-weight: 500; }
+
+#dots { left: 0; width: 1080px; top: 1240px; display: flex; justify-content: center; gap: 14px; }
+#dots i { width: 78px; height: 18px; border-radius: 9px; background: rgba(255,255,255,0.14); position: relative; overflow: hidden; }
+#dots i.done { background: var(--gold); }
+#dots i.now::after { content: ""; position: absolute; inset: 0; width: var(--fill, 0%); background: var(--gold); }
