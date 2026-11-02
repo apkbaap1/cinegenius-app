@@ -509,6 +509,20 @@ export function runLive() {
     lastHead = null;
     lastCursor = step(0);
     draw(1 / 30, lastCursor);
+  }, capStart() {
+    // film capture: stop the rAF clock, restart the tour, hide the chip; then capStep(dt) draws each frame
+    frozen = true;
+    startTour();
+    AP.t0 = T;
+    cam = null;
+    lastHead = null;
+    ui.tourChip.style.display = 'none';
+  }, capSkip(t, dt) {
+    // advance the operator without drawing (a chunk of the film that starts later)
+    for (let k = 0; k < Math.round(t / dt); k++) step(dt);
+  }, capStep(dt) {
+    lastCursor = step(dt);
+    draw(dt, lastCursor);
   }, still(t) {
     // freeze on the tour at t (no rAF loop interference: pause the clock afterwards)
     this.seekTour(t);
