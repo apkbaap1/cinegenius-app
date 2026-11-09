@@ -6,6 +6,12 @@
       "sourceType": "github",
       "skillPath": "skills/openfilm/SKILL.md",
       "computedHash": "a30f15632ebb29295dfff7131faf2c212e17f2bae2918a87ef0f716dcca8a157"
+    },
+    "perspective-illusion": {
+      "source": "dotslashsimran/simcraft",
+      "sourceType": "github",
+      "skillPath": "skills/video/perspective-illusion/SKILL.md",
+      "computedHash": "4cbf94991f49ee43186480e836ecedaac00f20bd398a9127d08c6557cab8361d"
     }
   }
 }
