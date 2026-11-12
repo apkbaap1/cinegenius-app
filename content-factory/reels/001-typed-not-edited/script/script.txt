@@ -1,0 +1,10 @@
+ఈ video ని ఎవరూ edit చేయలేదు. Claude type చేసింది.
+CapCut లేదు, After Effects లేదు, timeline కూడా లేదు.
+మామూలుగా అయితే video అంటే software, timeline, గంటల పని.
+ఇక్కడ మాత్రం video అంటే ఒక HTML file. Website లాగా.
+Tool పేరు HyperFrames. Free, open source.
+Claude HTML రాసింది. HyperFrames దాన్ని MP4 గా మార్చింది.
+మీరు చూస్తున్న ఈ text, ఈ motion, అంతా code.
+Software కి డబ్బులు పెట్టాల్సిన అవసరం లేదు.
+Setup guide కావాలంటే comment లో CODE అని రాయండి.
+Edit చేయకండి. Type చేయండి.

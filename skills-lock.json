@@ -1,11 +1,143 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
+    "ad-library-teardown": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ad-library-teardown/SKILL.md",
+      "computedHash": "11d4c77df86d5947d664551d5f84ad6fb8f8c474a24cabbecf067c18c6fcca57"
+    },
+    "audience-research": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/audience-research/SKILL.md",
+      "computedHash": "c528dbf8db3fde4adefb03b790f42d7409fe29caf47b924dd88c359334c07cc7"
+    },
+    "comment-mining": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/comment-mining/SKILL.md",
+      "computedHash": "b04130f646589c2c0ab729fc11a5e22fbb22ff3e38dfbca938d81a3734e20101"
+    },
+    "competitor-social-research": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/competitor-social-research/SKILL.md",
+      "computedHash": "23bcf408b2e8aaf38f173da6bbb599cfcbbd0963814252bd3e4a9ca84bbc1008"
+    },
+    "content-repurposing": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/content-repurposing/SKILL.md",
+      "computedHash": "047e1246c65bbdf72d786a82a478616f66b862c2dbe20562366a1c38cd9edb40"
+    },
+    "creator-profile-teardown": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/creator-profile-teardown/SKILL.md",
+      "computedHash": "8008480d4fdf40be8c63792fae39955ba47a76f0a0ec5d32f2c4e2a310103b12"
+    },
+    "figma": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/figma/SKILL.md",
+      "computedHash": "0e6398ef34b30dec730d4225a20bdb20e7ed2309ece8abea95949549fe19f3ac"
+    },
+    "hyperframes": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/hyperframes/SKILL.md",
+      "computedHash": "373b4b19ec8564cbf23f7f3b8399ee9fb4d92609d66948d4b98c13ebe63bbcbc"
+    },
+    "hyperframes-cli": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/hyperframes-cli/SKILL.md",
+      "computedHash": "864689d1c8b30389bb9dbc04dfd7a61ce8e62d2ba6924334e04a156e074c3029"
+    },
+    "hyperframes-registry": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/hyperframes-registry/SKILL.md",
+      "computedHash": "6ac664d7d7f2ffdf299136cffb1a9bbebe21fd2b9afa8e6f44cf0c7a2d3df3b6"
+    },
+    "influencer-prospecting": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/influencer-prospecting/SKILL.md",
+      "computedHash": "048d676462a1f2db62e36b80451a81097fa390358449781ade1bc60ecb1c6a23"
+    },
+    "media-use": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/media-use/SKILL.md",
+      "computedHash": "e1f3a9bd0366f1ff0341bd585443f271c8e176a80f295f3cf6d901f9ca87f7fb"
+    },
     "openfilm": {
       "source": "openfilm/openfilm",
       "sourceType": "github",
       "skillPath": "skills/openfilm/SKILL.md",
-      "computedHash": "a30f15632ebb29295dfff7131faf2c212e17f2bae2918a87ef0f716dcca8a157"
+      "computedHash": "b09c32234ec9d8e46f8ba8da435ac2409d875a567f9923e1110f075fbe57086a"
+    },
+    "outlier-post-finder": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/outlier-post-finder/SKILL.md",
+      "computedHash": "54e835e98db740c3ef6cda2c5f273b2b41bf82331168884bd44d03ead2d44457"
+    },
+    "product-demand-research": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-demand-research/SKILL.md",
+      "computedHash": "20c718d8328ce1241095675fdfff7ffddabc73a9f949d8c750761a5467b04610"
+    },
+    "remotion-to-hyperframes": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/remotion-to-hyperframes/SKILL.md",
+      "computedHash": "60d049626b6aef79f650f72d941e6eab7487d8f34bf734a1b92f2b2a6c34b310"
+    },
+    "reverse-any-video": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/reverse-any-video/SKILL.md",
+      "computedHash": "2cefe479a595e0bdaaeae6a23c297992ac133c1dfd49dd64b01b3e28eee591f0"
+    },
+    "scrapecreators-api": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/scrapecreators-api/SKILL.md",
+      "computedHash": "5bf942c823d97c3ac154d8c540378dd2a969259e7ae5991c3493489b1e188831"
+    },
+    "slideshow": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/slideshow/SKILL.md",
+      "computedHash": "9e0fe437b47e9edf4f1c6c9aa48b5c1d7c3a1b896d9a83a11934c7aa8e76d345"
+    },
+    "social-listening-brief": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/social-listening-brief/SKILL.md",
+      "computedHash": "f4ea9be2e28247b7da86e9a164664e8bff923f126d148f7b419b2978ccbe87f7"
+    },
+    "style-sampling": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/style-sampling/SKILL.md",
+      "computedHash": "cb49372a8bfd06f5478802f56febf2d25371fd3401e83957139ecf12e80e490b"
+    },
+    "transcript-intelligence": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/transcript-intelligence/SKILL.md",
+      "computedHash": "20a2e054b02e149ba822740f094ca504b4327b98899134a3c53a55fa3abb9515"
+    },
+    "trend-discovery": {
+      "source": "ScrapeCreators/social-media-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/trend-discovery/SKILL.md",
+      "computedHash": "9011bf7fbb1246fdebfc89499a8b0bab049589e34a7f94cb3dd204af152a5501"
     }
   }
 }

@@ -1,0 +1,65 @@
+{
+ "lines": [
+  {
+   "i": 0,
+   "text": "ఈ video ని ఎవరూ edit చేయలేదు. Claude type చేసింది.",
+   "start": 0.1,
+   "dur": 3.551
+  },
+  {
+   "i": 1,
+   "text": "CapCut లేదు, After Effects లేదు, timeline కూడా లేదు.",
+   "start": 3.801,
+   "dur": 3.07
+  },
+  {
+   "i": 2,
+   "text": "మామూలుగా అయితే video అంటే software, timeline, గంటల పని.",
+   "start": 7.021,
+   "dur": 3.48
+  },
+  {
+   "i": 3,
+   "text": "ఇక్కడ మాత్రం video అంటే ఒక HTML file. Website లాగా.",
+   "start": 10.652,
+   "dur": 4.076
+  },
+  {
+   "i": 4,
+   "text": "Tool పేరు HyperFrames. Free, open source.",
+   "start": 14.878,
+   "dur": 3.215
+  },
+  {
+   "i": 5,
+   "text": "Claude HTML రాసింది. HyperFrames దాన్ని MP4 గా మార్చింది.",
+   "start": 18.244,
+   "dur": 4.448
+  },
+  {
+   "i": 6,
+   "text": "మీరు చూస్తున్న ఈ text, ఈ motion, అంతా code.",
+   "start": 22.842,
+   "dur": 2.554
+  },
+  {
+   "i": 7,
+   "text": "Software కి డబ్బులు పెట్టాల్సిన అవసరం లేదు.",
+   "start": 25.545,
+   "dur": 2.144
+  },
+  {
+   "i": 8,
+   "text": "Setup guide కావాలంటే comment లో CODE అని రాయండి.",
+   "start": 27.839,
+   "dur": 2.731
+  },
+  {
+   "i": 9,
+   "text": "Edit చేయకండి. Type చేయండి.",
+   "start": 30.72,
+   "dur": 2.271
+  }
+ ],
+ "total": 33.741
+}

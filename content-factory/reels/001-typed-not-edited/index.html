@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="te">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Anek Telugu";
+        font-weight: 500;
+        src: url("assets/fonts/anek-telugu-telugu-500-normal.woff2") format("woff2");
+        unicode-range: U+0951-0952, U+0964-0965, U+0C00-0C7F, U+1CDA, U+1CF2, U+200C-200D, U+25CC;
+      }
+      @font-face {
+        font-family: "Anek Telugu";
+        font-weight: 800;
+        src: url("assets/fonts/anek-telugu-telugu-800-normal.woff2") format("woff2");
+        unicode-range: U+0951-0952, U+0964-0965, U+0C00-0C7F, U+1CDA, U+1CF2, U+200C-200D, U+25CC;
+      }
+      @font-face {
+        font-family: "Anek Telugu";
+        font-weight: 500;
+        src: url("assets/fonts/anek-telugu-latin-500-normal.woff2") format("woff2");
+        unicode-range: U+0000-00FF, U+2000-206F, U+2190-21FF;
+      }
+      @font-face {
+        font-family: "Anek Telugu";
+        font-weight: 800;
+        src: url("assets/fonts/anek-telugu-latin-800-normal.woff2") format("woff2");
+        unicode-range: U+0000-00FF, U+2000-206F, U+2190-21FF;
+      }
+      @font-face {
+        font-family: "Anek Telugu";
+        font-weight: 800;
+        src: url("assets/fonts/anek-telugu-latin-ext-800-normal.woff2") format("woff2");
+        unicode-range: U+20B9;
+      }
+      :root {
+        --ground: #0d1016;
+        --panel: #161b24;
+        --line: #2a3140;
+        --ink: #f3efe4;
+        --dim: #8b93a3;
+        --accent: #ffd23f;
+        --mint: #5ee6a8;
+        --red: #ff5d5d;
+        --font-display: "Anek Telugu", sans-serif;
+        --font-mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--ground);
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        font-family: var(--font-display);
+        color: var(--ink);
+        overflow: hidden;
+      }
+      #bg {
+        position: absolute;
+        inset: 0;
+        background-color: var(--ground);
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 90px 90px;
+        opacity: 0.35;
+      }
+      #glow {
+        position: absolute;
+        left: 140px;
+        top: 420px;
+        width: 800px;
+        height: 800px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 210, 63, 0.16), rgba(255, 210, 63, 0) 65%);
+      }
+      /* Each scene fills the frame; its content stays in the Instagram-safe band (y 168 to 1330). */
+      .scene {
+        position: absolute;
+        inset: 0;
+      }
+      .band {
+        position: absolute;
+        left: 80px;
+        width: 860px;
+        top: 200px;
+        height: 1100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 44px;
+      }
+      .mono {
+        font-family: var(--font-mono);
+      }
+      .kicker {
+        font-size: 44px;
+        font-weight: 500;
+        color: var(--dim);
+        line-height: 1.3;
+      }
+      .big {
+        font-size: 144px;
+        font-weight: 800;
+        line-height: 1.22;
+        letter-spacing: -0.01em;
+      }
+      .mid {
+        font-size: 84px;
+        font-weight: 800;
+        line-height: 1.28;
+      }
+      .hl {
+        color: var(--accent);
+      }
+      .mint {
+        color: var(--mint);
+      }
+      .typed {
+        font-size: 84px;
+        font-weight: 800;
+        line-height: 1.3;
+        white-space: nowrap;
+        align-self: flex-start;
+      }
+      .typed .prompt {
+        color: var(--mint);
+        font-weight: 700;
+        margin-right: 16px;
+      }
+
+      /* s1: the three tools that were not used */
+      .row {
+        position: relative;
+        align-self: flex-start;
+        font-size: 104px;
+        font-weight: 800;
+        line-height: 1.25;
+        padding-right: 20px;
+      }
+      .row .strike {
+        position: absolute;
+        left: -10px;
+        right: 0;
+        top: 50%;
+        height: 12px;
+        margin-top: -6px;
+        background: var(--red);
+        border-radius: 6px;
+        transform-origin: left center;
+      }
+
+      /* s2: a fake editing timeline */
+      #s2-tl {
+        position: relative;
+        width: 860px;
+        height: 420px;
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: 24px;
+        overflow: hidden;
+      }
+      .trk {
+        position: absolute;
+        left: 24px;
+        height: 62px;
+        border-radius: 12px;
+        transform-origin: left center;
+      }
+      #s2-head {
+        position: absolute;
+        left: 24px;
+        top: 0;
+        width: 6px;
+        height: 420px;
+        background: var(--red);
+      }
+
+      /* s3: the code card */
+      .code {
+        width: 860px;
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: 24px;
+        padding: 40px 44px;
+        font-family: var(--font-mono);
+        font-size: 44px;
+        line-height: 1.55;
+        color: var(--ink);
+      }
+      .code .ln {
+        white-space: nowrap;
+      }
+      .code .tag {
+        color: var(--mint);
+      }
+      .code .attr {
+        color: var(--accent);
+      }
+      .code .txt {
+        font-family: var(--font-display);
+        font-weight: 800;
+      }
+
+      /* s4: the tool name */
+      #s4-name {
+        font-size: 132px;
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+      }
+      .chips {
+        display: flex;
+        gap: 24px;
+      }
+      .chip {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 46px;
+        padding: 18px 34px;
+        border-radius: 999px;
+        border: 3px solid var(--mint);
+        color: var(--mint);
+      }
+      .chip.fill {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--ground);
+      }
+
+      /* s5: the pipeline */
+      #s5 .band {
+        gap: 0;
+        align-items: flex-start;
+      }
+      .node {
+        width: 700px;
+        height: 170px;
+        background: var(--panel);
+        border: 3px solid var(--line);
+        border-radius: 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 44px;
+      }
+      .node .nm {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 58px;
+        line-height: 1.2;
+      }
+      .node .ds {
+        font-size: 40px;
+        font-weight: 500;
+        color: var(--dim);
+        line-height: 1.3;
+      }
+      .node.out {
+        border-color: var(--accent);
+      }
+      .node.out .nm {
+        color: var(--accent);
+      }
+      .arrow {
+        width: 8px;
+        height: 70px;
+        margin-left: 96px;
+        background: var(--mint);
+        transform-origin: center top;
+      }
+
+      /* s6: everything on screen is an element */
+      .el {
+        position: relative;
+        align-self: flex-start;
+        border: 3px dashed var(--mint);
+        border-radius: 14px;
+        padding: 26px 34px 14px;
+      }
+      .el .lab {
+        position: absolute;
+        left: 20px;
+        top: -30px;
+        background: var(--mint);
+        color: var(--ground);
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 30px;
+        line-height: 1;
+        padding: 10px 14px;
+        border-radius: 8px;
+      }
+
+      /* s7 */
+      #s7-zero {
+        font-size: 420px;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--accent);
+        letter-spacing: -0.03em;
+      }
+
+      /* s8: the comment box */
+      #s8-box {
+        width: 860px;
+        background: var(--ink);
+        color: var(--ground);
+        border-radius: 36px;
+        padding: 40px 44px;
+        display: flex;
+        align-items: center;
+        gap: 32px;
+      }
+      #s8-av {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: var(--line);
+        flex: none;
+      }
+      #s8-code {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 120px;
+        line-height: 1.1;
+        letter-spacing: 0.04em;
+      }
+
+      /* s9 */
+      #s9-handle {
+        font-size: 40px;
+        color: var(--dim);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="34.2"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="bg"></div>
+      <div id="glow" data-layout-ignore></div>
+
+      <!-- 0. HOOK: on screen at frame 0 -->
+      <div id="s0" class="scene clip" data-start="0" data-duration="3.72" data-track-index="1">
+        <div class="band">
+          <div id="s0-k" class="kicker mono">// reel_001.html</div>
+          <h1 id="s0-a" class="big">ఈ video ని<br />ఎవరూ <span class="hl">edit</span><br />చేయలేదు.</h1>
+          <div id="s0-b" class="typed"><span class="prompt mono">&gt;</span>Claude <span class="mint">type</span> చేసింది.</div>
+        </div>
+      </div>
+
+      <!-- 1. STAKE: what was not used -->
+      <div id="s1" class="scene clip" data-start="3.72" data-duration="3.23" data-track-index="1">
+        <div class="band">
+          <div id="s1-r1" class="row">CapCut<span id="s1-x1" class="strike"></span></div>
+          <div id="s1-r2" class="row">After Effects<span id="s1-x2" class="strike"></span></div>
+          <div id="s1-r3" class="row">Timeline<span id="s1-x3" class="strike"></span></div>
+          <div id="s1-k" class="mid hl">ఏదీ లేదు.</div>
+        </div>
+      </div>
+
+      <!-- 2. The usual way -->
+      <div id="s2" class="scene clip" data-start="6.95" data-duration="3.63" data-track-index="1">
+        <div class="band">
+          <div id="s2-k" class="kicker">మామూలుగా అయితే video అంటే</div>
+          <div id="s2-tl">
+            <div id="s2-t1" class="trk" style="top: 40px; width: 520px; background: #5b8cff"></div>
+            <div id="s2-t2" class="trk" style="top: 130px; width: 760px; background: #b06cff"></div>
+            <div id="s2-t3" class="trk" style="top: 220px; width: 380px; background: #ff8a5b"></div>
+            <div id="s2-t4" class="trk" style="top: 310px; width: 640px; background: #3fc7c0"></div>
+            <div id="s2-head"></div>
+          </div>
+          <div id="s2-a" class="mid">software, timeline,</div>
+          <div id="s2-b" class="big hl">గంటల పని.</div>
+        </div>
+      </div>
+
+      <!-- 3. The other way -->
+      <div id="s3" class="scene clip" data-start="10.58" data-duration="4.22" data-track-index="1">
+        <div class="band">
+          <div id="s3-k" class="kicker">ఇక్కడ మాత్రం</div>
+          <div id="s3-a" class="mid">video = ఒక <span class="hl">HTML file</span></div>
+          <div id="s3-code" class="code">
+            <div id="s3-l1" class="ln"><span class="tag">&lt;h1</span> <span class="attr">class</span>="clip"</div>
+            <div id="s3-l2" class="ln">&nbsp;&nbsp;<span class="attr">data-start</span>="0"</div>
+            <div id="s3-l3" class="ln">&nbsp;&nbsp;<span class="attr">data-duration</span>="3"<span class="tag">&gt;</span></div>
+            <div id="s3-l4" class="ln txt">&nbsp;&nbsp;ఈ video ని ఎవరూ…</div>
+            <div id="s3-l5" class="ln"><span class="tag">&lt;/h1&gt;</span></div>
+          </div>
+          <div id="s3-b" class="mid">Website లాగా.</div>
+        </div>
+      </div>
+
+      <!-- 4. The tool -->
+      <div id="s4" class="scene clip" data-start="14.8" data-duration="3.37" data-track-index="1">
+        <div class="band">
+          <div id="s4-k" class="kicker">Tool పేరు</div>
+          <div id="s4-name">Hyper<span class="hl">Frames</span></div>
+          <div class="chips">
+            <div id="s4-c1" class="chip fill">FREE</div>
+            <div id="s4-c2" class="chip">OPEN SOURCE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Who did what -->
+      <div id="s5" class="scene clip" data-start="18.17" data-duration="4.6" data-track-index="1">
+        <div class="band">
+          <div id="s5-n1" class="node"><div class="nm">Claude</div><div class="ds">HTML రాసింది</div></div>
+          <div id="s5-a1" class="arrow"></div>
+          <div id="s5-n2" class="node"><div class="nm">index.html</div><div class="ds">ఒకే ఒక file</div></div>
+          <div id="s5-a2" class="arrow"></div>
+          <div id="s5-n3" class="node"><div class="nm">HyperFrames</div><div class="ds">render చేసింది</div></div>
+          <div id="s5-a3" class="arrow"></div>
+          <div id="s5-n4" class="node out"><div class="nm">reel.mp4</div><div class="ds">మీరు చూస్తున్నది ఇదే</div></div>
+        </div>
+      </div>
+
+      <!-- 6. Everything is an element -->
+      <div id="s6" class="scene clip" data-start="22.77" data-duration="2.7" data-track-index="1">
+        <div class="band" style="gap: 70px">
+          <div id="s6-e1" class="el mid"><span class="lab">&lt;h1&gt;</span>ఈ text</div>
+          <div id="s6-e2" class="el mid"><span class="lab">gsap.to()</span>ఈ motion</div>
+          <div id="s6-e3" class="big hl">అంతా code.</div>
+        </div>
+      </div>
+
+      <!-- 7. Cost -->
+      <div id="s7" class="scene clip" data-start="25.47" data-duration="2.3" data-track-index="1">
+        <div class="band" style="gap: 20px">
+          <div id="s7-k" class="kicker">Editing software ఖర్చు</div>
+          <div id="s7-zero">₹0</div>
+          <div id="s7-a" class="mid">డబ్బులు పెట్టాల్సిన<br />అవసరం లేదు.</div>
+        </div>
+      </div>
+
+      <!-- 8. The one ask -->
+      <div id="s8" class="scene clip" data-start="27.77" data-duration="2.88" data-track-index="1">
+        <div class="band">
+          <div id="s8-a" class="mid">Setup guide కావాలా?</div>
+          <div id="s8-k" class="kicker">Comment లో ఇలా రాయండి</div>
+          <div id="s8-box">
+            <div id="s8-av"></div>
+            <div id="s8-code">CODE</div>
+          </div>
+          <div id="s8-b" class="mid hl">మీ DM కి పంపిస్తా.</div>
+        </div>
+      </div>
+
+      <!-- 9. Loop back to the hook -->
+      <div id="s9" class="scene clip" data-start="30.65" data-duration="3.55" data-track-index="1">
+        <div class="band">
+          <div id="s9-a" class="row">Edit చేయకండి.<span id="s9-x" class="strike"></span></div>
+          <div id="s9-b" class="typed" style="font-size: 124px"><span class="prompt mono">&gt;</span><span class="mint">Type</span> చేయండి.</div>
+          <div id="s9-handle" class="mono">@ashokkumar.ai</div>
+        </div>
+      </div>
+
+      <audio
+        id="vo"
+        class="clip"
+        data-start="0"
+        data-duration="33.7"
+        data-track-index="5"
+        data-volume="1"
+        src="assets/vo.mp3"
+      ></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const HIDE = "inset(0% 100% 0% 0%)";
+      const SHOW = "inset(0% 0% 0% 0%)";
+      // rise: fade and slide a line in. type: reveal left to right in steps, like typing.
+      const rise = (sel, t, d = 0.32) =>
+        tl.fromTo(sel, { opacity: 0, y: 46 }, { opacity: 1, y: 0, duration: d, ease: "power3.out" }, t);
+      const type = (sel, t, d, steps) =>
+        tl.fromTo(sel, { clipPath: HIDE }, { clipPath: SHOW, duration: d, ease: `steps(${steps})` }, t);
+      const strike = (sel, t) =>
+        tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: 0.22, ease: "power2.out" }, t);
+
+      // background drift across the whole reel
+      tl.fromTo("#glow", { x: -160, y: -120 }, { x: 200, y: 420, duration: 34.2, ease: "none" }, 0);
+
+      // 0. hook (already readable at frame 0, then settles)
+      tl.fromTo("#s0-a", { scale: 1.06 }, { scale: 1, duration: 0.7, ease: "power3.out", transformOrigin: "left center" }, 0);
+      tl.fromTo("#s0-k", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.1);
+      type("#s0-b", 2.0, 1.0, 14);
+
+      // 1. three tools, struck out one by one
+      rise("#s1-r1", 3.78, 0.25);
+      strike("#s1-x1", 4.3);
+      rise("#s1-r2", 4.7, 0.25);
+      strike("#s1-x2", 5.35);
+      rise("#s1-r3", 5.7, 0.25);
+      strike("#s1-x3", 6.2);
+      rise("#s1-k", 6.35, 0.25);
+
+      // 2. the usual way: a timeline being scrubbed
+      rise("#s2-k", 7.0);
+      tl.fromTo("#s2-tl", { opacity: 0, y: 46 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 7.15);
+      ["#s2-t1", "#s2-t2", "#s2-t3", "#s2-t4"].forEach((s, i) =>
+        tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 7.3 + i * 0.12),
+      );
+      tl.fromTo("#s2-head", { x: 0 }, { x: 800, duration: 3.2, ease: "none" }, 7.3);
+      rise("#s2-a", 8.3);
+      rise("#s2-b", 9.5);
+
+      // 3. the other way: a video is an HTML file
+      rise("#s3-k", 10.62);
+      rise("#s3-a", 11.2);
+      tl.fromTo("#s3-code", { opacity: 0, y: 46 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 12.0);
+      type("#s3-l1", 12.1, 0.35, 10);
+      type("#s3-l2", 12.45, 0.3, 9);
+      type("#s3-l3", 12.75, 0.3, 10);
+      type("#s3-l4", 13.05, 0.35, 8);
+      type("#s3-l5", 13.4, 0.15, 4);
+      rise("#s3-b", 13.75);
+
+      // 4. the tool
+      rise("#s4-k", 14.85);
+      tl.fromTo("#s4-name", { opacity: 0, scale: 0.86 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)", transformOrigin: "left center" }, 15.5);
+      tl.fromTo("#s4-c1", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.28, ease: "back.out(2)" }, 16.75);
+      tl.fromTo("#s4-c2", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.28, ease: "back.out(2)" }, 17.2);
+
+      // 5. who did what
+      rise("#s5-n1", 18.25);
+      tl.fromTo("#s5-a1", { scaleY: 0 }, { scaleY: 1, duration: 0.25, ease: "power2.out" }, 19.0);
+      rise("#s5-n2", 19.2);
+      tl.fromTo("#s5-a2", { scaleY: 0 }, { scaleY: 1, duration: 0.25, ease: "power2.out" }, 20.1);
+      rise("#s5-n3", 20.3);
+      tl.fromTo("#s5-a3", { scaleY: 0 }, { scaleY: 1, duration: 0.25, ease: "power2.out" }, 21.3);
+      rise("#s5-n4", 21.5);
+      tl.fromTo("#s5-n4", { scale: 1 }, { scale: 1.04, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 1, transformOrigin: "left center" }, 21.8);
+
+      // 6. everything is an element
+      rise("#s6-e1", 22.85, 0.25);
+      rise("#s6-e2", 23.55, 0.25);
+      tl.fromTo("#s6-e2", { x: 0 }, { x: 150, duration: 0.45, ease: "power2.inOut", yoyo: true, repeat: 1 }, 23.85);
+      rise("#s6-e3", 24.4, 0.25);
+
+      // 7. cost
+      rise("#s7-k", 25.5, 0.2);
+      tl.fromTo("#s7-zero", { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power4.out", transformOrigin: "left center" }, 25.65);
+      rise("#s7-a", 26.2, 0.25);
+
+      // 8. the ask
+      rise("#s8-a", 27.82, 0.25);
+      rise("#s8-k", 28.5, 0.25);
+      tl.fromTo("#s8-box", { opacity: 0, y: 46 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 28.6);
+      type("#s8-code", 28.8, 0.4, 4);
+      rise("#s8-b", 29.3, 0.25);
+
+      // 9. loop
+      rise("#s9-a", 30.7, 0.25);
+      strike("#s9-x", 31.15);
+      tl.fromTo("#s9-a", { opacity: 1 }, { opacity: 0.45, duration: 0.2, immediateRender: false }, 31.25);
+      type("#s9-b", 31.4, 0.6, 10);
+      tl.fromTo("#s9-handle", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 31.0);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
