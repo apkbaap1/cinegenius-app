@@ -25,8 +25,8 @@ building, then use one of:
 - **From source (slow, needs Rust 1.95+):** clone the repo and run
   `cargo build --release -p effectcraft-cli`; the binary is `target/release/effectcraft-cli`.
 
-To use it as MCP tools instead of shell calls, register
-`{"command": "<path>/effectcraft-cli", "args": ["mcp", "--autosave"]}` in `.mcp.json`. The tool names
+This repo's `.mcp.json` registers `effectcraft-cli mcp --autosave`, so once the binary is on `PATH`
+a new session gets it as MCP tools. The tool names
 below (`execute_command`, `add_keyframe`, `render_frame`…) are the MCP ones; each has a CLI twin.
 
 ## 2. The loop

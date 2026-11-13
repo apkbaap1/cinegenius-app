@@ -25,6 +25,7 @@ engine command is `effectcraft-cli exec <id> '<json>' project.ecproj --save`.
 | Shape modifiers | `layer.addShapeItem {"layer":"Ring","kind":"trim"}` → returns `{uid, path}` to animate |
 | Import media | `file.import {"paths":["/abs/clip.mp4"]}`; add `"sequence":true` for a numbered image run |
 | Move a layer in time | `layer.timing {"layers":["Scene 2"],"start":5.1}` (comp seconds) |
+| Outline-only shape | create it with a `stroke`, then `set_property {"layer":"Ring","path":"contents/group/contents/fill/opacity","value":0}` (an 8-digit hex fill does not make it transparent) |
 | Mask | `layer.addMask {"layer":"Clip","shape":"ellipse"}` → `layer.mask.set {"field":"feather","value":40}` |
 
 ## Animate
