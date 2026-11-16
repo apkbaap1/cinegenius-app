@@ -23,6 +23,16 @@ VOICES = {"Bhavana": "female", "Lakshmi": "female", "Sravani": "female",
           "Srinivas": "male", "Karthik": "male", "Pranay": "male"}
 SR = 24000
 
+# The Telugu normaliser reads digits in Telugu: "3D" -> "మూడు డీ". Tech terms (3D, 2D, 4K, 5G, 1080p)
+# are said in English, so a digit glued to Latin letters is spelled as the English number in Telugu script.
+EN_NUM = {"0": "జీరో", "1": "వన్", "2": "టూ", "3": "త్రీ", "4": "ఫోర్", "5": "ఫైవ్", "6": "సిక్స్", "7": "సెవెన్",
+          "8": "ఎయిట్", "9": "నైన్", "10": "టెన్", "360": "త్రీ సిక్స్టీ", "1080": "టెన్ ఎయిటీ", "720": "సెవెన్ ట్వెంటీ"}
+def fix_tech_terms(text):
+    def sub(m):
+        n, tail = m.group(1), m.group(2)
+        return (EN_NUM[n] + (" " + tail if tail else "")) if n in EN_NUM else m.group(0)
+    return re.sub(r"(?<![\w.])(\d{1,4})([A-Za-z]{1,3})(?![A-Za-z])", sub, text)
+
 def parse_txt(path, cast, default):
     lines, scene_break, n = [], False, 0
     for raw in open(path, encoding="utf-8"):
@@ -49,6 +59,7 @@ def main():
     ap.add_argument("--cast", default=""); ap.add_argument("--default", default="Bhavana")
     ap.add_argument("--gap", type=float, default=0.6); ap.add_argument("--scene-gap", type=float, default=1.2)
     ap.add_argument("--lead", type=float, default=0.5, help="silence before the first line (text scripts)")
+    ap.add_argument("--keep-digits", action="store_true", help="don't respell 3D/4K-style terms in English")
     ap.add_argument("--seeds", type=int, default=4); ap.add_argument("--length", type=float, default=None)
     ap.add_argument("--hima", default=os.environ.get("HIMA_DIR", os.path.expanduser("~/.cache/hima-tts-nano-te")))
     a = ap.parse_args()
@@ -56,6 +67,10 @@ def main():
     cast = {k.strip(): v.strip() for k, v in cast.items()}
     lines = json.load(open(a.script, encoding="utf-8")) if a.script.endswith(".json") else parse_txt(a.script, cast, a.default)
     for L in lines:
+        if not a.keep_digits:
+            fixed = fix_tech_terms(L["t"])
+            if fixed != L["t"]: print(f"{L['id']}: read as -> {fixed}")
+            L["t"] = fixed
         if L["v"] not in VOICES and not L["v"].endswith((".wav", ".safetensors")):
             sys.exit(f"line {L['id']}: unknown voice {L['v']!r}; use one of {', '.join(VOICES)} or a .wav/.safetensors voice file")
     out = os.path.abspath(a.out); os.makedirs(out, exist_ok=True)

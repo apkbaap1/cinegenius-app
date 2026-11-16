@@ -37,6 +37,9 @@ pick and say which. Also possible: a `.wav` (5-10 s of clear speech) to copy a v
    Speaker labels are mapped with `--cast`. Unlabelled lines use `--default`. A label that is
    already a voice name (`Bhavana: ...`) needs no cast. **Only Telugu speech in the text**: the
    model reads everything, so no stage directions, timings or brackets in spoken lines.
+   Tech terms with digits (3D, 4K, 5G, 1080p) are respelled automatically so they are read in English
+   (the model's normaliser would say "3D" as "మూడు డీ"); the script prints each rewritten line.
+   `--keep-digits` turns this off. For a Reel use tight pauses: `--lead 0.2 --gap 0.35 --scene-gap 0.6`.
    For a film with fixed timings use `.json`: `[{"id":"01","v":"Bhavana","t":"...","s":3.4,"e":7.8}]`
    (s/e in seconds). Each line is placed at `s`, and up to `--seeds` takes are tried to fit `s..e`.
 3. **Generate:**
