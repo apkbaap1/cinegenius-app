@@ -59,6 +59,7 @@ def main():
     ap.add_argument("--cast", default=""); ap.add_argument("--default", default="Bhavana")
     ap.add_argument("--gap", type=float, default=0.6); ap.add_argument("--scene-gap", type=float, default=1.2)
     ap.add_argument("--lead", type=float, default=0.5, help="silence before the first line (text scripts)")
+    ap.add_argument("--take", type=int, default=0, help="take number (seed): a different number gives a different reading of the same text")
     ap.add_argument("--keep-digits", action="store_true", help="don't respell 3D/4K-style terms in English")
     ap.add_argument("--seeds", type=int, default=4); ap.add_argument("--length", type=float, default=None)
     ap.add_argument("--hima", default=os.environ.get("HIMA_DIR", os.path.expanduser("~/.cache/hima-tts-nano-te")))
@@ -81,7 +82,7 @@ def main():
     for L in lines:
         slot = (L["e"] - L["s"]) if "s" in L and "e" in L else None
         best = None
-        for seed in range(a.seeds if slot else 1):
+        for seed in range(a.take, a.take + (a.seeds if slot else 1)):
             audio = trim(np.asarray(tts.say(L["t"], voice=L["v"], seed=seed), dtype=np.float32))
             over = max(0.0, len(audio) / SR - slot) if slot else 0.0
             if best is None or over < best[0]: best = (over, seed, audio)

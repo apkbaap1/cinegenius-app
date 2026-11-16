@@ -51,6 +51,8 @@ pick and say which. Also possible: a `.wav` (5-10 s of clear speech) to copy a v
    of every line, for retiming a film's cues). It prints `OVERRUN` when a take is longer than its
    slot and `WARNING` on overlaps. Fix those by moving `s` of the line or the next one, shortening
    the text, or more `--seeds`. Don't speed speech up.
+   **Another take** ("try again", "different reading"): rerun with `--take 1`, `--take 2`, ... into a new
+   folder. Same voice, a different delivery; the same take number always gives the same audio.
 4. **Mix onto a video** (optional): `bash $SKILL_DIR/scripts/mix.sh film.mp4 out/vo/voiceover.wav film-VO.mp4`
    The music is ducked under the voice, then everything is normalised to -16 LUFS. The script prints the
    stream lengths and loudness. Check that the audio length matches the video.
