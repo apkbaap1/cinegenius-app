@@ -22,7 +22,9 @@ pick and say which. Also possible: a `.wav` (5-10 s of clear speech) to copy a v
 
 ## Steps
 
-1. **Setup** (once per container, ~1-2 min): `bash .claude/skills/telugu-voiceover/scripts/setup.sh`
+`SKILL_DIR` below is this skill's folder (in this repo: `.claude/skills/telugu-voiceover`).
+
+1. **Setup** (once per container, ~1-2 min): `bash $SKILL_DIR/scripts/setup.sh`
    Model goes to `$HIMA_DIR` (default `~/.cache/hima-tts-nano-te`).
 2. **Write or take the script.** Text format (`.txt`), one spoken line per line:
    ```
@@ -39,23 +41,27 @@ pick and say which. Also possible: a `.wav` (5-10 s of clear speech) to copy a v
    (s/e in seconds). Each line is placed at `s`, and up to `--seeds` takes are tried to fit `s..e`.
 3. **Generate:**
    ```bash
-   python .claude/skills/telugu-voiceover/scripts/voiceover.py script.txt out/vo \
+   python $SKILL_DIR/scripts/voiceover.py script.txt out/vo \
      --cast "కథకుడు=Bhavana,మొసలి=Srinivas,కోతి=Pranay" [--length 80]
    ```
    Output: `line<NN>.wav` per line, `voiceover.wav` (48 kHz, -18 LUFS), `report.json` (start/end
    of every line, for retiming a film's cues). It prints `OVERRUN` when a take is longer than its
    slot and `WARNING` on overlaps. Fix those by moving `s` of the line or the next one, shortening
    the text, or more `--seeds`. Don't speed speech up.
-4. **Mix onto a video** (optional): `bash .claude/skills/telugu-voiceover/scripts/mix.sh film.mp4 out/vo/voiceover.wav film-VO.mp4`
+4. **Mix onto a video** (optional): `bash $SKILL_DIR/scripts/mix.sh film.mp4 out/vo/voiceover.wav film-VO.mp4`
    The music is ducked under the voice, then everything is normalised to -16 LUFS. The script prints the
    stream lengths and loudness. Check that the audio length matches the video.
 5. **Verify** (you cannot listen): transcribe with
-   `pip install faster-whisper` then `python films/panchatantra/pipeline/w.py medium out/vo/voiceover.wav`.
+   `pip install faster-whisper` then `python $SKILL_DIR/scripts/transcribe.py medium out/vo/voiceover.wav`.
    Use Whisper in Hindi mode: it writes the Telugu sounds in Devanagari, so you can check that every line is present and in order.
-6. **Deliver** with SendUserFile: the video (if any), `voiceover.wav`, and the script. Name the voices
-   used. `.wav`/`.mp4` are gitignored: never commit audio; commit the script/JSON if it belongs to a film.
+6. **Deliver** (send or attach the files for the user): the video (if any), `voiceover.wav`, and the script. Name the voices
+   used. In a git repo, never commit audio or video; commit the script/JSON if it belongs to a film.
 
-## Panchatantra films
+## Requirements
+
+Network access to huggingface.co (model download, ~250 MB, plus PyTorch from PyPI on first run) and ffmpeg.
+
+## Panchatantra films (CineGenius repo only)
 
 The film pipeline is in `films/panchatantra/PIPELINE.md`. The "Kothi, Mosali" example is in
 `films/panchatantra/vo/`: `lines.json` holds its timed lines on the film's cue anchors. Render the
