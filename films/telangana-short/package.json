@@ -1,0 +1,27 @@
+{
+  "name": "telangana-short",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts TelanganaShort out/video.mp4 --codec h264 --crf 16 --scale 1.3333"
+  },
+  "dependencies": {
+    "@react-three/fiber": "^8.17.10",
+    "@react-three/postprocessing": "^2.16.6",
+    "@remotion/bundler": "^4.0.522",
+    "@remotion/cli": "^4.0.522",
+    "@remotion/renderer": "^4.0.522",
+    "@remotion/three": "^4.0.522",
+    "postprocessing": "^6.36.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.522",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.31",
+    "@types/three": "^0.170.0",
+    "typescript": "^5.9.3"
+  }
+}
