@@ -7,7 +7,7 @@ export const GATE: XZ = [0, -112];      // the four-minaret gate across the stre
 export const GATE_W = 20;               // footprint side
 export const SHOPS = [-50, -55, -60];   // shop fronts with rolling shutters on the west side of the street (x = -6, facing +x)
 export const BUS: XZ = [2.6, -78];      // where the bus stops (heading -z toward the gate)
-export const LAMP_WIN: [number, number, number] = [-6.02, 10.3, -88]; // second-floor window (absolute y: ground is 6) // the one lit window of the quiet street (shot "quiet")
+export const LAMP_WIN: [number, number, number] = [-5.96, 10.3, -88]; // second-floor window (absolute y: ground is 6) // the one lit window of the quiet street (shot "quiet")
 export const CANOPY: XZ = [30, -34.2];  // hunger-strike canopy on the promenade
 export const VIL: XZ = [-520, -460];    // village centre: the teaching tree
 export const BOARD: XZ = [VIL[0] + 3.2, VIL[1] - 1.2]; // chalkboard

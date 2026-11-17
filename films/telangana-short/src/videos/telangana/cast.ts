@@ -378,7 +378,7 @@ const june = (cam: CamInfo, t: number, out: Stage) => {
     const t0 = W.june + 0.1 + k * 0.42, u = (t - t0) / 1.4;
     if (u < 0 || u >= 1) continue;
     const col = FIRE_COLS[k % 6], uq = q(u, 30);
-    out.fx.push({ key: `fw${k % 6}|${uq}`, cw: 500, ch: 500, draw: (p) => fxFirework(p, uq, col, k), x: GATE[0] + (hh(k, 3) - 0.5) * 60, y: G + 26 + hh(k, 4) * 22, z: GATE[1] + 22 + (hh(k, 5) - 0.5) * 8, w: 18, h: 18 });
+    out.fx.push({ key: `fw${k % 6}|${uq}`, cw: 500, ch: 500, draw: (p) => fxFirework(p, uq, col, k), x: GATE[0] + (hh(k, 3) - 0.5) * 60, y: G + 22 + hh(k, 4) * 20, z: GATE[1] + 22 + (hh(k, 5) - 0.5) * 8, w: 30, h: 30 });
   }
 };
 /** 15, 16, 20 Bathukamma: women round the plate (none on the camera's side), clapping as they circle */
