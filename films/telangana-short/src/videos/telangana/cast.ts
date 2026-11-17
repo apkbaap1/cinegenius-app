@@ -5,13 +5,13 @@
 // Cards, effects and blobs live on the NOINK layer so the world ink pass never outlines their quads.
 import * as THREE from "three";
 import {
-  Pen, bodyFront, bodySide, swingKid, soldier, townsfolk, OFFICER, KID, PARENT, fxNote, fxBurst, fxSplash, fxStars, fxCreak, fxRing, fxBlob, fxShadow, fxContact, fxPlank, fxDrum,
-  Outfit, Expr, FrontOpts, SideOpts,
+  Pen, bodyFront, bodySide, fxBurst, fxShadow, fxContact, fxPaper, fxHand, fxGavel, fxFirework,
+  student, woman, PROFESSOR, leader, villager, miner, kidIn, worker, lawyer, driver, Outfit, Expr, FrontOpts, SideOpts,
 } from "./toon";
 import {
-  FPS, D0, FILES, ROW_GAP, COUNT, PARK, SHOTS, SNAP, DROP0, DROP1, DROP_H, V3, front, marchPhase, stomp, deckY, dropW, dropU, shapeZ,
-  smooth, clamp01, BridgeState,
+  FPS, D0, FILES, ROW_GAP, STUDENTS, SHOTS, V3, W, marchFront, marchPhase, busZ, smooth, clamp01, HOOK_AT, TABLE_AT, TOP_FLOWER,
 } from "./story";
+import { QUAY_Z, CANOPY, VIL, BK, FIELDS, DELHI, MINE, BUS, SHOPS, GATE } from "./places";
 import { LIGHTS } from "./lights";
 import { NOINK } from "./ink";
 import { cardShade, blobMaterial, CARD_K } from "./cardshade";
@@ -120,9 +120,6 @@ export type CamInfo = { pos: THREE.Vector3; right: THREE.Vector3; sun?: THREE.Ve
 
 const hh = (i: number, s = 0) => { const v = Math.sin(i * 127.1 + s * 311.7) * 43758.5453; return v - Math.floor(v); };
 const q = (v: number, n = 120) => Math.round(v * n) / n;
-const SOLDIER = [0, 1, 2, 3].map((v) => soldier(v));
-const BARE = [0, 1, 2, 3].map((v) => soldier(v, { hat: null }));
-const FOLK = [0, 1, 2, 3, 4, 5].map((v) => townsfolk(v));
 const vOf = (i: number) => (i * 7 + (i >> 2)) % 4;
 /** head-shape seed: 7 shapes, so marching soldiers in step still share canvases */
 const seedOf = (i: number) => ((i * 5 + 3) % 7) + 1;
@@ -171,7 +168,6 @@ const LEAD = 2 / FPS;
 /** eyelid 0 open .. 1 shut. Reference: gaps 0.5-2.3 s, 4-frame blink half / shut / shut / half, plus a blink across
  *  every expression swap (the shut frames hide the swap) */
 const LID = [0.5, 1, 1, 0.5];
-const SWAPS: Record<number, number[]> = { 4: [16.17, 17.3], 5: [19.48, 20.6], 6: [21.9, 23.7], 7: [29.4, 30.6], 8: [SNAP] };
 const lidAt = (t: number, i: number, swaps: number[] = []) => {
   const f = Math.round(t * FPS);
   for (const ts of swaps) { const k = f - Math.round((ts - LEAD) * FPS) + 1; if (k >= 0 && k < 4) return LID[k]; }
@@ -221,253 +217,228 @@ const blob = (out: Stage, x: number, y: number, z: number, sc = 1, k = 1) => {
     w: 0.52 * sc, h: 0.4 * sc, flat: true, rot });
 };
 
-// ---------------- crowd by shot ----------------
+// ---------------- the people of each scene ----------------
 export type Stage = { places: Place[]; fx: FxPlace[] };
+const G = D0;
+const STU = Array.from({ length: 8 }, (_, v) => student(v));
+const WOM = Array.from({ length: 7 }, (_, v) => woman(v));
+const VILL = Array.from({ length: 4 }, (_, v) => villager(v));
+const KIDS = Array.from({ length: 4 }, (_, v) => kidIn(v));
+const LAW = Array.from({ length: 3 }, (_, v) => lawyer(v));
+const WRK = Array.from({ length: 3 }, (_, v) => worker(v));
+const MINER_ON = [0, 1].map((v) => miner(v, true)), MINER_OFF = [0, 1].map((v) => miner(v, false));
+/** a mixed townsperson for crowds: students, women, villagers, kids */
+const townWho = (i: number): Who => {
+  const k = (i * 7 + 3) % 10;
+  if (k < 3) return { i, o: STU[i % 8], okey: `st${i % 8}` };
+  if (k < 7) return { i, o: WOM[i % 7], okey: `wo${i % 7}` };
+  if (k < 9) return { i, o: VILL[i % 4], okey: `vi${i % 4}` };
+  return { i, o: KIDS[i % 4], okey: `kd${i % 4}` };
+};
+const isKid = (w: Who) => w.okey.startsWith("kd");
+/** someone standing still (front view), with blinks and an optional wave */
+const stand = (cam: CamInfo, t: number, out: Stage, who: Who, x: number, z: number, expr: Expr, wave?: number, y = G, extra: Partial<FrontOpts> = {}) => {
+  const sc = isKid(who) || who.o.build === "kid" ? 0.72 : 1;
+  out.places.push(person(cam, who, x, y, z, { side: false, mirror: false }, { mode: "stand", expr, wave, blink: lidAt(t, who.i), ...extra }, {}, sc));
+  blob(out, x, y, z, sc);
+};
+const sit = (cam: CamInfo, t: number, out: Stage, who: Who, x: number, z: number, expr: Expr, y = G) => {
+  const sc = isKid(who) || who.o.build === "kid" ? 0.72 : 1;
+  out.places.push(person(cam, who, x, y, z, { side: false, mirror: false }, { mode: "sit", expr, blink: lidAt(t, who.i) }, {}, sc));
+  blob(out, x, y, z, 1.05 * sc, 0.8);
+};
+const waveAt = (t: number, i: number, speed = 9) => q(Math.sin(t * speed + i * 1.3), 30);
 
-const exprMarch = (id: number, t: number, i: number, tau: number): { expr: Expr; look: number } => {
-  const lau = i % 3 === 0, whi = i % 5 === 1, L = LEAD;
-  switch (id) {
-    case 1: return { expr: lau ? "laugh" : whi ? "whistle" : "grin", look: 0 };
-    case 2: case 3: return { expr: i % 4 === 3 ? "smile_closed" : i % 2 ? "neutral" : "stern", look: 0 };
-    case 4: return t < 16.17 - L ? { expr: i % 2 ? "neutral" : "stern", look: 0 } : t < 17.3 - L ? { expr: lau ? "shock" : "nervous", look: 0 } : { expr: "neutral", look: 0 };
-    case 5: return { expr: t < 19.48 - L ? "neutral" : t < 20.6 - L ? "grin" : i % 2 ? "laugh" : "grin", look: 0 };
-    case 6: return { expr: (i === 2 && t > 21.9 - L) || (t > 23.7 - L && i % 4 === 1) ? "whistle" : t > 23.7 - L && lau ? "laugh" : "grin", look: 0 };
-    case 7: return t < 29.4 - L ? { expr: lau ? "laugh" : "grin", look: 0 } : t < 30.6 - L ? { expr: i % 2 ? "nervous" : "grin", look: -1 } : { expr: "nervous", look: 0 };
-    case 8: return { expr: tau < SNAP - L ? "nervous" : "shock", look: tau < SNAP + 0.6 ? -1 : 0 };
-    default: return { expr: whi ? "whistle" : "grin", look: 0 };
+/** 1 the hook: grandfather, mother and child on the promenade at sunrise */
+const hook = (cam: CamInfo, t: number, out: Stage) => {
+  const [x, , z] = HOOK_AT;
+  stand(cam, t, out, { i: 1, o: { ...VILL[0], hair: "#e9e6e0", build: "stout" }, okey: "grandpa" }, x - 0.95, z, "smile_closed");
+  stand(cam, t, out, { i: 2, o: WOM[1], okey: "wo1" }, x, z - 0.15, "smile");
+  stand(cam, t, out, { i: 3, o: KIDS[0], okey: "kd0" }, x + 0.8, z + 0.1, t > 4 ? "grin" : "smile", t > 4.5 ? waveAt(t, 3, 6) : undefined);
+};
+/** a light scatter of people on the promenade (aerials) */
+const promenade = (cam: CamInfo, t: number, out: Stage, n: number, x0: number, x1: number, cheer = false) => {
+  for (let i = 0; i < n; i++) {
+    const x = x0 + ((i * 37.3) % 1 + hh(i)) / 2 * (x1 - x0), z = -35.8 + hh(i, 2) * 4.6;
+    const who = townWho(i + 300);
+    stand(cam, t, out, who, x, z, (["smile", "grin", "smile_closed", "laugh"] as Expr[])[i % 4], cheer && i % 3 !== 1 ? waveAt(t, i) : undefined);
   }
 };
-
-/** the marching column (shots 1-8, 13) */
-const column = (id: number, t: number, b: BridgeState, cam: CamInfo, out: Stage) => {
-  const s = SHOTS[id - 1], tau = s.tau(t);
-  const stopT = SNAP + 0.3, walkT = id === 8 ? Math.min(tau, stopT) : tau;
-  const F = front(walkT), ph = marchPhase(walkT), st = stomp(tau);
-  const falling = id === 8 && tau >= DROP0;
-  for (let i = 0; i < COUNT; i++) {
-    const row = i >> 2, x0 = FILES[i & 3] + (hh(i) - 0.5) * 0.08, z = F + row * ROW_GAP + (hh(i, 2) - 0.5) * 0.1;
-    let x = x0, y = Math.abs(z) <= 30 ? deckY(z, b) : D0;
-    const who: Who = { i, o: SOLDIER[vOf(i)], okey: `s${vOf(i)}` };
-    let { expr, look } = exprMarch(id, t, i, tau);
-    let mode: "march" | "stand" | "fall" | "sit" = id === 8 && tau >= SNAP + 0.25 ? "stand" : "march";
-    let tilt = 0;
-    if (falling) {
-      // the soldiers lag the falling deck a little (cartoon hang time), then sit in the water
-      const lagY = D0 + b.bounce * shapeZ(z) - dropU(tau - 0.13) * DROP_H * dropW(z);
-      const air = Math.max(0, lagY - y);
-      y += air;
-      const u = clamp01((tau - DROP0) / (DROP1 - DROP0));
-      x = x0 + (hh(i, 3) - 0.5) * 0.7 * u;
-      mode = tau < DROP1 + 0.13 ? "fall" : "sit";
-      tilt = mode === "fall" ? (hh(i, 4) - 0.5) * 50 * u : 0;
-      if (mode === "sit") expr = i % 3 ? "dazed" : "shock";
-    }
-    const view = viewOf(cam, x, z, 0, -1);
-    const blink = expr !== "whistle" ? lidAt(t, i, SWAPS[id]) : 0;
-    const fo: FrontOpts = { phase: mode === "march" ? ph : 0, expr, mode, look, blink, lift: 60 * st, tilt };
-    // side views: the stance foot keeps pace with the column (0.8 m steps at 2 steps/s), foreshortened by the view
-    const so: SideOpts = { phase: mode === "march" ? ph : 0, expr, mode: mode === "march" ? "march" : "stand", blink, stomp: st, stride: view.fs };
-    out.places.push(person(cam, who, x, y, z, mode === "fall" || mode === "sit" ? { side: false, mirror: false } : view, fo, so));
-    if (mode === "march" || mode === "stand") blob(out, x, y, z);
-    // whistled notes drift up from whistlers near the lens
-    if (expr === "whistle" && (id === 6 || id === 1 || id === 13) && cam.pos.distanceTo(tmp.set(x, y, z)) < 16) {
-      for (let n = 0; n < 4; n++) {
-        const age = ((t - 21.9 + n * 0.42 + hh(i, 5)) % 1.68) / 1.68;
-        const pop = Math.min(1, age * 7) * (age > 0.82 ? (1 - age) / 0.18 : 1);
-        if (pop <= 0.02) continue;
-        const kind = (n + i) % 2, side = 0.16 + 0.32 * age + 0.05 * Math.sin(age * 9 + n);
-        out.fx.push({ key: `note${kind}`, cw: 220, ch: 260, draw: (p) => fxNote(p, kind), x: x + cam.right.x * side, y: y + 1.5 + 0.85 * age, z: z + cam.right.z * side - 0.1,
-          w: 0.17 * pop, h: 0.2 * pop, rot: 0.3 * Math.sin(age * 6 + n) });
-      }
-    }
+/** 3 the promise: two leaders at the table (the paper is an effect card on it), onlookers behind */
+const signing = (cam: CamInfo, t: number, out: Stage) => {
+  const [x, , z] = TABLE_AT;
+  stand(cam, t, out, { i: 10, o: leader(0), okey: "ld0" }, x - 0.75, z - 0.7, t > 17.6 ? "smile" : "neutral");
+  stand(cam, t, out, { i: 11, o: leader(1), okey: "ld1" }, x + 0.75, z - 0.7, t > 17.6 ? "smile_closed" : "neutral");
+  for (let i = 0; i < 7; i++) stand(cam, t, out, townWho(i + 20), x - 4.2 + i * 1.4 + hh(i) * 0.4, z - 3.2 - hh(i, 3) * 1.6, i % 2 ? "smile" : "neutral");
+  const sign = clamp01((t - 16.0) / 1.9), icons = clamp01((t - 19.2) / 0.3) + clamp01((t - 20.1) / 0.3) + clamp01((t - 20.85) / 0.3);
+  out.fx.push({ key: `paper|${q(sign, 30)}|${q(icons, 30)}`, cw: 400, ch: 300, draw: (p) => fxPaper(p, q(sign, 30), q(icons, 30)), x, y: G + 0.78, z: z - 0.05, w: 0.56, h: 0.42, flat: true, rot: 0 });
+};
+/** 4 the 1969 column of students walking toward the lake; fists up from "జై తెలంగాణ" */
+const march = (cam: CamInfo, t: number, out: Stage) => {
+  const F = marchFront(t), ph = marchPhase(t);
+  for (let i = 0; i < STUDENTS; i++) {
+    const row = i >> 2, x = FILES[i & 3] + (hh(i) - 0.5) * 0.2, z = F - row * ROW_GAP + (hh(i, 2) - 0.5) * 0.15;
+    const who: Who = { i, o: STU[(i * 3) % 8], okey: `st${(i * 3) % 8}` };
+    const up = t > W.jai - 0.07 && (i + row) % 2 === 0;
+    const expr: Expr = t > W.jai - 0.07 ? (i % 3 ? "stern" : "grin") : (i % 4 === 1 ? "neutral" : "stern");
+    const view = viewOf(cam, x, z, 0, 1);
+    const fo: FrontOpts = { mode: "stroll", phase: q(ph + hh(i, 4) * 0.08, 60), expr, blink: lidAt(t, i), wave: up ? 1 : undefined };
+    const so: SideOpts = { mode: "march", phase: q(ph, 60), expr, stomp: 0.6, stride: 0.8 * view.fs, blink: lidAt(t, i) };
+    out.places.push(person(cam, who, x, G, z, view, fo, so));
+    blob(out, x, G, z);
+  }
+  for (let i = 0; i < 10; i++) { // onlookers at the doorways
+    const sx = i % 2 ? 1 : -1, z = -60 - i * 4.2 + hh(i) * 2;
+    stand(cam, t, out, townWho(i + 60), sx * (5.3 - hh(i, 5) * 0.5), z, i % 3 ? "smile" : "neutral", t > W.jai && i % 3 === 0 ? waveAt(t, i) : undefined);
   }
 };
-
-const sitters = (cam: CamInfo, t: number, out: Stage, spots: [number, number, number][], exprs: (i: number) => Expr, stars: (i: number) => boolean, water: boolean) => {
-  spots.forEach(([x, y, z], i) => {
-    const bare = i % 3 === 1;
-    const v = vOf(i + 3), who: Who = { i, o: bare ? BARE[v] : SOLDIER[v], okey: `${bare ? "b" : "s"}${v}` };
-    const expr = exprs(i), bob = water ? 0.03 * Math.sin(t * 2.2 + i) : 0;
-    out.places.push(person(cam, who, x, y + bob, z, { side: false, mirror: false }, { mode: "sit", expr, blink: lidAt(t, i), look: 0 }, {}));
-    if (stars(i)) {
-      const u = (t * 0.9 + hh(i)) % 1;
-      out.fx.push({ key: `stars${q(u, 30)}`, cw: 420, ch: 210, draw: (p) => fxStars(p, q(u, 30)), x, y: y + bob + 1.3, z, w: 0.75, h: 0.375 });
-    }
-    if (water) {
-      const u = ((t + hh(i, 7) * 2) % 2.2) / 2.2;
-      out.fx.push({ key: `ring${q(u, 30)}`, cw: 600, ch: 600, draw: (p) => fxRing(p, q(u, 30)), x, y: 0.03, z, w: 2.0, h: 2.0, flat: true });
-      // darker water right where the body meets the surface (only the front arc shows below the card)
-      out.fx.push({ key: `blob|contact|${WATERLINE}`, cw: 128, ch: 128, draw: (p) => fxContact(p, WATERLINE), x, y: 0.034 + bob * 0.3, z, w: 0.7, h: 0.5, flat: true });
-      if (bare) out.fx.push({ key: "shako", cw: 200, ch: 200, draw: shakoAlone, x: x + 0.55 + 0.3 * hh(i, 8), y: 0.12 + 0.03 * Math.sin(t * 2 + i), z: z - 0.3, w: 0.42, h: 0.42, rot: -0.5 + hh(i, 6) });
-    } else {
-      out.fx.push({ key: "puddle", cw: 300, ch: 150, draw: puddle, x, y: D0 + 0.02, z: z - 0.05, w: 1.5, h: 0.75, flat: true });
-      blob(out, x, y, z, 1.05, 0.8);
-    }
+/** 6 the professor explaining under the tree, listeners on the mats */
+const teach = (cam: CamInfo, t: number, out: Stage) => {
+  const [vx, vz] = VIL;
+  const talk = q(0.5 + 0.5 * Math.sin(t * 2.3), 12);
+  stand(cam, t, out, { i: 40, o: PROFESSOR, okey: "prof" }, vx + 1.9, vz - 0.3, Math.sin(t * 3.1) > 0.2 ? "smile" : "smile_closed", talk);
+  const spots: [number, number][] = [[-1.9, 2.0], [-0.9, 2.3], [0.2, 2.0], [1.2, 2.4], [-1.5, 3.4], [-0.3, 3.6], [0.9, 3.5], [2.0, 3.2], [-1.0, 4.6], [0.6, 4.7]];
+  spots.forEach(([dx, dz], k) => {
+    const who = k % 3 === 0 ? { i: 41 + k, o: KIDS[k % 4], okey: `kd${k % 4}` } : k % 3 === 1 ? { i: 41 + k, o: STU[k % 8], okey: `st${k % 8}` } : { i: 41 + k, o: VILL[k % 4], okey: `vi${k % 4}` };
+    sit(cam, t, out, who, vx + dx, vz + dz, (["smile", "neutral", "smile_closed"] as Expr[])[k % 3]);
   });
 };
-const WATERLINE = hexOf([0.3, 0.36, 0.52], 1);
-/** flotsam in the near water of the river shots (9-10), so the bottom of the frame is not empty: hats, planks, a drum.
- *  World positions 2.5-5 m in front of both river cameras (z -27 / -25.4 looking +z); half under the surface, bobbing. */
-const FLOAT: { kind: "shako" | "plank" | "drum"; x: number; z: number; s: number; r: number }[] = [
-  // round-4 river cameras sit at z -24.6 / -24.2: the two nearest pieces were 0.7-1.5 m from the lens (cut-off blobs)
-  { kind: "shako", x: -0.25, z: -22.5, s: 0.46, r: 0.6 }, // (drum removed: cut by the frame edge it read as a blob)
-  { kind: "shako", x: 0.95, z: -24.6, s: 0.42, r: 0.25 }, // (near plank removed: cut by the frame edge)
-];
-const flotsam = (t: number, out: Stage) =>
-  FLOAT.forEach((f, i) => {
-    const bob = 0.03 * Math.sin(t * 1.9 + i * 1.7), r = f.r + 0.08 * Math.sin(t * 1.3 + i);
-    const [cw, ch, draw, ar] = f.kind === "shako" ? [200, 200, shakoAlone, 1] as const : f.kind === "plank" ? [320, 110, fxPlank, 110 / 320] as const : [260, 240, fxDrum, 240 / 260] as const;
-    const w = f.s, h = f.s * ar;
-    out.fx.push({ key: f.kind, cw, ch, draw, x: f.x, y: 0.28 * h + bob, z: f.z, w, h, rot: r });
-    out.fx.push({ key: `ring${q(((t * 0.45 + i * 0.3) % 1), 30)}`, cw: 600, ch: 600, draw: (p) => fxRing(p, q(((t * 0.45 + i * 0.3) % 1), 30)), x: f.x, y: 0.03, z: f.z, w: 1.1 * f.s + 0.5, h: 1.1 * f.s + 0.5, flat: true });
+/** 7 the fast: a man on the mat under the canopy, supporters round him */
+const fast = (cam: CamInfo, t: number, out: Stage) => {
+  const [cx, cz] = CANOPY;
+  sit(cam, t, out, { i: 60, o: { jacket: "#f4f1ea", pants: "#efe9dc", boots: "#5a3b2a", hat: "hair", hair: "#3a2a24", skin: "#c98f62", moustache: "#2a1a14", glasses: true }, okey: "faster" }, cx, cz - 0.2, "neutral");
+  for (let i = 0; i < 9; i++) {
+    const a = Math.PI * (1.1 + (i / 8) * 0.8), r = 2.3 + hh(i) * 1.2;
+    const who = i % 2 ? { i: 61 + i, o: STU[i % 8], okey: `st${i % 8}` } : townWho(61 + i);
+    stand(cam, t, out, who, cx + Math.cos(a) * r * 1.4, cz - 0.6 + Math.sin(a) * r * 0.5, i % 3 ? "stern" : "neutral", t > W.delhiYes - 1 && i % 3 === 0 ? waveAt(t, i) : undefined);
+  }
+};
+/** 8 Delhi: the big hand over the building, thumbs up then a raised palm */
+const delhi = (cam: CamInfo, t: number, out: Stage) => {
+  if (t < W.yes - 0.25) return;
+  const kind = t < W.wait - 0.07 ? 0 : 1, t0 = kind ? W.wait - 0.07 : W.yes - 0.25, pop = q(easeBack(clamp01((t - t0) / 0.3)), 30);
+  out.fx.push({ key: `hand${kind}`, cw: 400, ch: 400, draw: (p) => fxHand(p, kind), x: DELHI[0], y: G + 36, z: DELHI[1] - 4, w: 22 * pop, h: 22 * pop });
+};
+const easeBack = (u: number) => { const c = 1.7; return 1 + (c + 1) * (u - 1) ** 3 + c * (u - 1) ** 2; };
+/** 9-10 the street: the bus, the people at the shops, the lawyers on the steps of the court */
+const street = (cam: CamInfo, t: number, out: Stage, id: number) => {
+  const bz = busZ(t);
+  if (id === 10 || t > W.halt + 0.5) {
+    stand(cam, t, out, { i: 80, o: driver(0), okey: "drv0" }, BUS[0] + 1.9, bz - 3.6, "stern");
+    stand(cam, t, out, { i: 81, o: driver(1), okey: "drv1" }, BUS[0] + 2.7, bz - 2.4, "neutral");
+  }
+  SHOPS.forEach((sz, k) => {
+    const who = { i: 85 + k, o: WRK[k % 3], okey: `wk${k % 3}` };
+    if (id === 9 && t < W.halt + 0.3 + k * 0.35) stand(cam, t, out, who, -5.0, sz + 1.0, "neutral");
+    else sit(cam, t, out, who, -4.8, sz + 1.3, k % 2 ? "stern" : "neutral");
   });
-const shakoAlone = (p: Pen) => {
-  p.poly([[42, 160], [158, 160], [166, 50], [34, 50]], "#3a3d47", 8);
-  p.ell(100, 158, 60, 10, "#16171b", 7, 0, 180);
-  p.ell(100, 96, 14, 12, "#c9ccd2", 6);
-  p.ell(100, 36, 14, 14, "#2b7a4b", 6);
-};
-const puddle = (p: Pen) => { p.ell(150, 75, 140, 58, "#6f97c6", 0); p.ell(120, 62, 60, 16, "#a9c9ea", 0); };
-
-/** the extras hold still and only cheer on cue: "pride of the whole town", "like a crowd of tourists" */
-const CHEER: [number, number][] = [[8.01 - LEAD, 9.45], [65.96 - LEAD, 67.5]];
-const townsfolkAt = (cam: CamInfo, t: number, out: Stage) => {
-  const spots: [number, number][] = [];
-  for (let i = 0; i < 26; i++) {
-    const bank = i < 13 ? -1 : 1, k = i % 13, sx = k % 2 ? 1 : -1;
-    spots.push([sx * (5.2 + (k >> 1) * 1.7 + hh(i) * 0.6), bank * (31.6 + hh(i, 2) * 3.2)]);
-  }
-  const on = CHEER.some(([a, b]) => t >= a && t < b);
-  spots.forEach(([x, z], i) => {
-    const kid = i % 5 === 2, o = kid ? KID : FOLK[i % 6], hop = kid && on ? Math.max(0, Math.sin(t * 7 + i)) * 0.18 : 0;
-    const who: Who = { i: i + 200, o, okey: kid ? "kid" : `f${i % 6}` };
-    const expr: Expr = (["smile", "grin", "laugh", "smile_closed"] as Expr[])[i % 4];
-    const fo: FrontOpts = { mode: "stand", expr, wave: i % 3 === 2 || !on ? undefined : q(Math.sin(t * 9 + i * 1.3), 30), blink: lidAt(t, i + 40) };
-    out.places.push(person(cam, who, x, D0 + hop, z, { side: false, mirror: false }, fo, {}, kid ? 0.72 : 1));
-    blob(out, x, D0, z, kid ? 0.72 : 1, hop > 0 ? 0.6 : 1);
-  });
-};
-
-/** soldiers strolling out of step across the rebuilt bridge (shot 15): own pace kept (sound), poses on ones */
-const tourists = (cam: CamInfo, t: number, out: Stage) => {
-  const t0 = 62.08;
-  for (let i = 0; i < 24; i++) {
-    const sp = 0.55 + hh(i) * 0.5, z = -4 + (i / 24) * 28 + hh(i, 2) * 1.5 - sp * (t - t0), x = (hh(i, 3) - 0.5) * 4.0;
-    const bare = i % 5 === 2, v = vOf(i), who: Who = { i, o: bare ? BARE[v] : SOLDIER[v], okey: `${bare ? "b" : "s"}${v}` };
-    const prop = i % 7 === 3 ? "icecream" : bare ? "shako" : null;
-    const lick = prop === "icecream" && (t * 0.7 + hh(i, 4)) % 1 < 0.45;
-    const expr: Expr = lick ? "lick" : (["smile", "smile_closed", "grin", "smile"] as Expr[])[i % 4];
-    const phase = q(((t - t0) * sp / 1.4 + hh(i, 5)) % 1, 120); // cadence sp/1.4 Hz unchanged = 0.7 m per step
-    const look = Math.round(Math.sin(t * 0.8 + i * 1.7) * 1.2);
-    const fo: FrontOpts = { mode: "stroll", phase, expr, look: Math.max(-1, Math.min(1, look)), prop, blink: lidAt(t, i) };
-    const view = viewOf(cam, x, z, 0, -1);
-    const so: SideOpts = { mode: "march", phase, expr, stomp: 0.55, stride: 0.875 * view.fs };
-    out.places.push(person(cam, who, x, D0, z, view, fo, so));
-    blob(out, x, D0, z);
+  if (id === 10) {
+    for (let k = 0; k < 4; k++) sit(cam, t, out, { i: 90 + k, o: LAW[k % 3], okey: `lw${k % 3}` }, -4.6 + (k % 2) * 0.7, -66.8 - k * 0.9, k % 2 ? "stern" : "neutral");
+    for (let k = 0; k < 6; k++) sit(cam, t, out, townWho(95 + k), 1.0 + (k % 3) * 1.1, -60.5 - (k >> 1) * 1.4, "stern");
   }
 };
-
-// officer hammering the new rule onto a sign at the bridge end (shot 14)
-export const HITS = [59.79, 60.33, 61.69];
-export const SIGN_AT: V3 = [2.25, D0, -30.9];
-/** 0 = hammer up, 1 = struck. Reference action timing: 4 f wind-up, held ~7 f at the top, a 1-frame strike on the word */
-const hammerK = (t: number) => {
-  let k = 1;
-  for (const th of HITS) {
-    const n = (t - th) * FPS; // frames to contact
-    if (n >= -11 && n < -7) k = Math.min(k, 1 - smooth((n + 11) / 4));
-    else if (n >= -7 && n < 0) k = 0;
-  }
-  return k;
-};
-const officer = (cam: CamInfo, t: number, out: Stage) => {
-  const fo: FrontOpts = { mode: "stand", expr: "stern", prop: ["hammer", q(hammerK(t), 30)], blink: lidAt(t, 99), facing: 1 };
-  out.places.push(person(cam, { i: 99, o: OFFICER, okey: "off" }, 3.35, D0, -31.55, { side: false, mirror: false }, fo, {}));
-  blob(out, 3.35, D0, -31.55, 1.1);
-  for (const th of HITS) if (t >= th && t < th + 5 / FPS) {
-    const u = (t - th) / (5 / FPS);
-    out.fx.push({ key: `burst${q(u, 30)}`, cw: 500, ch: 500, draw: (p) => fxBurst(p, q(u, 30)), x: 2.95, y: D0 + 1.55, z: -31.0, w: 0.9, h: 0.9 });
+/** 11 the mine: miners at the tunnel mouth; lamps go out one by one on "బొగ్గు గనులు" */
+const mine = (cam: CamInfo, t: number, out: Stage) => {
+  const [mx, mz] = MINE;
+  for (let k = 0; k < 7; k++) {
+    const off = t > W.mines + 0.4 + k * 0.17, v = k % 2;
+    const x = mx - 3.3 + k * 1.1 + (hh(k) - 0.5) * 0.3, z = mz + 6.0 + (k % 2) * 0.9;
+    stand(cam, t, out, { i: 110 + k, o: off ? MINER_OFF[v] : MINER_ON[v], okey: `mn${v}${off ? "x" : "o"}` }, x, z, off ? "stern" : "neutral");
   }
 };
-
-// swing in the park (shot 12): pushes land at the back end of every swing, the arc grows
-export const SWING_T = 1.55, PUSH0 = 48.79;
-const pushes = [0, 1, 2, 3].map((k) => PUSH0 + k * SWING_T);
-export const swingAmp = (t: number) => 6 + pushes.reduce((a, tp) => a + 11 * smooth((t - tp) / 0.3), 0);
-export const swingAngle = (t: number) => -((swingAmp(t) * Math.PI) / 180) * Math.cos((2 * Math.PI * (t - PUSH0)) / SWING_T);
-/** the swing kid's back (seat + ~.12 m, ~8 cm behind the rope) in world space when the swing is at angle th */
-const kidBack = (th: number): [number, number] => {
-  const lx = -0.083, ly = -2.174; // local to the swing card (pivot at the origin), card yawed by PI
-  return [PARK[0] - (lx * Math.cos(th) - ly * Math.sin(th)), PARK[1] + 2.88 + lx * Math.sin(th) + ly * Math.cos(th)];
+/** 12 the Million March on Tank Bund */
+const million = (cam: CamInfo, t: number, out: Stage) => {
+  let n = 0;
+  for (let row = 0; row < 4; row++) for (let i = 0; i < 46; i++) {
+    const x = -55 + i * 2.4 + (hh(n) - 0.5) * 1.1 + (row % 2) * 1.2, z = -35.7 + row * 1.25 + (hh(n, 2) - 0.5) * 0.4;
+    if (Math.abs(x - CANOPY[0]) < 0.1) { n++; continue; }
+    const who = townWho(400 + n);
+    stand(cam, t, out, who, x, z, (["grin", "smile", "laugh", "smile_closed"] as Expr[])[n % 4], n % 3 === 0 ? waveAt(t, n, 7) : undefined);
+    n++;
+  }
 };
-/** where the parent stands for push k: hands reach the kid's back at the back of the arc with the arms ~ straight */
-const pushSpot = (k: number) => {
-  const A = (swingAmp(pushes[k]) * Math.PI) / 180, [bx, by] = kidBack(-A);
-  const cy = 975 - (by - D0) / SU, dy = cy - 515, dx = Math.sqrt(Math.max(120 * 120, 222 * 222 - dy * dy));
-  return { px: bx + (53 + dx) * SU, hand: [300 + 53 + dx, cy] as [number, number] };
+/** 13 the gavel in front of the building */
+const parliament = (cam: CamInfo, t: number, out: Stage) => {
+  const k = t < W.gavel - 0.35 ? 0 : t < W.gavel ? 0 : 1;
+  const wind = t > W.gavel - 0.5 && t < W.gavel ? -0.25 : 0;
+  out.fx.push({ key: `gavel${k}${wind}`, cw: 400, ch: 400, draw: (p) => fxGavel(p, k + wind), x: DELHI[0] + 2, y: G + 6.5, z: DELHI[1] - 40, w: 9, h: 9 });
+  if (t >= W.gavel && t < W.gavel + 0.25) {
+    const u = q((t - W.gavel) / 0.25, 30);
+    out.fx.push({ key: `burst${u}`, cw: 500, ch: 500, draw: (p) => fxBurst(p, u), x: DELHI[0] + 0.5, y: G + 4.4, z: DELHI[1] - 40.5, w: 9, h: 9 });
+  }
 };
-const park = (cam: CamInfo, t: number, out: Stage) => {
-  const th = swingAngle(t), vel = Math.sin((2 * Math.PI * (t - PUSH0)) / SWING_T);
-  const A = (swingAmp(t) * Math.PI) / 180, kick = q(0.35 + 0.55 * vel, 40);
-  const expr: Expr = A < 0.35 ? "smile" : A < 0.6 ? "grin" : "laugh";
-  const light = light2D(cam, true), lid = lidAt(t, 78);
-  out.places.push({ key: `swing|${kick}|${expr}|${q(light)}|${lid}`, geo: "swing", x: PARK[0], y: PARK[1] + 2.88, z: PARK[2], yaw: Math.PI, roll: th,
-    draw: (p) => swingKid(p, KID, kick, expr, light, lid), size: [490, 1610, 0.7] });
-  const push = Math.max(0, ...pushes.map((tp) => 1 - Math.abs(t - tp + 0.05) / 0.32));
-  // stand at this push's spot; step back to the next spot between pushes (the arc grows after every push)
-  let k = 0;
-  while (k < pushes.length - 1 && t > pushes[k] + 0.35) k++;
-  const cur = pushSpot(k), prev = pushSpot(Math.max(0, k - 1));
-  const step = k > 0 ? smooth((t - (pushes[k - 1] + 0.35)) / (SWING_T - 0.7)) : 1;
-  const px = prev.px + (cur.px - prev.px) * step, pz = PARK[2] + 0.1;
-  const so: SideOpts = { mode: "push", pose: q(push, 40), expr: push > 0.3 ? "grin" : "smile", blink: lidAt(t, 77), hand: cur.hand };
-  out.places.push({ ...person(cam, { i: 77, o: PARENT, okey: "parent" }, px, D0, pz, { side: true, mirror: true }, {}, so), mirror: false, yaw: Math.PI });
-  blob(out, px, D0, pz);
+/** 14 the second of June: the street cheering, fireworks over the gate */
+const FIRE_COLS = ["#ffcf4a", "#ff6a8a", "#7fe0ff", "#b8ff7a", "#ffffff", "#ff9a3a"];
+const june = (cam: CamInfo, t: number, out: Stage) => {
+  for (let i = 0; i < 70; i++) {
+    const x = (hh(i, 7) - 0.5) * 10.5, z = -79 - (i / 70) * 24 - hh(i, 8) * 1.5;
+    stand(cam, t, out, townWho(500 + i), x, z, (["laugh", "grin", "relief_open"] as Expr[])[i % 3], i % 2 ? waveAt(t, i, 10) : undefined);
+  }
+  for (let k = 0; k < 14; k++) {
+    const t0 = W.june + 0.1 + k * 0.42, u = (t - t0) / 1.4;
+    if (u < 0 || u >= 1) continue;
+    const col = FIRE_COLS[k % 6], uq = q(u, 30);
+    out.fx.push({ key: `fw${k % 6}|${uq}`, cw: 500, ch: 500, draw: (p) => fxFirework(p, uq, col, k), x: GATE[0] + (hh(k, 3) - 0.5) * 50, y: G + 42 + hh(k, 4) * 24, z: GATE[1] - 6 + (hh(k, 5) - 0.5) * 20, w: 26, h: 26 });
+  }
+};
+/** 15, 16, 20 Bathukamma: women round the plate (none on the camera's side), clapping as they circle */
+const bathukamma = (cam: CamInfo, t: number, out: Stage, id: number) => {
+  const [bx, bz] = BK, n = 7;
+  for (let k = 0; k < n; k++) {
+    const a = Math.PI * (1.08 + (k / (n - 1)) * 0.84) + 0.05 * Math.sin(t * 0.8), r = 1.85;
+    const clap = q(0.5 + 0.5 * Math.sin(t * 6.5 + k * 1.1), 6);
+    stand(cam, t, out, { i: 130 + k, o: WOM[k % 7], okey: `wo${k % 7}` }, bx + Math.cos(a) * r, bz + Math.sin(a) * r, k % 2 ? "smile_closed" : "grin", clap);
+  }
+  if (id === 20) {
+    stand(cam, t, out, { i: 140, o: KIDS[1], okey: "kd1" }, bx + 0.75, bz + 0.15, t > TOP_FLOWER ? "laugh" : "smile", t > TOP_FLOWER - 0.6 && t < TOP_FLOWER + 0.4 ? 0.2 : undefined);
+    if (t >= TOP_FLOWER && t < TOP_FLOWER + 0.5) {
+      const u = q((t - TOP_FLOWER) / 0.5, 30);
+      out.fx.push({ key: `spark${u}`, cw: 500, ch: 500, draw: (p) => fxBurst(p, u, "#fff3b0", 8, 30, 200), x: bx, y: G + 1.25, z: bz + 0.05, w: 0.6, h: 0.6 });
+    }
+  }
+};
+/** 17 every generation, standing behind the finished tower */
+const generations = (cam: CamInfo, t: number, out: Stage) => {
+  const [bx, bz] = BK;
+  const rows: Who[][] = [
+    [{ i: 150, o: WOM[0], okey: "wo0" }, { i: 151, o: KIDS[2], okey: "kd2" }, { i: 152, o: WOM[4], okey: "wo4" }, { i: 153, o: KIDS[1], okey: "kd1" }, { i: 154, o: WOM[2], okey: "wo2" }],
+    [{ i: 160, o: MINER_ON[0], okey: "mn0o" }, { i: 161, o: driver(0), okey: "drv0" }, { i: 162, o: PROFESSOR, okey: "prof" }, { i: 163, o: LAW[0], okey: "lw0" }, { i: 164, o: WRK[1], okey: "wk1" }, { i: 165, o: MINER_ON[1], okey: "mn1o" }],
+    [{ i: 170, o: leader(0), okey: "ld0" }, { i: 171, o: STU[1], okey: "st1" }, { i: 172, o: STU[4], okey: "st4" }, { i: 173, o: VILL[2], okey: "vi2" }, { i: 174, o: STU[6], okey: "st6" }, { i: 175, o: STU[2], okey: "st2" }, { i: 176, o: leader(1), okey: "ld1" }],
+  ];
+  rows.forEach((r, ri) => r.forEach((who, k) => {
+    const x = bx + (k - (r.length - 1) / 2) * 1.05, z = bz - 2.6 - ri * 1.5;
+    stand(cam, t, out, who, x, z, (["smile", "smile_closed", "grin"] as Expr[])[(k + ri) % 3]);
+  }));
+};
+/** 19 farmers far out in the paddy */
+const fields = (cam: CamInfo, t: number, out: Stage) => {
+  for (let k = 0; k < 6; k++) stand(cam, t, out, { i: 180 + k, o: k % 2 ? VILL[k % 4] : WOM[k % 7], okey: k % 2 ? `vi${k % 4}` : `wo${k % 7}` },
+    FIELDS[0] - 30 + k * 11 + hh(k) * 4, FIELDS[1] + 8 + hh(k, 2) * 20, "smile");
 };
 
 /** everything with a face in shot `id` at time t */
-export const stage = (id: number, t: number, b: BridgeState, cam: CamInfo): Stage => {
+export const stage = (id: number, t: number, cam: CamInfo): Stage => {
   const out: Stage = { places: [], fx: [] };
   const s = SHOTS[id - 1];
   LNAME = s.light;
   findSun(cam, SUN);
-  if (s.crowd === "march" || s.crowd === "fall") column(id, t, b, cam, out);
-  if (s.towns) townsfolkAt(cam, t, out);
-  if (s.crowd === "water") {
-    const spots: [number, number, number][] = [];
-    for (let i = 0; i < 40; i++) spots.push([FILES[i & 3] * 1.12 + (hh(i, 11) - 0.5) * 0.6, -0.6, -21.6 + (i >> 2) * 1.6 + (hh(i, 12) - 0.5) * 0.7]);
-    const happy: Expr[] = ["relief", "relief_open", "smile", "relief"], hurt: Expr[] = ["pained", "dazed", "pained", "dazed"];
-    sitters(cam, t, out, spots, (i) => (id === 9 ? happy : hurt)[i % 4], (i) => id === 10 && i % 4 === 1, true);
-    flotsam(t, out);
+  switch (s.scene) {
+    case "hook": hook(cam, t, out); promenade(cam, t, out, 14, -30, 30); break;
+    case "aerial": promenade(cam, t, out, 40, -60, 60); break;
+    case "sign": signing(cam, t, out); break;
+    case "march": march(cam, t, out); break;
+    case "teach": teach(cam, t, out); break;
+    case "fast": fast(cam, t, out); promenade(cam, t, out, 16, 10, 60); break;
+    case "delhi": delhi(cam, t, out); break;
+    case "halt": case "strike": street(cam, t, out, id); break;
+    case "mine": mine(cam, t, out); break;
+    case "million": million(cam, t, out); break;
+    case "parliament": parliament(cam, t, out); break;
+    case "june": june(cam, t, out); break;
+    case "bk": bathukamma(cam, t, out, id); break;
+    case "gens": generations(cam, t, out); break;
+    case "fields": fields(cam, t, out); break;
   }
-  if (s.crowd === "bank") {
-    const spots: [number, number, number][] = [[-7.2, D0, -33.6], [-6.1, D0, -32.1], [-5.0, D0, -34.3], [-4.3, D0, -31.6], [-3.4, D0, -33.2],
-      [-2.4, D0, -31.9], [-6.8, D0, -35.4], [-4.1, D0, -35.6], [-1.9, D0, -34.6]];
-    const ex: Expr[] = ["dazed", "relief", "smile_closed", "pained"];
-    sitters(cam, t, out, spots, (i) => ex[i % 4], (i) => i % 4 === 0, false);
-    officer(cam, t, out);
-  }
-  if (s.crowd === "tourists") tourists(cam, t, out);
-  if (id === 12) park(cam, t, out);
   return out;
 };
-
-// ---------------- one-off effects ----------------
-export const snapFx = (tau: number, at: V3, out: Stage) => {
-  if (tau >= SNAP && tau < SNAP + 0.45) {
-    const u = (tau - SNAP) / 0.45;
-    out.fx.push({ key: `bigburst${q(u, 30)}`, cw: 500, ch: 500, draw: (p) => fxBurst(p, q(u, 30)), x: at[0], y: at[1] + 0.12, z: at[2] - 0.15, w: 1.5, h: 1.5 });
-  }
-};
-export const splashFx = (tau: number, out: Stage) => {
-  const u = (tau - DROP1) / 1.1;
-  if (u < 0 || u >= 1) return;
-  for (const [x, z, s] of [[-2.9, -24, 1], [2.9, -21, 0.9], [-2.9, -15, 0.85], [2.9, -9, 0.8], [0, -27.5, 1.2], [-2.9, -5, 0.6]] as const)
-    out.fx.push({ key: `splash${q(u, 30)}`, cw: 800, ch: 800, draw: (p) => fxSplash(p, q(u, 30)), x, y: 2.6 * s, z, w: 7 * s, h: 7 * s }); // base of the drawing on the water line
-};
-export const creakFx = (t: number, pts: V3[], out: Stage, size = 0.8) =>
-  pts.forEach(([x, y, z], i) => {
-    const u = q((t * 1.3 + i * 0.37) % 1, 30);
-    out.fx.push({ key: `creak${u}`, cw: 300, ch: 300, draw: (p) => fxCreak(p, u), x, y, z, w: size, h: size, rot: i * 0.6 - 0.6 });
-  });
 export { FPS };

@@ -239,8 +239,9 @@ export class Strand {
 /** a sight line of the film: from the lens toward the shot's subject, `len` along d (d has unit forward component) */
 export type Ray = { o: THREE.Vector3; d: THREE.Vector3; len: number; core: boolean };
 let sight: Ray[] = [];
+export const setSight = (r: Ray[]) => { sight = r; };
 /** does any sight line pass through this box? (centre lines only for small props, so they can still frame a shot) */
-const inTheWay = (x0: number, x1: number, y0: number, y1: number, z0: number, z1: number, coreOnly = false) => {
+export const inTheWay = (x0: number, x1: number, y0: number, y1: number, z0: number, z1: number, coreOnly = false) => {
   for (const { o, d, len, core } of sight) {
     if (coreOnly && !core) continue;
     let t0 = 0, t1 = len;
@@ -477,15 +478,15 @@ type Style = { wall: string; shutter: string; roof: string; timber?: boolean; br
 // round 3: saturation -35 % on every wall (neutral warm grey / beige; the salmon became a warm greige)
 // round 4: the pale greiges still read lavender-grey in shade -> a muted brick / cream / ochre / terracotta spread
 const STYLES: Style[] = [
-  { wall: "#ecdab2", shutter: "#3f6fb5", roof: "#d27a62" },              // cream
-  { wall: "#d8a95f", shutter: "#2f6a43", roof: "#b8644f" },              // ochre
-  { wall: "#c47a5c", shutter: "#2f5f6a", roof: "#8f97a8" },              // muted brick-red plaster
-  { wall: "#efdcb8", shutter: "#2f5f6a", roof: "#c9775a", timber: true }, // cream timber frame
-  { wall: "#ddbd78", shutter: "#5a3b2a", roof: "#d27a62" },              // straw ochre
-  { wall: "#cc9a6c", shutter: "#3f6fb5", roof: "#8e7aa0" },              // terracotta sand
-  { wall: "#e2c49a", shutter: "#8c3b4a", roof: "#c9775a" },              // warm sandstone
-  { wall: "#e3d2b8", shutter: "#2f6a43", roof: "#8f97a8", brick: true },
-];
+  { wall: "#efe6d2", shutter: "#2f6fbf", roof: "#c4673f" },              // whitewash, blue shutters
+  { wall: "#e8b96a", shutter: "#2f6a43", roof: "#b8644f" },              // turmeric ochre
+  { wall: "#9fc9b7", shutter: "#7b3fa8", roof: "#c4673f" },              // mint green
+  { wall: "#e7a59a", shutter: "#2f5f6a", roof: "#b8644f" },              // old-city pink
+  { wall: "#a9c4e2", shutter: "#8c3b4a", roof: "#c4673f" },              // indigo-wash blue
+  { wall: "#f1d79a", shutter: "#2f6fbf", roof: "#a85a3c" },              // pale yellow
+  { wall: "#d98f5f", shutter: "#2f6a43", roof: "#c4673f" },              // terracotta
+  { wall: "#e6dccd", shutter: "#3f6fb5", roof: "#b8644f" },              // lime plaster
+]
 const roofMat = (col: string) => lam("roof" + col, () => ({ map: roofHD(col, col === "#8f97a8"), side: THREE.DoubleSide }));
 
 /** gabled house: front facade (local +z) at width w, depth d, wall height h, ridge along local x (left out if it blocks a shot) */

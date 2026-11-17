@@ -18,7 +18,7 @@ import { InkPass, noInkFallback } from "./ink";
 import { LensBlur, GrainEffect } from "./lensblur";
 import { GradeEffect, GRADES, GRADE_STRENGTH, gradeFor } from "./grade";
 import { Kit } from "./build";
-import { TOTAL, FLASH_AT, SHOTS, layersAt, dofAt } from "./story";
+import { TOTAL, FLASHES, SHOTS, layersAt, dofAt } from "./story";
 
 export const BRIDGE_FRAMES = TOTAL;
 
@@ -106,7 +106,7 @@ export const BridgeShort: React.FC = () => {
   const f = useCurrentFrame();
   const kit = useKit();
   if (!kit) return null;
-  const flash = f >= FLASH_AT && f < FLASH_AT + 4 ? [1, 0.75, 0.45, 0.2][f - FLASH_AT] : 0;
+  const fa = FLASHES.find((a) => f >= a && f < a + 4), flash = fa !== undefined ? [1, 0.75, 0.45, 0.2][f - fa] : 0;
   return (
     <AbsoluteFill style={{ background: "#cfe3f2" }}>
       {layersAt(f).map((l, i) => <ShotView key={i ? "over" : "base"} id={l.id} kit={kit} alpha={l.alpha} />)}

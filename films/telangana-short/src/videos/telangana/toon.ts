@@ -983,3 +983,67 @@ export const fxBlob = (p: Pen, col: string) => {
   for (const [r, k] of [[0, 0], [0.5, 0.04], [0.64, 0.18], [0.76, 0.42], [0.87, 0.72], [0.95, 0.92], [1, 1]] as const) gr.addColorStop(r, mix(col, WHITE, k));
   g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
 };
+
+// ---------------- Telangana effect cards (no words anywhere: pictures only) ----------------
+export const lawyer = (v = 0): Outfit => ({ jacket: "#1d1b22", pants: "#2a2a30", boots: INK, hat: "hair", hair: ["#1d1418", "#d8d4cc", "#2a1a14"][v % 3],
+  skin: SKINS_IN[(v + 2) % 5], buttons: "#f4f1ea", moustache: v % 2 ? "#1d1418" : undefined, ...(v % 3 === 2 ? { bun: true, hair: "#1d1418", bindi: true } : {}) });
+export const driver = (v = 0): Outfit => ({ jacket: "#b89a5e", pants: "#8c744a", boots: "#4a3426", hat: "hair", hair: "#1d1418", skin: SKINS_IN[(v + 1) % 5],
+  moustache: "#1d1418", build: v % 2 ? "stout" : "adult" });
+/** the 1956 paper on the table, 400 x 300: ink lines of a written page (scribbles, not letters), two signatures that
+ *  draw on (sign 0..1), then three pictures pop in (icons 0..3): a briefcase (jobs), an open book (education), coins (money) */
+export const fxPaper = (p: Pen, sign: number, icons: number) => {
+  p.poly([[14, 10], [386, 18], [380, 290], [8, 282]], "#fbf6e8", 6);
+  for (let i = 0; i < 5; i++) { const y = 40 + i * 20; p.stroke(Array.from({ length: 14 }, (_, k) => [40 + k * 22, y + 3 * Math.sin(k * 1.7 + i)] as P2), 3, "#8a8fa8"); }
+  const sig = (x0: number, y0: number, k: number) => {
+    if (k <= 0) return;
+    const pts: P2[] = []; const n = Math.max(2, Math.round(24 * k));
+    for (let i = 0; i < n; i++) { const u = i / 23; pts.push([x0 + u * 110, y0 + 10 * Math.sin(u * 14) - 8 * u]); }
+    p.stroke(pts, 4, "#1f2a6a");
+  };
+  sig(40, 250, clamp(sign * 2, 0, 1)); sig(230, 250, clamp(sign * 2 - 1, 0, 1));
+  const pop = (i: number) => clamp(icons - i, 0, 1);
+  const s0 = pop(0), s1 = pop(1), s2 = pop(2);
+  if (s0 > 0) { const c: P2 = [90, 170], k = 0.6 + 0.4 * s0; // briefcase
+    p.poly([[c[0] - 36 * k, c[1] - 18 * k], [c[0] + 36 * k, c[1] - 18 * k], [c[0] + 36 * k, c[1] + 26 * k], [c[0] - 36 * k, c[1] + 26 * k]], "#8a5a34", 5);
+    p.arc(c[0], c[1] - 18 * k, 14 * k, 12 * k, 180, 360, 5); p.stroke([[c[0] - 36 * k, c[1]], [c[0] + 36 * k, c[1]]], 3); }
+  if (s1 > 0) { const c: P2 = [200, 170], k = 0.6 + 0.4 * s1; // open book
+    p.poly([[c[0], c[1] - 18 * k], [c[0] - 44 * k, c[1] - 26 * k], [c[0] - 44 * k, c[1] + 22 * k], [c[0], c[1] + 30 * k]], "#f4f1ea", 5);
+    p.poly([[c[0], c[1] - 18 * k], [c[0] + 44 * k, c[1] - 26 * k], [c[0] + 44 * k, c[1] + 22 * k], [c[0], c[1] + 30 * k]], "#f4f1ea", 5);
+    for (const s of [-1, 1]) for (let i = 0; i < 3; i++) p.stroke([[c[0] + s * 10 * k, c[1] - 8 * k + i * 12 * k], [c[0] + s * 34 * k, c[1] - 12 * k + i * 12 * k]], 2.5, "#8a8fa8"); }
+  if (s2 > 0) { const c: P2 = [310, 178], k = 0.6 + 0.4 * s2; // stacked coins
+    for (let i = 0; i < 3; i++) p.ell(c[0], c[1] + 16 * k - i * 13 * k, 30 * k, 11 * k, "#e8b93a", 4);
+    p.ell(c[0] + 34 * k, c[1] + 18 * k, 22 * k, 9 * k, "#e8b93a", 4); }
+};
+/** a giant cartoon hand, 400 x 400: thumbs up (kind 0) or a raised open palm, "wait" (kind 1) */
+export const fxHand = (p: Pen, kind: number) => {
+  const S = SKINS_IN[0];
+  if (kind === 0) {
+    p.poly(rrect(110, 170, 290, 340, 40), S, 9);
+    for (let i = 0; i < 4; i++) p.stroke([[150, 205 + i * 34], [270, 205 + i * 34]], 6);
+    p.poly([[150, 175], [175, 60], [215, 55], [225, 100], [215, 178]], S, 9);
+    p.poly(rrect(95, 330, 305, 390, 10), "#f4f1ea", 9);
+  } else {
+    p.poly(rrect(120, 170, 290, 340, 50), S, 9);
+    for (let i = 0; i < 4; i++) p.poly(rrect(126 + i * 41, 40 + (i === 0 || i === 3 ? 30 : 0), 162 + i * 41, 200, 18), S, 8);
+    p.poly([[285, 260], [345, 185], [372, 205], [300, 300]], S, 8);
+    p.poly(rrect(110, 330, 300, 390, 10), "#f4f1ea", 9);
+  }
+};
+/** the gavel, 400 x 400: k 0 raised .. 1 struck, on a round wooden block */
+export const fxGavel = (p: Pen, k: number) => {
+  p.ell(200, 350, 120, 30, "#8a5a34", 8);
+  const ang = rad(-55 + 55 * clamp(k, 0, 1)), R = (pts: P2[]) => rotPts(pts, ang, 300, 330);
+  p.band(R([[300, 330], [170, 200]]), "#a8724a", 18, 6, "round");
+  p.poly(R(rrect(110, 150, 230, 215, 14).map(([x, y]) => [x, y] as P2)), "#7a4b2a", 8);
+  p.poly(R([[132, 150], [150, 150], [150, 215], [132, 215]]), "#e8b93a", 0);
+};
+/** a firework: a ring of coloured sparks expanding and falling (t 0..1), 500 x 500 */
+export const fxFirework = (p: Pen, t: number, col: string, seed = 1) => {
+  const c = 250, e = 1 - (1 - t) ** 2.5, fall = 40 * t * t;
+  for (let i = 0; i < 18; i++) {
+    const a = rad(i * 20 + seed * 7), r = 30 + 200 * e * (0.8 + 0.2 * Math.sin(i * 3.1 + seed));
+    const x = c + r * Math.cos(a), y = c + r * Math.sin(a) + fall, tail = 40 * (1 - t);
+    p.line([[c + (r - tail) * Math.cos(a), c + (r - tail) * Math.sin(a) + fall * 0.8], [x, y]], col, Math.max(3, 10 * (1 - t)), false);
+    p.dot(x, y, Math.max(3, 9 * (1 - t)), t < 0.85 ? "#fffbe8" : col);
+  }
+};
