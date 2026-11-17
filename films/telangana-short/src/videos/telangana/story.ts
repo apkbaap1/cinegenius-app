@@ -188,8 +188,8 @@ const CAMS: Record<number, Key[]> = {
   ],
   // 14 the second of June: dusk, fireworks over the gate, the street cheering; crane up on "అవతరించింది"
   14: [
-    { f: 2420, s: (fr) => dolly([1.6, G + 1.5, -74], [0, G + 12, -112], pushK(fr, 2420, 0.0018), { fov: 48 }) },
-    { f: f(W.born) - 8, s: crane(f(W.born) - 8, 55, [1.6, G + 1.5, -74], [6, G + 6, -66], [10, G + 16, -58], [0, G + 12, -112], [0, G + 22, -112], 48, 50) },
+    { f: 2420, s: (fr) => dolly([1.6, G + 1.6, -50], [0, G + 20, -112], pushK(fr, 2420, 0.0016), { fov: 52 }) },
+    { f: f(W.born) - 8, s: crane(f(W.born) - 8, 55, [1.6, G + 1.6, -50], [6, G + 6, -44], [10, G + 15, -38], [0, G + 20, -112], [0, G + 28, -112], 52, 54) },
   ],
   // 15 Bathukamma: the women round the plate; 16 low close-up as the rings rise
   15: [

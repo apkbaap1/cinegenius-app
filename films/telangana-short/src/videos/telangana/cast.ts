@@ -361,24 +361,24 @@ const million = (cam: CamInfo, t: number, out: Stage) => {
 const parliament = (cam: CamInfo, t: number, out: Stage) => {
   const k = t < W.gavel - 0.35 ? 0 : t < W.gavel ? 0 : 1;
   const wind = t > W.gavel - 0.5 && t < W.gavel ? -0.25 : 0;
-  out.fx.push({ key: `gavel${k}${wind}`, cw: 400, ch: 400, draw: (p) => fxGavel(p, k + wind), x: DELHI[0] + 2, y: G + 6.5, z: DELHI[1] - 40, w: 9, h: 9 });
+  out.fx.push({ key: `gavel${k}${wind}`, cw: 400, ch: 400, draw: (p) => fxGavel(p, k + wind), x: DELHI[0] + 2, y: G + 10, z: DELHI[1] - 29, w: 7, h: 7 });
   if (t >= W.gavel && t < W.gavel + 0.25) {
     const u = q((t - W.gavel) / 0.25, 30);
-    out.fx.push({ key: `burst${u}`, cw: 500, ch: 500, draw: (p) => fxBurst(p, u), x: DELHI[0] + 0.5, y: G + 4.4, z: DELHI[1] - 40.5, w: 9, h: 9 });
+    out.fx.push({ key: `burst${u}`, cw: 500, ch: 500, draw: (p) => fxBurst(p, u), x: DELHI[0] + 0.5, y: G + 8.3, z: DELHI[1] - 29.5, w: 7, h: 7 });
   }
 };
 /** 14 the second of June: the street cheering, fireworks over the gate */
 const FIRE_COLS = ["#ffcf4a", "#ff6a8a", "#7fe0ff", "#b8ff7a", "#ffffff", "#ff9a3a"];
 const june = (cam: CamInfo, t: number, out: Stage) => {
   for (let i = 0; i < 70; i++) {
-    const x = (hh(i, 7) - 0.5) * 10.5, z = -79 - (i / 70) * 24 - hh(i, 8) * 1.5;
+    const x = (hh(i, 7) - 0.5) * 10.5, z = -57 - (i / 70) * 30 - hh(i, 8) * 1.5;
     stand(cam, t, out, townWho(500 + i), x, z, (["laugh", "grin", "relief_open"] as Expr[])[i % 3], i % 2 ? waveAt(t, i, 10) : undefined);
   }
   for (let k = 0; k < 14; k++) {
     const t0 = W.june + 0.1 + k * 0.42, u = (t - t0) / 1.4;
     if (u < 0 || u >= 1) continue;
     const col = FIRE_COLS[k % 6], uq = q(u, 30);
-    out.fx.push({ key: `fw${k % 6}|${uq}`, cw: 500, ch: 500, draw: (p) => fxFirework(p, uq, col, k), x: GATE[0] + (hh(k, 3) - 0.5) * 50, y: G + 42 + hh(k, 4) * 24, z: GATE[1] - 6 + (hh(k, 5) - 0.5) * 20, w: 26, h: 26 });
+    out.fx.push({ key: `fw${k % 6}|${uq}`, cw: 500, ch: 500, draw: (p) => fxFirework(p, uq, col, k), x: GATE[0] + (hh(k, 3) - 0.5) * 60, y: G + 34 + hh(k, 4) * 22, z: GATE[1] + 4 + (hh(k, 5) - 0.5) * 12, w: 24, h: 24 });
   }
 };
 /** 15, 16, 20 Bathukamma: women round the plate (none on the camera's side), clapping as they circle */
