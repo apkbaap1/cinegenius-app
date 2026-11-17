@@ -295,7 +295,12 @@ export const buildTelangana = (root: THREE.Object3D, kit: Kit, rays: Ray[]): Dyn
   }
   buildGate(b);
   // the promenade: lamp posts and trees along the lake, a few stalls; the far shore: trees and low hills
-  for (let x = -140; x <= 140; x += 10) if (Math.abs(x) > 6 && Math.abs(x - 30) > 5) prop(b, kit, "lantern", x, D0, -30.9, 3.2);
+  // lamp posts along the promenade: a dark iron pole, a cream globe (the Kenney lantern is not in the kit here)
+  const pole = lam("lampPole", () => ({ color: "#2f3340" })), globe = lam("lampGlobe", () => ({ color: "#f6efd8" }));
+  for (let x = -140; x <= 140; x += 10) if (Math.abs(x) > 6 && Math.abs(x - 30) > 5 && !inTheWay(x - 0.3, x + 0.3, D0, D0 + 4, -31.2, -30.6, true)) {
+    b.add(new THREE.CylinderGeometry(0.06, 0.09, 3.6, 8).translate(0, 1.8, 0), pole, M4(x, D0, -30.9));
+    b.add(new THREE.SphereGeometry(0.22, 12, 8), globe, M4(x, D0 + 3.75, -30.9));
+  }
   for (const bank of [-1, 1]) for (let x = -150; x <= 150; x += 18) if (Math.abs(x) > 12) prop(b, kit, pick(["tree_oak", "tree_default", "tree_fat"]), x + r() * 4, D0, bank * 34.6, 7 + r() * 3, r() * 6);
   const hill = new THREE.SphereGeometry(1, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2);
   const hm = [lam("rockA", () => ({ color: "#b59a7a" })), lam("rockB", () => ({ color: "#a68c6e" })), lam("hillG", () => ({ color: "#8bb05c" }))];

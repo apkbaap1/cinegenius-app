@@ -509,7 +509,6 @@ export const house = (b: Batch, x: number, z: number, yaw: number, w: number, d:
   b.add(quad(V(-hw - o, h - 0.25, hd + o), V(hw + o, h - 0.25, hd + o), V(hw + o, h + rh, 0), V(-hw - o, h + rh, 0), ru, rv), rm, m);
   b.add(quad(V(hw + o, h - 0.25, -hd - o), V(-hw - o, h - 0.25, -hd - o), V(-hw - o, h + rh, 0), V(hw + o, h + rh, 0), ru, rv), rm, m);
   const cx = hw * 0.45 * (si % 2 ? 1 : -1);
-  b.add(boxGeo(V(cx - 0.4, h + rh * 0.3, -hd * 0.35 - 0.4), V(cx + 0.4, h + rh + 1.1, -hd * 0.35 + 0.4), 2), lam("chim", () => ({ map: rep(brick(), 1, 1) })), m);
   houseDetail(b, m, w, d, h, rh, cx);
 };
 
@@ -549,10 +548,6 @@ const houseDetail = (b: Batch, m: THREE.Matrix4, w: number, d: number, h: number
   wins(8, false, (u) => [hw - u * w, -hd], [0, -1]);          // back: side texture (8 m layout) stretched over w
   wins(8, false, (u) => [-hw, -hd + u * d], [-1, 0]);         // left side (-x): side texture is always the 8 m layout
   wins(8, false, (u) => [hw, hd - u * d], [1, 0]);            // right side (+x)
-  // chimney cap + pot
-  const cz = -hd * 0.35, top = h + rh + 1.1;
-  ub(b, capM(), m, chx - 0.52, chx + 0.52, top, top + 0.16, cz - 0.52, cz + 0.52);
-  b.add(new THREE.CylinderGeometry(0.13, 0.16, 0.42, 10).translate(0, 0.21, 0), lam("chimPot", () => ({ color: "#b8684a" })), m.clone().multiply(new THREE.Matrix4().makeTranslation(chx, top + 0.16, cz)));
 };
 
 // ---------------- painted extras ----------------

@@ -297,7 +297,7 @@ const teach = (cam: CamInfo, t: number, out: Stage) => {
   const [vx, vz] = VIL;
   const talk = q(0.5 + 0.5 * Math.sin(t * 2.3), 12);
   stand(cam, t, out, { i: 40, o: PROFESSOR, okey: "prof" }, vx + 1.9, vz - 0.3, Math.sin(t * 3.1) > 0.2 ? "smile" : "smile_closed", talk);
-  const spots: [number, number][] = [[-1.9, 2.0], [-0.9, 2.3], [0.2, 2.0], [1.2, 2.4], [-1.5, 3.4], [-0.3, 3.6], [0.9, 3.5], [2.0, 3.2], [-1.0, 4.6], [0.6, 4.7]];
+  const spots: [number, number][] = [[-1.9, 2.0], [-0.9, 2.3], [0.2, 2.0], [1.2, 2.4], [-1.5, 3.4], [-0.3, 3.6], [0.9, 3.5], [2.0, 3.2]];
   spots.forEach(([dx, dz], k) => {
     const who = k % 3 === 0 ? { i: 41 + k, o: KIDS[k % 4], okey: `kd${k % 4}` } : k % 3 === 1 ? { i: 41 + k, o: STU[k % 8], okey: `st${k % 8}` } : { i: 41 + k, o: VILL[k % 4], okey: `vi${k % 4}` };
     sit(cam, t, out, who, vx + dx, vz + dz, (["smile", "neutral", "smile_closed"] as Expr[])[k % 3]);
