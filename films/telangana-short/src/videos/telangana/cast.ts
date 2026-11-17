@@ -342,7 +342,7 @@ const mine = (cam: CamInfo, t: number, out: Stage) => {
   const [mx, mz] = MINE;
   for (let k = 0; k < 7; k++) {
     const off = t > W.mines + 0.4 + k * 0.17, v = k % 2;
-    const x = mx - 3.3 + k * 1.1 + (hh(k) - 0.5) * 0.3, z = mz + 6.0 + (k % 2) * 0.9;
+    const x = mx - 3.3 + k * 1.1 + (hh(k) - 0.5) * 0.3, z = mz + 4.2 + (k % 2) * 0.9;
     stand(cam, t, out, { i: 110 + k, o: off ? MINER_OFF[v] : MINER_ON[v], okey: `mn${v}${off ? "x" : "o"}` }, x, z, off ? "stern" : "neutral");
   }
 };

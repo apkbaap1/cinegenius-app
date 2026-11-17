@@ -168,13 +168,13 @@ const CAMS: Record<number, Key[]> = {
   ],
   // 10 the strike, three inserts on the words: buses / offices / courts
   10: [
-    { f: 1823, s: (fr) => dolly([5.2, G + 1.6, -86.5], [BUS[0] - 0.3, G + 1.6, BUS[1] - 4.8], pushK(fr, 1823, 0.0022), { fov: 40 }) },
+    { f: 1823, s: (fr) => dolly([7.0, G + 1.7, -93.5], [BUS[0] + 1.6, G + 1.5, BUS[1] - 4.0], pushK(fr, 1823, 0.0022), { fov: 42 }) },
     { f: f(W.offices) - 2, cut: true, s: (fr) => dolly([2.6, G + 1.6, -51], [-6, G + 1.4, -57.5], pushK(fr, f(W.offices), 0.003), { fov: 40, roll: -0.03 }) },
     { f: f(W.courts) - 2, cut: true, s: (fr) => dolly([2.8, G + 1.4, -64.5], [-5.2, G + 1.0, -68.5], pushK(fr, f(W.courts), 0.003), { fov: 40, roll: 0.03 }) },
   ],
   // 11 the mine: miners at the tunnel mouth, lamps going out one by one
   11: [
-    { f: f(66.2), s: (fr) => dolly([mx + 1.4, G + 1.55, mz - 1.5], [mx - 0.2, G + 1.6, mz + 7.2], pushK(fr, f(66.2), 0.0025), { fov: 42 }) },
+    { f: f(66.2), s: (fr) => dolly([mx + 1.4, G + 1.6, mz - 4.0], [mx - 0.2, G + 1.9, mz + 6.0], pushK(fr, f(66.2), 0.0025), { fov: 44 }) },
   ],
   // 12 the Million March: aerial over Tank Bund, then into the crowd on "వేల మంది"
   12: [
@@ -258,7 +258,7 @@ export const DOF: Dof[] = [
   { f: 1558, cInf: 0 },                                                        // Delhi, the street, the strike
   { f: f(W.offices) - 2, cInf: 8 },                                            // shutters
   { f: f(W.courts) - 2, cInf: 10 },                                            // lawyers on the steps
-  { f: f(66.2), cInf: 10, focus: () => [mx, G + 1.6, mz + 6.4] },               // miners
+  { f: f(66.2), cInf: 10, focus: () => [mx, G + 1.6, mz + 4.6] },               // miners
   { f: 2063, cInf: 0 },                                                        // march aerial
   { f: f(W.came) - 2, cInf: 9 },                                               // the crowd
   { f: 2216, cInf: 0 },                                                        // parliament, June 2

@@ -172,9 +172,10 @@ const buildMine = (b: Batch) => {
   b.add(new THREE.CircleGeometry(45, 40).rotateX(-Math.PI / 2), lam("coalyard", () => ({ color: "#5d5560" })), M4(mx, D0 + 0.01, mz - 6));
   // tunnel mouth: a timber portal with a black opening in the hill face
   const s = new THREE.Shape(); s.moveTo(-3.2, 0); s.lineTo(-3.2, 3.6); s.quadraticCurveTo(0, 6.2, 3.2, 3.6); s.lineTo(3.2, 0); s.lineTo(-3.2, 0);
-  b.add(new THREE.ShapeGeometry(s, 12), lam("tunnel", () => ({ color: "#121015" })), M4(mx, D0, mz + 9.0, Math.PI));
-  for (const x of [-3.6, 3.6]) b.add(boxGeo(V(mx + x - 0.3, D0, mz + 8.6), V(mx + x + 0.3, D0 + 4.4, mz + 9.4)), wood());
-  b.add(boxGeo(V(mx - 4.2, D0 + 4.4, mz + 8.6), V(mx + 4.2, D0 + 5.1, mz + 9.4)), wood());
+  b.add(new THREE.ShapeGeometry(s, 12), lam("tunnel", () => ({ color: "#121015" })), M4(mx, D0, mz + 7.3, Math.PI));
+  for (const x of [-3.6, 3.6]) b.add(boxGeo(V(mx + x - 0.3, D0, mz + 6.9), V(mx + x + 0.3, D0 + 4.4, mz + 7.7)), wood());
+  b.add(boxGeo(V(mx - 4.2, D0 + 4.4, mz + 6.9), V(mx + 4.2, D0 + 5.1, mz + 7.7)), wood());
+  b.add(boxGeo(V(mx - 4.4, D0, mz + 7.6), V(mx + 4.4, D0 + 5.6, mz + 9.5)), lam("minehill", () => ({ color: "#8a8a6a" }))); // rock face round the portal
   // headframe: four steel legs, cross braces, a wheel at the top
   const steel = lam("steelRed", () => ({ color: "#9a3b2f" }));
   const leg = (a: THREE.Vector3, c: THREE.Vector3, th: number) => {
