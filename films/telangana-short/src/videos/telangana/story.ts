@@ -202,12 +202,12 @@ const CAMS: Record<number, Key[]> = {
   ],
   // 17 every generation: the finished tower in front, the people of every era standing behind it; pull back on "ప్రతి తరం"
   17: [
-    { f: 2931, s: (fr) => dolly([bx + 0.3, G + 0.95, bz + 2.6], [bx, G + 1.0, bz - 3], pushK(fr, 2931, 0.0018), { fov: 42 }) },
-    { f: f(W.gen) - 6, dur: 40, s: (fr) => dolly([bx + 0.6, G + 1.6, bz + 5.2], [bx, G + 1.4, bz - 4], pushK(fr, f(W.gen), 0.0016), { fov: 46 }) },
+    { f: 2931, s: (fr) => dolly([bx + 1.3, G + 1.35, bz + 3.4], [bx - 0.7, G + 1.05, bz - 3], pushK(fr, 2931, 0.0018), { fov: 44 }) },
+    { f: f(W.gen) - 6, dur: 40, s: (fr) => dolly([bx + 1.6, G + 1.8, bz + 5.6], [bx - 0.5, G + 1.3, bz - 4], pushK(fr, f(W.gen), 0.0016), { fov: 46 }) },
   ],
   // 18 the empty chair by the chalkboard at sunset
   18: [
-    { f: 3092, s: (fr) => dolly([CHAIR[0] + 2.4, G + 1.3, CHAIR[1] + 3.6], [CHAIR[0] + 0.7, G + 0.85, CHAIR[1] - 0.3], pushK(fr, 3092, 0.0022), { fov: 40 }) },
+    { f: 3092, s: (fr) => dolly([CHAIR[0] + 0.9, G + 1.35, CHAIR[1] + 3.6], [CHAIR[0] + 0.5, G + 0.85, CHAIR[1] - 0.2], pushK(fr, 3092, 0.0022), { fov: 40 }) },
   ],
   // 19 the fields at golden hour: crane up and away
   19: [
