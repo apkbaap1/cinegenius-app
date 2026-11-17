@@ -168,7 +168,7 @@ const CAMS: Record<number, Key[]> = {
   ],
   // 10 the strike, three inserts on the words: buses / offices / courts
   10: [
-    { f: 1823, s: (fr) => dolly([7.0, G + 1.7, -93.5], [BUS[0] + 1.6, G + 1.5, BUS[1] - 4.0], pushK(fr, 1823, 0.0022), { fov: 42 }) },
+    { f: 1823, s: (fr) => dolly([4.6, G + 1.7, -93.5], [BUS[0] + 1.2, G + 1.5, BUS[1] - 4.0], pushK(fr, 1823, 0.0022), { fov: 42 }) },
     { f: f(W.offices) - 2, cut: true, s: (fr) => dolly([2.6, G + 1.6, -51], [-6, G + 1.4, -57.5], pushK(fr, f(W.offices), 0.003), { fov: 40, roll: -0.03 }) },
     { f: f(W.courts) - 2, cut: true, s: (fr) => dolly([2.8, G + 1.4, -64.5], [-5.2, G + 1.0, -68.5], pushK(fr, f(W.courts), 0.003), { fov: 40, roll: 0.03 }) },
   ],
@@ -207,7 +207,7 @@ const CAMS: Record<number, Key[]> = {
   ],
   // 18 the empty chair by the chalkboard at sunset
   18: [
-    { f: 3092, s: (fr) => dolly([CHAIR[0] + 0.9, G + 1.35, CHAIR[1] + 3.6], [CHAIR[0] + 0.5, G + 0.85, CHAIR[1] - 0.2], pushK(fr, 3092, 0.0022), { fov: 40 }) },
+    { f: 3092, s: (fr) => dolly([CHAIR[0] + 0.3, G + 1.35, CHAIR[1] + 3.6], [CHAIR[0] + 0.05, G + 0.85, CHAIR[1] - 0.2], pushK(fr, 3092, 0.0022), { fov: 40 }) },
   ],
   // 19 the fields at golden hour: crane up and away
   19: [
