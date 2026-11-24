@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>three-looks film</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; overflow: hidden; }
+  canvas { display: block; margin: auto; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+// ---------------------------------------------------------------- CONFIG
+const CONFIG = {
+  look: '01 Low-Poly',          // which card in references/styles.md
+  duration: 8,                  // seconds
+  fps: 30,
+  width: 1920, height: 1080,    // 16:9. 9:16 -> 1080x1920, 1:1 -> 1080x1080, 4:5 -> 1080x1350
+  background: '#cfe8ec',
+  exposure: 1.0,
+  bloom: null,                  // e.g. { strength: 0.9, radius: 0.4, threshold: 0.8 } for Neon / Circuit / LED
+  seed: 7,
+};
+
+// ---------------------------------------------------------------- KIT (pure helpers)
+const kit = {
+  rng(seed) { let s = seed >>> 0 || 1; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); },
+  clamp: (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)),
+  lerp: (a, b, k) => a + (b - a) * k,
+  // progress 0..1 of a beat that starts at `start` and lasts `dur`
+  beat(t, start, dur) { return kit.clamp((t - start) / dur); },
+  ease: {
+    linear: k => k,
+    inOutCubic: k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2,
+    outCubic: k => 1 - Math.pow(1 - k, 3),
+    outBack: k => { const c = 1.70158, c3 = c + 1; return 1 + c3 * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); },
+    outBounce: k => { const n = 7.5625, d = 2.75;
+      if (k < 1 / d) return n * k * k; if (k < 2 / d) return n * (k -= 1.5 / d) * k + .75;
+      if (k < 2.5 / d) return n * (k -= 2.25 / d) * k + .9375; return n * (k -= 2.625 / d) * k + .984375; },
+  },
+  // texture drawn in code: draw(ctx, w, h, rand)
+  canvasTexture(w, h, draw, { srgb = true, repeat = null, seed = 1 } = {}) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h, kit.rng(seed));
+    const tex = new THREE.CanvasTexture(c);
+    if (srgb) tex.colorSpace = THREE.SRGBColorSpace;
+    if (repeat) { tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(...repeat); }
+    tex.anisotropy = 8;
+    return tex;
+  },
+  // a flat card with text, drawn to canvas; returns a Mesh (height in world units)
+  label(text, { height = 0.5, font = '700 120px system-ui, sans-serif', color = '#222', bg = '#fff', pad = 40, radius = 30 } = {}) {
+    const m = document.createElement('canvas').getContext('2d'); m.font = font;
+    const tw = Math.ceil(m.measureText(text).width), th = parseInt(font.match(/(\d+)px/)[1]);
+    const w = tw + pad * 2, h = Math.round(th * 1.35) + pad;
+    const tex = kit.canvasTexture(w, h, (ctx) => {
+      if (bg) { ctx.fillStyle = bg; ctx.beginPath(); ctx.roundRect(0, 0, w, h, radius); ctx.fill(); }
+      ctx.font = font; ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text, w / 2, h / 2 + th * 0.05);
+    });
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, toneMapped: false });
+    return new THREE.Mesh(new THREE.PlaneGeometry(height * w / h, height), mat);
+  },
+  // seeded vertex noise for hand-made / clay / rock shapes
+  wobble(geometry, amount = 0.05, seed = 1) {
+    const r = kit.rng(seed), p = geometry.attributes.position, v = new THREE.Vector3(), map = new Map();
+    for (let i = 0; i < p.count; i++) {
+      v.fromBufferAttribute(p, i);
+      const key = `${v.x.toFixed(3)},${v.y.toFixed(3)},${v.z.toFixed(3)}`; // keep shared vertices together
+      if (!map.has(key)) map.set(key, [(r() - .5) * amount, (r() - .5) * amount, (r() - .5) * amount]);
+      const d = map.get(key); p.setXYZ(i, v.x + d[0], v.y + d[1], v.z + d[2]);
+    }
+    geometry.computeVertexNormals(); return geometry;
+  },
+};
+
+// ---------------------------------------------------------------- RENDERER
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(CONFIG.width, CONFIG.height);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = CONFIG.exposure;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+const fit = () => { const s = Math.min(innerWidth / CONFIG.width, innerHeight / CONFIG.height);
+  Object.assign(renderer.domElement.style, { width: CONFIG.width * s + 'px', height: CONFIG.height * s + 'px' }); };
+addEventListener('resize', fit); fit();
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(CONFIG.background);
+const camera = new THREE.PerspectiveCamera(30, CONFIG.width / CONFIG.height, 0.1, 500);
+
+kit.studioEnv = () => { const pm = new THREE.PMREMGenerator(renderer);
+  scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; };
+
+let composer = null;
+if (CONFIG.bloom) {
+  composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  const b = CONFIG.bloom;
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(CONFIG.width, CONFIG.height), b.strength, b.radius, b.threshold));
+  composer.addPass(new OutputPass());
+}
+kit.composer = () => composer; // add ShaderPasses (Kuwahara, x-ray) here if a look needs them
+
+// ---------------------------------------------------------------- BUILD (once)
+// Replace this demo with the look's card. Store anything update() needs in `S`.
+const S = {};
+function build() {
+  const rand = kit.rng(CONFIG.seed);
+  scene.add(new THREE.HemisphereLight('#dff3ff', '#9cb88a', 0.9));
+  const sun = new THREE.DirectionalLight('#ffe2b8', 2.2);
+  sun.position.set(6, 9, 4); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8 });
+  scene.add(sun);
+
+  // water
+  const water = new THREE.Mesh(new THREE.CircleGeometry(9, 48),
+    new THREE.MeshStandardMaterial({ color: '#3fa7a3', roughness: .4, flatShading: true }));
+  water.rotation.x = -Math.PI / 2; water.receiveShadow = true; scene.add(water);
+
+  // island: faceted, height-coloured
+  const g = new THREE.CylinderGeometry(4, 4.6, 0.8, 18, 3).toNonIndexed();
+  kit.wobble(g, 0.35, CONFIG.seed);
+  const cols = [], pos = g.attributes.position, c = new THREE.Color();
+  for (let i = 0; i < pos.count; i += 3) {
+    const y = (pos.getY(i) + pos.getY(i + 1) + pos.getY(i + 2)) / 3;
+    c.set(y > 0.25 ? (rand() > .5 ? '#9cb88a' : '#8fb07c') : y > -0.2 ? '#e9d3a4' : '#d8b98a');
+    for (let k = 0; k < 3; k++) cols.push(c.r, c.g, c.b);
+  }
+  g.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+  const island = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: .9 }));
+  island.position.y = 0.2; island.castShadow = island.receiveShadow = true; scene.add(island);
+
+  // trees that pop up one by one
+  S.trees = [];
+  for (let i = 0; i < 9; i++) {
+    const a = rand() * Math.PI * 2, r = 0.6 + rand() * 2.6;
+    const tree = new THREE.Group();
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.08, .1, .4, 5), new THREE.MeshStandardMaterial({ color: '#8a6a4a', flatShading: true }));
+    trunk.position.y = .2;
+    const top = new THREE.Mesh(new THREE.ConeGeometry(.45, 1, 6), new THREE.MeshStandardMaterial({ color: i % 3 ? '#5f8a5b' : '#ef8a6f', flatShading: true }));
+    top.position.y = .85;
+    trunk.castShadow = top.castShadow = true;
+    tree.add(trunk, top);
+    tree.position.set(Math.cos(a) * r, 0.6, Math.sin(a) * r);
+    tree.userData.start = 1 + i * 0.25;
+    S.trees.push(tree); scene.add(tree);
+  }
+
+  S.title = kit.label('Low-Poly', { height: 0.9, color: '#2b2a33', bg: '#f6efe0' });
+  S.title.position.set(0, 3.2, 0); scene.add(S.title);
+}
+
+// ---------------------------------------------------------------- UPDATE (pure in t)
+function update(t) {
+  const { ease, beat } = kit;
+  // camera: slow orbit + push-in
+  const a = 0.6 + t * 0.08, d = kit.lerp(20, 16, ease.inOutCubic(beat(t, 0, CONFIG.duration)));
+  camera.position.set(Math.cos(a) * d, 9, Math.sin(a) * d);
+  camera.lookAt(0, 0.8, 0);
+
+  for (const tree of S.trees) tree.scale.setScalar(Math.max(0.0001, ease.outBack(beat(t, tree.userData.start, 0.6))));
+
+  const k = ease.outBack(beat(t, 4, 0.7));
+  S.title.scale.setScalar(Math.max(0.0001, k));
+  S.title.quaternion.copy(camera.quaternion); // face camera
+}
+
+// ---------------------------------------------------------------- PLAYER / RECORDER API
+build();
+const draw = (t) => { update(t); composer ? composer.render() : renderer.render(scene, camera); };
+window.__film = { duration: CONFIG.duration, fps: CONFIG.fps, width: CONFIG.width, height: CONFIG.height,
+  seek(t) { draw(t); return true; } };
+
+const q = new URLSearchParams(location.search);
+if (q.has('t') || q.has('record')) { draw(parseFloat(q.get('t') || '0')); }
+else {
+  let paused = false, t0 = performance.now(), held = 0;
+  addEventListener('keydown', e => { if (e.code === 'Space') { paused = !paused; if (!paused) t0 = performance.now() - held * 1000; } });
+  const loop = () => { if (!paused) { held = ((performance.now() - t0) / 1000) % CONFIG.duration; draw(held); } requestAnimationFrame(loop); };
+  loop();
+}
+window.__film.ready = true;
+</script>
+</body>
+</html>
