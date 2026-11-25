@@ -1,6 +1,6 @@
 ---
 name: three-looks
-description: Make short 3D motion graphics (explainers and stories, 7-12 s) built entirely in code with three.js 0.187 and the STAGE and SOUND kits, in 30 named looks from the 3D Style Atlas - Low-Poly, Paper Pop-Up, Soft Clay, Tiny Diorama, Blueprint Build, Spotlight Stage, Neon Sign, Exploded View, Marble Run, X-Ray, LED Wall, Inflated, Painted, Circuit City, Glass and Light, Factory Line, White Model, Voxel, Data Skyline, Ink and Toon, Pin Wall, Toy Blocks, Particle Swarm, Museum Gallery, Pencil Sketch, Domino Chain, Node Network, Shadow Box, Layer Stack, Dithered - with a storyboard of rendered stills first, then a self-contained HTML player and an MP4 with synthesized sound. Use when the user asks for a 3D explainer or animated story, a three.js film, names one of these looks, or pastes a "3D motion graphic ... style" prompt.
+description: Make short 3D motion graphics (explainers and stories, 7-12 s) built entirely in code with three.js 0.187 and the STAGE and SOUND kits, in 31 named looks from the 3D Style Atlas - Low-Poly, Paper Pop-Up, Soft Clay, Tiny Diorama, Blueprint Build, Spotlight Stage, Neon Sign, Exploded View, Marble Run, X-Ray, LED Wall, Inflated, Painted, Circuit City, Glass and Light, Factory Line, White Model, Voxel, Data Skyline, Ink and Toon, Pin Wall, Toy Blocks, Particle Swarm, Museum Gallery, Pencil Sketch, Domino Chain, Node Network, Shadow Box, Layer Stack, Dithered, Floating Screens - with a storyboard of rendered stills first, then a self-contained HTML player and an MP4 with synthesized sound. Use when the user asks for a 3D explainer or animated story, a three.js film, names one of these looks, or pastes a "3D motion graphic ... style" prompt.
 ---
 
 # three-looks
@@ -97,6 +97,7 @@ look is the one named in it; the sources in it match the files here.
 | 28 | Shadow Box | Flat content made physical | explainer | sequences with a natural order in depth: timelines, eras, layers, before and after |
 | 29 | Layer Stack | Diagrams with depth | explainer | anything built in layers: a tech stack, a teardown, how a request travels through a system |
 | 30 | Dithered | Filters over 3D | explainer | a still-life object or set-up with desktop windows for numbers: routines, cycles, steps, anything with a clock |
+| 31 | Floating Screens | Products and screens | explainer | anything made of steps or screens: an app flow, a workflow, a process, stats or quotes |
 
 For fonts, extra libraries and reference topics, see `CARDS.md`.
 
