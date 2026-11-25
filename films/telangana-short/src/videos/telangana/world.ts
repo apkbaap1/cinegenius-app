@@ -15,9 +15,9 @@ import { FPS, D0, SHOTS, camAt, V3, FOREGROUND, ShotDef, busZ, shutterK, ringsUp
 import { BUS } from "./places";
 
 // ---------------- assets ----------------
-const KENNEY = ["tree_oak", "tree_default", "tree_detailed", "tree_fat", "tree_cone", "tree-high-round", "tree", "plant_bushLarge", "plant_bushDetailed",
-  "plant_bush", "hedge", "flower_redA", "flower_yellowA", "flower_purpleA", "grass_large", "grass", "lily_large", "lantern", "cart", "stall-red",
-  "stall-green", "stall-bench", "banner-red", "banner-green", "windmill", "canoe"];
+// only the CC0 nature-kit models that ship in public/bridge/kenney (asking for absent ones logged 404s)
+const KENNEY = ["tree_oak", "tree_default", "tree_detailed", "tree_fat", "tree_cone", "plant_bushLarge", "plant_bushDetailed",
+  "plant_bush", "flower_redA", "flower_yellowA", "flower_purpleA", "grass_large", "grass", "lily_large", "canoe"];
 let kitP: Promise<Kit> | null = null;
 export const loadKit = () => {
   if (!kitP) {
