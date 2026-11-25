@@ -12,6 +12,8 @@ Every look comes with the same brief (`references/looks/PROMPT.md`), its own sty
 overlay), `sound.js` (synthesized score), plus `text3d.js` or `strokefont.js` for the looks
 that need them. The kits, cards and references are stored word for word: do not edit them.
 
+Paths below (`assets/`, `references/`, `scripts/`) are relative to this skill's own folder.
+
 A pasted atlas prompt is the same brief with one look filled in. If the user pastes one, the
 look is the one named in it; the sources in it match the files here.
 
@@ -54,7 +56,9 @@ look is the one named in it; the sources in it match the files here.
    - Make the deliverable one self-contained file:
      `node scripts/bundle.mjs films/<name>/index.html films/<name>/<name>.html`. This inlines
      the kits and the style.
-6. **Render the MP4.** Run `node scripts/render.mjs films/<name>/<name>.html --out films/<name>/<name>.mp4`.
+6. **Render the MP4** (only where a shell with Node, Playwright's Chromium and ffmpeg is
+   available, as in Claude Code; in the Claude app without them, deliver the self-contained
+   HTML as the film, show it as an artifact, and say the MP4 needs a machine with those tools). Run `node scripts/render.mjs films/<name>/<name>.html --out films/<name>/<name>.mp4`.
    - The script steps `window.seek(i/30)` through every frame in headless Chromium and pipes
      the frames into ffmpeg.
    - It renders the score with `SOUND.renderOffline(..., { voiceover: false })` and muxes it in

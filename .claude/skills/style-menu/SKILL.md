@@ -7,9 +7,11 @@ description: The menu of 37 saved 3D animation styles (Low-Poly, Paper Pop-Up, S
 
 This skill is the front door to the saved styles. It does three things: show the menu,
 match a topic to a style, and hand the chosen style to the **three-looks** skill. three-looks
-does the actual building (storyboard, film, MP4). Every style lives in
-`.claude/skills/three-looks/references/looks/<nn>-<id>/`, with its `card.md` and its
-reference `style.js`.
+does the actual building (storyboard, film, MP4), and it must be installed too. Every style
+lives in the three-looks skill folder under `references/looks/<nn>-<id>/`, with its
+`card.md` and its reference `style.js`. Find that folder wherever skills are installed (for
+example `.claude/skills/three-looks/` in Claude Code, or the uploaded skills folder in the
+Claude app).
 
 ## How the user can ask
 
