@@ -26,6 +26,8 @@ Each card is copied word for word from the atlas prompt for that look. The slot 
 | 20 | Ink and Toon | `20-ink-toon` | an explainer | Anton, Caveat | none | Pour-over coffee in three steps: grind, bloom, pour |
 | 21 | Pin Wall | `21-pin-wall` | an explainer | Oswald, Inter | none | How a volcanic island is born |
 | 22 | Toy Blocks | `22-toy-blocks` | an explainer | Fredoka, Fraunces | none | The 50/30/20 budget rule: 50% needs, 30% wants, 20% savings |
+| 23 | Particle Swarm | `23-particle-swarm` | an explainer | Inter | none | Why popcorn pops |
+| 24 | Museum Gallery | `24-museum-gallery` | an explainer | DM Serif Display, Oswald, Space Mono | none | Four moments that led to AI today: Turing's question, Deep Blue, AlphaGo and ChatGPT |
 
 ## 01. Low-Poly
 
@@ -509,4 +511,48 @@ Materials: Pale maple with drawn grain that runs the right way on every face (en
 Camera: Long lens at a child's eye height. It starts close on the word spelled in alphabet blocks, cranes up to the first tower as it grows, then makes one slow arc around the stacks with a slight push, close enough that the tallest tower nearly fills the height of the frame. Shallow focus keeps the room soft.
 Finish: Real motion blur on the falling blocks, real depth of field, colours kept true (neutral tone curve), a touch of warmth and contrast, light vignette, very fine grain. No bloom to speak of.
 Good for: Lists, comparisons, proportions, steps and "the building blocks of X". One cube is one unit, a tower is a bar, a brick is a label, alphabet blocks spell the headline; pictures on the faces say what each unit is.
+```
+
+## 23. Particle Swarm
+
+- Folder: `references/looks/23-particle-swarm/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Inter`
+- Tell it as: an explainer
+- Reference topic: Why popcorn pops
+
+```
+STYLE CARD
+Name: Particle Swarm
+Family: Flat content made physical
+Use: explainer
+Look: Sixty thousand tiny glass beads hanging in front of a matte paper wall. They pile into plump, rounded models of things (a seed, a drop, a cell, an organ, a heap) that fill most of the frame and throw a soft shadow on the wall, change colour and strain while they hold, then let go and fly on to the next formation.
+Motion: Beads arrive as a stream, overshoot their place and settle. A formed shape never freezes: it breathes, a colour change can run through it as a front, loose beads inside it buzz like a gas, and it can swell and tremble. When it lets go, a front crosses it or it bursts from the centre: beads are thrown outwards, curl along a flow field in ribbons and veils, then land in the next shape, with a few stragglers arriving late.
+Light: One soft, warm key from the upper left, like a window, so every bead has a lit side, a small glint and a shadow on its neighbours, and the whole shape drops a soft shadow on the wall. Warm fill from all round. Heat is shown as light: hot beads glow by themselves and an orange lamp comes up from below.
+Materials: Polished glass seed beads, uneven in size and shade, each with a sharp highlight and a glow on its far side: golden corn, blue water, white steam, cream popcorn. Matte paper wall in a deep, dull teal that all of them stand out from.
+Camera: Long lens with shallow focus on the shape, so beads that fly towards the camera go soft. One slow continuous dolly: close and a little to one side of the small first shape, drifting back and round to square-on while it changes, pulled back by the burst to hold the big last shape.
+Finish: Real motion blur and depth of field from accumulation (96 sub-renders), neutral tone mapping to keep the colours true, a touch of bloom on the glints and the hot beads only, a soft vignette, almost no grain. Captions are a crisp 2D overlay.
+Good for: Processes where stuff flows, gathers, splits, grows, heats up or bursts, and things that are made of many units (cells, molecules, people, grains, data points). The beads are the stuff itself: a beat is either a new formation the swarm flows into or a change that runs through a formation while it holds (it warms from one side, something inside it comes loose, it swells). Populations keep their colour and identity from start to finish, so the viewer can follow where each kind of thing ends up. One short caption per beat names what is happening; the beads never form words or numbers.
+```
+
+## 24. Museum Gallery
+
+- Folder: `references/looks/24-museum-gallery/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): DM Serif Display, Oswald, Space Mono`
+- Tell it as: an explainer
+- Reference topic: Four moments that led to AI today: Turing's question, Deep Blue, AlphaGo and ChatGPT
+
+```
+STYLE CARD
+Name: Museum Gallery
+Family: Spaces and journeys
+Use: explainer
+Look: A dark gallery hall at night: gilt-framed posters on a deep green damask wall, each in its own tight pool of warm spotlight with the beam hanging in the air, a brass plaque beside every frame, a rope barrier and a polished stone floor that mirrors it all.
+Motion: One unbroken dolly move in three kinds of shot: it opens wide and oblique on the first exhibit with the others waiting down the wall, tracks past the middle ones at medium distance, and ends pushing in on the last. Each exhibit's lamps click on just before the gaze leaves for it, and the ones already seen sink back to a glow.
+Light: One tight ceiling spot per artwork and a smaller one per plaque, warm, with deep shadow between the pools and no ambient light. Lamps that are off still glow faintly so the frames ahead read in the dark. The last exhibit swells to one and a half times the light of the others during the final push-in.
+Materials: Flat poster-style prints (drawn in 2D) in black-and-gold frames with real depth, engraved brushed brass, brass posts with velvet rope, woven wall fabric, dark polished stone.
+Camera: A long lens on a low dolly, shallow focus pulled from exhibit to exhibit. The gaze lingers on each exhibit and travels quickly between them while the dolly itself never stops; the frame and its plaque fill most of the picture, with a strip of mirror floor underneath.
+Finish: Real depth of field and soft shadows, gentle bloom on the brightest print, filmic contrast with true blacks, a clear vignette and fine grain.
+Good for: Lists and timelines of three to five points: each point is one framed poster with a plaque (a year or number, plus a few words), visited in order, with the last one as the conclusion.
 ```

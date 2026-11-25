@@ -1,6 +1,6 @@
 ---
 name: three-looks
-description: Make short 3D motion graphics (explainers and stories, 7-12 s) built entirely in code with three.js 0.187 and the STAGE and SOUND kits, in 22 named looks from the 3D Style Atlas - Low-Poly, Paper Pop-Up, Soft Clay, Tiny Diorama, Blueprint Build, Spotlight Stage, Neon Sign, Exploded View, Marble Run, X-Ray, LED Wall, Inflated, Painted, Circuit City, Glass and Light, Factory Line, White Model, Voxel, Data Skyline, Ink and Toon, Pin Wall, Toy Blocks - with a storyboard of rendered stills first, then a self-contained HTML player and an MP4 with synthesized sound. Use when the user asks for a 3D explainer or animated story, a three.js film, names one of these looks, or pastes a "3D motion graphic ... style" prompt.
+description: Make short 3D motion graphics (explainers and stories, 7-12 s) built entirely in code with three.js 0.187 and the STAGE and SOUND kits, in 24 named looks from the 3D Style Atlas - Low-Poly, Paper Pop-Up, Soft Clay, Tiny Diorama, Blueprint Build, Spotlight Stage, Neon Sign, Exploded View, Marble Run, X-Ray, LED Wall, Inflated, Painted, Circuit City, Glass and Light, Factory Line, White Model, Voxel, Data Skyline, Ink and Toon, Pin Wall, Toy Blocks, Particle Swarm, Museum Gallery - with a storyboard of rendered stills first, then a self-contained HTML player and an MP4 with synthesized sound. Use when the user asks for a 3D explainer or animated story, a three.js film, names one of these looks, or pastes a "3D motion graphic ... style" prompt.
 ---
 
 # three-looks
@@ -89,6 +89,8 @@ look is the one named in it; the sources in it match the files here.
 | 20 | Ink and Toon | Filters over 3D | explainer | steps, recipes, how-tos |
 | 21 | Pin Wall | Flat content made physical | explainer | terrain, waves, morphing reliefs |
 | 22 | Toy Blocks | Material worlds | explainer | lists, proportions, "building blocks of X" |
+| 23 | Particle Swarm | Flat content made physical | explainer | things that flow, gather, heat up or burst; many units |
+| 24 | Museum Gallery | Spaces and journeys | explainer | lists and timelines of 3-5 points, last one the conclusion |
 
 For fonts, extra libraries and reference topics, see `CARDS.md`.
 
