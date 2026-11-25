@@ -1,0 +1,512 @@
+# The looks: style cards and slot values
+
+Each card is copied word for word from the atlas prompt for that look. The slot values fill `PROMPT.md`.
+
+| # | Look | Folder | Use | Google Fonts | Extra library | Reference topic |
+|---|---|---|---|---|---|---|
+| 01 | Low-Poly | `01-low-poly` | an explainer | Oswald | none | The water cycle: evaporation from the sea, clouds forming, rain on the mountains, a river running back to the sea |
+| 02 | Paper Pop-Up | `02-paper-pop-up` | a story | Fraunces | none | From flower to honey jar: a bee on flowers, the hive, the jar on the breakfast table |
+| 03 | Soft Clay | `03-soft-clay` | an explainer | Fredoka | TEXT3D | How compound interest grows your savings |
+| 04 | Tiny Diorama | `04-tiny-diorama` | an explainer | Fredoka | none | How your parcel gets to you |
+| 05 | Blueprint Build | `05-blueprint-build` | an explainer | none | STROKEFONT | An ergonomic desk set-up: screen top at eye level, elbows at about 90 degrees, feet flat on the floor |
+| 06 | Spotlight Stage | `06-spotlight-stage` | a story | Oswald, Playfair Display | none | The first powered flight: from the Wright brothers' bicycle shop in Dayton to 12 seconds and 120 feet at Kitty Hawk on 17 December 1903 |
+| 07 | Neon Sign | `07-neon-sign` | an explainer | none | STROKEFONT | How a rainbow forms |
+| 08 | Exploded View | `08-exploded-view` | an explainer | IBM Plex Mono, Space Grotesk | none | What's inside a ballpoint pen |
+| 09 | Marble Run | `09-marble-run` | an explainer | Oswald | none | How your inbox sorts email |
+| 10 | X-Ray | `10-x-ray` | an explainer | Space Grotesk, IBM Plex Mono | none | Why a vacuum flask keeps drinks hot |
+| 11 | LED Wall | `11-led-wall` | a story | none | none | The Tortoise and the Hare, as a pixel cartoon playing on the lamp wall |
+| 12 | Inflated | `12-inflated` | an explainer | none | STROKEFONT | How a hot-air balloon flies |
+| 13 | Painted | `13-painted` | a story | Caveat | none | From wind to bread: a gust crosses a wheat field and turns the windmill, the millstone grinds flour, and a loaf ends up on the bakery sill |
+| 14 | Circuit City | `14-circuit-city` | an explainer | IBM Plex Mono | none | A prompt's trip across a chip: PROMPT, MEMORY, PROCESSOR, ANSWER |
+| 15 | Glass and Light | `15-glass-light` | an explainer | Inter | none | How a vinaigrette comes together: 3 parts oil, 1 part vinegar |
+| 16 | Factory Line | `16-factory-line` | an explainer | Fredoka, Inter | none | How an AI agent finishes a task: plan, search, write, check |
+| 17 | White Model | `17-white-model` | an explainer | Inter, IBM Plex Mono | none | How rooftop solar powers a home: sunlight, panels, inverter, home, and the surplus going out to the grid |
+| 18 | Voxel | `18-voxel` | an explainer | none | none | How a tomato plant grows: seed, sprout, plant, fruit |
+| 19 | Data Skyline | `19-data-skyline` | an explainer | Space Grotesk, IBM Plex Mono, Fraunces | none | World population by the billion: 1 billion in 1804, 2 in 1927, 4 in 1974, 8 in 2022 |
+| 20 | Ink and Toon | `20-ink-toon` | an explainer | Anton, Caveat | none | Pour-over coffee in three steps: grind, bloom, pour |
+| 21 | Pin Wall | `21-pin-wall` | an explainer | Oswald, Inter | none | How a volcanic island is born |
+| 22 | Toy Blocks | `22-toy-blocks` | an explainer | Fredoka, Fraunces | none | The 50/30/20 budget rule: 50% needs, 30% wants, 20% savings |
+
+## 01. Low-Poly
+
+- Folder: `references/looks/01-low-poly/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Oswald`
+- Tell it as: an explainer
+- Reference topic: The water cycle: evaporation from the sea, clouds forming, rain on the mountains, a river running back to the sea
+
+```
+STYLE CARD
+Name: Low-Poly
+Family: Filters over 3D
+Use: explainer
+Look: A miniature world of flat, faceted shapes, like folded paper or cut stone: every triangle is one tone, and neighbours differ slightly, inside a short palette of sand, coral and cream against teal water and sage greens.
+Motion: Things grow by unfolding facet by facet from one point, or pop out of the ground with a bounce; water heaves so its facets keep catching the light, clouds drift, small cut-gem droplets rise and fall.
+Light: One low, warm sun from the side with soft-edged shadows, a cool blue sky filling the shadow sides so every facet turns either warm or cool, and peach haze that swallows the distance.
+Materials: Matte paper-like facets with no texture at all; only the water is slightly glossy. Colour comes per triangle from the palette, never from gradients.
+Camera: One continuous crane move on a long lens with tilt-shift-shallow focus, so the landscape feels like a tabletop model: close on each stage in turn, then out to the whole scene.
+Finish: True depth of field and motion blur, colours kept true (neutral tone curve), a gentle vignette and only enough grain to keep the sky from banding. No filter pass: the facets are real geometry.
+Good for: Processes that happen in a place: cycles, journeys, supply chains, how a system of parts feeds itself. Each stage is a spot in the landscape with a paper flag, and the camera travels the route between them.
+```
+
+## 02. Paper Pop-Up
+
+- Folder: `references/looks/02-paper-pop-up/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Fraunces`
+- Tell it as: a story
+- Reference topic: From flower to honey jar: a bee on flowers, the hive, the jar on the breakfast table
+
+```
+STYLE CARD
+Name: Paper Pop-Up
+Family: Material worlds
+Use: story
+Look: A pop-up book open on a wooden table in lamplight. Every scene is built from flat die-cut card: printed in a few flat colours, creased down the middle, standing in layers on real fold mechanisms, with a pale core showing on every cut edge.
+Motion: Only the pages move. As a page turns, the scene on the old spread is pressed flat under it and the next one is pulled up out of the gutter by its own folds, layer after layer; pieces on paper arms tremble when the page lands. A pull tab slides out to change one thing on the last spread.
+Light: One warm desk lamp from the upper left with soft-edged shadows, so each layer throws a shadow on the one behind and the two wings of every fold take different light; a faint cool rim from behind; the table falls off into the dark.
+Materials: Thick uncoated card with visible fibre and a slight cockle, flat matt ink with a little grain, bare cream card on cut edges and as a thin margin around each shape, cloth-covered boards, dark oiled wood.
+Camera: A long lens looking down the gutter from about twenty-five degrees up, close enough that the spread fills the frame. One slow drift from left to right that breathes out a little for each page turn and ends in a gentle push; shallow focus on the middle layers.
+Finish: Real depth of field, motion blur and area-light shadows from the accumulation renderer; neutral tone mapping so the inks stay true, a soft vignette, very fine grain.
+Good for: A story or a process in a few steps: one spread per step, each with one big subject in the middle, supporting pieces at the sides and one short line of words on a paper ribbon. A pull tab can show a change on the spot (fill, reveal, move).
+```
+
+## 03. Soft Clay
+
+- Folder: `references/looks/03-soft-clay/style.js`
+- `{LIBS}`: `, and the TEXT3D library (load it after the STAGE kit)`
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Fredoka`
+- Tell it as: an explainer
+- Reference topic: How compound interest grows your savings
+
+```
+STYLE CARD
+Name: Soft Clay
+Family: Material worlds
+Use: explainer
+Look: Everything is modelled in plasticine and filmed like stop-motion on a small tabletop: chunky, slightly lopsided forms with fingerprints, tool marks and pits in them, in a few colours from one box of clay, in front of a seamless paper backdrop.
+Motion: Animated on twos (15 poses a second) with no motion blur, by swapping shapes like a stop-motion animator: a ball of clay buds, hops over on an arc, lands as a thick puck, is pressed too flat and springs back into a coin. Stacks flinch when something lands on them, words are slapped onto the backdrop, and anything just touched shifts by a hair between poses. Only the camera moves smoothly.
+Light: One big soft lamp from the upper left that pools on the backdrop and falls off to the corners, plus soft light from the whole sky that is blocked in every crease and under every object, so contact shadows are real.
+Materials: Matte, waxy plasticine with a velvety sheen: a generated surface of fingerprints, knife drags, pits and joins bends the light, pressed spots are a little shinier, and each colour has a second colour streaked through it. The backdrop is uncoated coloured card.
+Camera: A macro lens with shallow focus on a slow dolly: it starts close enough to read the fingerprints, travels along with the action, then pulls back in the same move until the whole set fits, and ends on a slight push-in.
+Finish: True colours (neutral tone curve), almost no bloom, a light vignette and a little grain; a faint flicker in the lamp from pose to pose, like single frames shot one at a time.
+Good for: Anything that can be told with a few friendly objects on a table: amounts as piles and stacks, growth and comparison, simple characters and props, a number or a few words as fat clay letters. Good for warm, non-technical topics.
+```
+
+## 04. Tiny Diorama
+
+- Folder: `references/looks/04-tiny-diorama/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Fredoka`
+- Tell it as: an explainer
+- Reference topic: How your parcel gets to you
+
+```
+STYLE CARD
+Name: Tiny Diorama
+Family: Spaces and journeys
+Use: explainer
+Look: A whole little world on one floating tile, like a designer's model on a desk: chunky rounded buildings, a toy van, peg people and lollipop trees in a few matte paint colours, on a thick slab of ground whose cut sides show soil, clay and rock.
+Motion: Small life at small scale: one vehicle drives the route with weight (it squats, leans and nods when it brakes), doors roll and swing, smoke puffs, peg people hop, lights come on, and each stop's sign flips to the accent colour when its part is done. The tile turns slowly the whole time.
+Light: One soft warm sun from the front left that sinks and warms through the clip, a cool sky that darkens every crease and contact, and a few tiny lamps that take over at the end.
+Materials: Matte painted-model surfaces, flocked grass with a soft sheen, a hand-painted cross-section of earth with real stones pressed into it, card signs. One accent colour is kept for the thing the story follows.
+Camera: Long lens, three-quarter view from above, close enough that the tile fills the frame. The tile turns on its turntable to show each stop in order while the camera makes one slow rise and push-in; neither ever stops.
+Finish: Strong tilt-shift: a wide-open lens keeps a thin band sharp around the action and melts the near and far edges of the tile, which is what makes it read as a miniature. The band travels with the story and the lens stops down a little for the final picture. True colours, slightly rich, light vignette, almost no grain.
+Good for: Places, systems and journeys: anything with a few stops and something that travels between them (a supply chain, a commute, how a request moves through a company). Each stop is a little building with a sign; the traveller links them in order.
+```
+
+## 05. Blueprint Build
+
+- Folder: `references/looks/05-blueprint-build/style.js`
+- `{LIBS}`: `, and the STROKEFONT library`
+- `{FONTS}`: (no line)
+- Tell it as: an explainer
+- Reference topic: An ergonomic desk set-up: screen top at eye level, elbows at about 90 degrees, feet flat on the floor
+
+```
+STYLE CARD
+Name: Blueprint Build
+Family: Diagrams with depth
+Use: explainer
+Look: A real drafting sheet: deep blueprint blue with grain and worn fold creases, a title block, a construction grid, crisp white linework in two weights with hidden edges dashed, dimension arrows and numbered notes in plotted single-stroke capitals. The drawing turns out to be a 3D wireframe, and then a solid object standing on its own plan.
+Motion: Lines plot themselves in pen order with a hot tip. As the camera tips over, each part rises out of its own plan, which stays printed on the sheet. The numbered notes peel off the paper, turn to face the lens and are tied to the model with leaders, one by one. Then a hatched section plane climbs through the wireframe and leaves real material under it.
+Light: One soft key from behind and to the side, so tops and one flank are lit, the near faces stay in shade and a long soft shadow falls toward the camera across the sheet. A little cool fill. At the end the desk lamp in the model switches on.
+Materials: Uncoated blue paper that takes the light, flat white ink. The built object is restrained and real: pale oak, matt white steel, rust wool, off-white plaster, graphite plastic. The white lines stay on it as a faint ghost.
+Camera: One continuous crane move with a long lens that opens up: it starts straight above the sheet, where the drawing reads as a flat plan, tips down to a three-quarter view as the drawing gains height, and keeps drifting in until the last frame.
+Finish: Almost none: neutral tone curve so the blue and white stay true, light vignette, a trace of bloom on pen tips and the lamp, fine grain. Hidden lines are found by a real depth test, not drawn by hand.
+Good for: Plans, set-ups and how-it-is-made: first the layout as a flat drawing, then the same thing as an object, with dimensions and two or three numbered pointers attached to the places they talk about.
+```
+
+## 06. Spotlight Stage
+
+- Folder: `references/looks/06-spotlight-stage/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Oswald, Playfair Display`
+- Tell it as: a story
+- Reference topic: The first powered flight: from the Wright brothers' bicycle shop in Dayton to 12 seconds and 120 feet at Kitty Hawk on 17 December 1903
+
+```
+STYLE CARD
+Name: Spotlight Stage
+Family: Spaces and journeys
+Use: story
+Look: A toy theatre at night: crimson velvet, a worn timber stage and a painted world of flat card cut-outs standing in layers, with an easel card at the front for the caption. The room is dark; whatever the story is about is picked out by shafts of light cutting through haze.
+Motion: It plays like a show. Scenery flats slide in from the wings, pieces are flown in from above on thin rods, actors and props are cut-outs pushed along slots in the floor with a small wobble. Scene changes happen in view: flats part, others glide in, the easel card is pulled and the light changes colour.
+Light: Only stage lamps, each a real spot light with a matching visible beam: two follow spots from the house that stay on the actors, two wide front washes that set the colour of the scene, a top light that drops a shaft on the centre of the action, a small special on the easel card and a row of horizon lights behind the last flat. No fill: what no lamp touches stays black.
+Materials: Thick matt card painted in flat gouache colours with a fine ink line and paper grain, bare card on the sawn edges, thin steel rods and wires, deep-pile velvet with gold braid, dark stained boards with a satin reflection.
+Camera: One slow continuous move from a seat in the stalls: it starts a little left on the first scene, eases back and across as the stage changes, then drifts in and up with the action. Long lens, the whole stage picture sharp.
+Finish: Beams are ray-marched cones with drifting haze and dust that only shows inside them; soft shadows from each layer onto the one behind, bloom on the brightest card, filmic contrast, heavy vignette, fine grain.
+Good for: Stories, history, fables and step-by-step scenes. One scene per beat: each beat is a stage picture built from flat cut-out scenery and cut-out actors, and the change between beats is shown, not cut. The follow spot says where to look, the colour of the wash says where and when we are, and one short line on the easel card names the scene (it can carry a running number).
+```
+
+## 07. Neon Sign
+
+- Folder: `references/looks/07-neon-sign/style.js`
+- `{LIBS}`: `, and the STROKEFONT library`
+- `{FONTS}`: (no line)
+- Tell it as: an explainer
+- Reference topic: How a rainbow forms
+
+```
+STYLE CARD
+Name: Neon Sign
+Family: Flat content made physical
+Use: explainer
+Look: A line drawing bent out of real glass tube and mounted on a painted brick wall at night: bright cores, coloured gas, black-painted returns into rubber boots, clear standoffs, every unlit tube waiting as milky glass. Small tube lettering for captions. Wet ground at the foot of the wall mirrors the end of it.
+Motion: Neon never fades and never slides. A section snaps on, drops out and snaps again before it holds a touch over-bright and settles; one tube buzzes with the glow crawling along the glass before it catches. Things move the way real animated signs do it: by swapping between sets of tubes (pose A, pose B, pose C) and by lighting the segments of a path one after another, so light appears to travel.
+Light: The tubes are the only real light: each one throws its own colour on the brick, hot right behind the glass and falling off across the wall, and every flicker moves the whole scene. A faint cold street light keeps the unlit glass readable.
+Materials: Milky glass tube, semi-gloss paint over rough brick with soot and rain streaks, black rubber and matte blockout paint, clear acrylic standoffs, galvanised conduit, wet asphalt with puddles.
+Camera: Long lens, one slow continuous crane. It starts a little oblique so the glass stands off the wall, drifts in on the part of the drawing that is lighting, then follows the light down the wall and settles low and square on the result, over its reflection in the wet ground. It is still drifting on the last frame.
+Finish: Wide soft bloom from the over-bright cores, filmic contrast with deep blacks, slight depth of field, light vignette, fine grain, a trace of chromatic aberration.
+Good for: How something works, as a diagram that switches on in the order it happens: light, electricity, signals, water, traffic, money, a recipe, a journey. A beat is a group of tubes that strikes on because the one before it did. Outlines are the things, a chase of short segments is whatever flows between them, alternating poses are whatever repeats (rain, flames, wheels, a heartbeat), and colour carries meaning, so use it for the part of the idea that really is about colour, state or category. One small tube caption per beat names what just lit; the last thing to light is the result, and it holds.
+```
+
+## 08. Exploded View
+
+- Folder: `references/looks/08-exploded-view/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): IBM Plex Mono, Space Grotesk`
+- Tell it as: an explainer
+- Reference topic: What's inside a ballpoint pen
+
+```
+STYLE CARD
+Name: Exploded View
+Family: Diagrams with depth
+Use: explainer
+Look: A product teardown film: one object hangs over a pale seamless floor, comes apart along its axis into its parts, and every part gets a numbered callout in ink blue.
+Motion: The object unscrews and pulls apart along its axis into sub-assemblies, they park as two tiers, then each spreads into its parts one after another; every part overshoots its place, settles and keeps a slight tilt of its own. Callouts draw on as the focus reaches each part, then everything returns in reverse and seats with a click.
+Light: One very large soft top light, so every part drops a soft shadow on the floor, with sky light for the contact shading. Black cards in the reflections give chrome its dark streaks and clear plastic its edges.
+Materials: Real finishes, one per part: clear plastic, chrome, turned brass, a steel spring wound as a true helix, dimpled black rubber, milky tube with blue ink, one orange moulded piece.
+Camera: A long lens on a slow crane, looking down the axis so the row recedes: close on the object, back and up as it opens, creeping in while a shallow focus travels from part to part, then close again as it shuts. One continuous move.
+Finish: Depth of field and motion blur from the lens itself, neutral colour, almost no bloom, a light vignette. Labels and leader lines are drawn on top so they stay sharp.
+Good for: How something is built or what is inside it: any object made of parts. Each part is one named item, the order of the row is the order of assembly, and putting it back together shows where everything goes.
+```
+
+## 09. Marble Run
+
+- Folder: `references/looks/09-marble-run/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Oswald`
+- Tell it as: an explainer
+- Reference topic: How your inbox sorts email
+
+```
+STYLE CARD
+Name: Marble Run
+Family: Machines that explain
+Use: explainer
+Look: A handmade wooden marble run shot like a product film: a walnut board carrying pale maple rails on brass pins, brass paddle gates, swirled glass marbles and three glass jars on a maple plinth with the labels burnt into the wood, in front of a shaded seamless backdrop.
+Motion: Marbles are let go one at a time, pick up speed as they drop, clack against brass gates that flip to sort them, fall into their jar and settle into a pile. Nothing is eased by hand: speed comes from the height each marble has lost, and the piles are a small physics run.
+Light: Warm daylight from the upper left, kept off the backdrop so the wall sits in soft shade behind the sunlit wood. Rails and marbles throw soft shadows onto the board, and every marble drops a small glint of its own colour into its shadow.
+Materials: Satin maple and walnut with drawn grain, polished brass that picks up the window, coloured glass with a white vein that glows on the side away from the light, thick clear jar glass with bright edges.
+Camera: Long lens, shallow focus, one continuous shot that stays close. It rides beside one marble from the hopper, gets to the first gate just ahead of it and waits for the clack, follows it across the second gate, then travels down as it drops into its jar, opens just far enough to hold all three jars and pushes slowly in on the jars, their counters and their names.
+Finish: Real motion blur and depth of field, colours kept true (neutral tone curve), a small bloom on brass and glass glints, light vignette, fine grain.
+Good for: Sorting, routing and filtering: anything where many items take different paths through the same rules. The hopper is what comes in, each gate is one rule, each jar is one outcome with a counter under it, and how full the jars end up is the result.
+```
+
+## 10. X-Ray
+
+- Folder: `references/looks/10-x-ray/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Space Grotesk, IBM Plex Mono`
+- Tell it as: an explainer
+- Reference topic: Why a vacuum flask keeps drinks hot
+
+```
+STYLE CARD
+Name: X-Ray
+Family: Filters over 3D
+Use: explainer
+Look: A radiograph you can move around: the object turns into glowing film on a dark scanner bed, every wall brightest where you look through the most material, with one warm accent for the part that matters right now.
+Motion: The object starts solid. A scanning plane sweeps along it, the cut face glows as a live cross-section, and everything behind the plane is left see-through. Then the inner parts light up one at a time as something (here heat) runs into them.
+Light: Before the scan, a soft overhead key and long strip reflections on brushed steel. After it the room dims and the picture is made of emitted light only: film, accent and a faintly lit grid.
+Materials: Brushed steel and black plastic for the solid; for the X-ray one material that adds up the true path length through each closed part, so edges, rims and overlaps brighten by themselves.
+Camera: Long lens. One continuous crane from a low three-quarter view of the cut face up to a near plan view, like the plate of a radiograph, then a slow push that never stops.
+Finish: Gentle bloom on the brightest edges and the accent, neutral tone mapping so the two colours stay true, fine grain, a soft vignette. Callouts are crisp 2D type on poles that track points on the model.
+Good for: What is inside something and how it works: anatomy, machines, products, buildings. Up to three inner parts, each lit and named in turn, with a simple flow (heat, air, current, force) shown acting on them.
+```
+
+## 11. LED Wall
+
+- Folder: `references/looks/11-led-wall/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: (no line)
+- Tell it as: a story
+- Reference topic: The Tortoise and the Hare, as a pixel cartoon playing on the lamp wall
+
+```
+STYLE CARD
+Name: LED Wall
+Family: Flat content made physical
+Use: story
+Look: A giant outdoor screen made of real lamps: thousands of frosted round LEDs in black louvred cabinets on a steel gantry at night. From far away it is a crisp bright picture; close up it falls apart into single glowing lamps, each with a red, a green and a blue chip under its lens.
+Motion: The wall plays pixel animation at one pixel per lamp and 30 pictures a second: characters built from a few flat colours with a dark outline walk, run, stop and react in real cycles, the ground scrolls under them lamp by lamp with slower hills behind, and one short caption per beat pushes up into a ticker strip along the bottom. The camera does the opposite of the content: one slow continuous pull from a single lamp to the whole wall, still drifting at the end.
+Light: The wall is the light. Its own colours spill onto the louvres and the black plastic between the lamps, glow in the haze around it, tint the steel and paint the wet ground, and all of it changes when the picture changes. One cold floodlight from behind gives the steel a rim; everything else is night.
+Materials: Frosted dome lenses in black collars, satin black louvres and cabinet faces with seams and screws, galvanised lattice steel, rubber cable, wet tarmac with dry patches and a painted line.
+Camera: Long lens. Starts as a macro shot at a low angle across the lamps with very shallow focus, pulls back and swings round to face the wall while the story waits on its opening pose, has the wall in frame by the time the first story event happens, and then keeps drifting back and across, low over the wet ground, to the last frame.
+Finish: Soft bloom from the lamps, true-colour (neutral) tone mapping so the LED colours stay saturated, light vignette, very little grain. No scanline or pixel filters: the dots are real geometry.
+Good for: Any 2D animation, diagram or story that can be drawn at lamp resolution: a fable with two characters, a process with parts that move along a track, a chart that grows, a map with a route, a game-like sequence. Draw it on a small canvas with one pixel per lamp. A beat is something happening in that picture (a character sets off, stops, is overtaken, arrives); a label is one short dot-font line in the ticker strip; what moves is the pixel picture, while the wall, its housing and the light it throws stay the same and take their colour from whatever is playing.
+```
+
+## 12. Inflated
+
+- Folder: `references/looks/12-inflated/style.js`
+- `{LIBS}`: `, and the STROKEFONT library`
+- `{FONTS}`: (no line)
+- Tell it as: an explainer
+- Reference topic: How a hot-air balloon flies
+
+```
+STYLE CARD
+Name: Inflated
+Family: Material worlds
+Use: explainer
+Look: Everything is a glossy inflatable in a bright one-colour studio: here a striped hot-air balloon, its basket, a flame, arrows, clouds and small tube letters. Each skin has welded seams and is limp, flat and creased when short of air, round and mirror-smooth when full.
+Motion: Air is the animation. Things fill in pumps that overshoot and snap taut, swell from the valve end outwards, stand up, wobble and settle. Full things float and sway, landings squash and rock, arrows and captions inflate in and deflate out. Every jolt rings out as a wobble.
+Light: Softboxes overhead and to the left and a thin strip on the right draw long white highlights on every skin. A soft key from the upper left shapes the forms and drops soft shadows; the floor and the flame bounce their colour onto the skins.
+Materials: Clear-coated vinyl in hot candy colours (pink, orange, yellow, red) with cream trim and a wicker-orange basket, on a cobalt sweep with just enough sheen to hold a blurred pool of colour under each object.
+Camera: One slow, continuous crane on a long lens that stays with the main object: high over it while it lies on the floor, sinking and pulling back as it stands, looking up at it as it rises, overtaking it to look down as it sinks, level again for the last hold.
+Finish: True colours (neutral tone curve), real motion blur on the wobble, a touch of depth of field, soft bloom on the highlights and the flame, almost no grain.
+Good for: Any explainer or story that can be told with a few simple inflated objects and characters. It is strongest where pressure, growth, floating, squeezing or too much and too little is the point, because how full each thing is carries the meaning. A beat is one change of air (something fills, lifts, vents, sags) that causes the next one; small balloon arrows show a push or a flow; each beat gets one short caption in small tube letters at the side of the frame.
+```
+
+## 13. Painted
+
+- Folder: `references/looks/13-painted/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Caveat`
+- Tell it as: a story
+- Reference topic: From wind to bread: a gust crosses a wheat field and turns the windmill, the millstone grinds flour, and a loaf ends up on the bakery sill
+
+```
+STYLE CARD
+Name: Painted
+Family: Filters over 3D
+Use: story
+Look: A filter, not a set: any lit 3D scene comes out as an oil painting on canvas, with thick directional brush dabs, broken colour, ridges of paint that catch a raking light, linen weave showing through the thin darks and a ragged unpainted edge. Here it carries a golden-hour countryside: a wheat field, a windmill, a bakery cottage.
+Motion: Things happen inside the painting and each one causes the next: a gust runs through the wheat as a wave of bent stalks, reaches the sails and spins them up, the millstone turns with them, flour pours into a sack and puffs, a loaf is slid onto a sill. Brush dabs are fixed to the things they describe, so they travel with stalks, sails and sacks instead of boiling; the canvas weave stays still. Each caption is brushed on in under half a second when its beat starts and stays until the next one.
+Light: One low golden sun from behind and to the side, long shadows, cool blue-violet sky light in every shadow, and small warm lamps (a doorway, a window, a lantern) wherever the story needs the eye. Warm light against cool shadow is the whole palette.
+Materials: Rough simple shapes with no detail of their own, each big enough to survive a brush nine pixels wide. Every surface carries a field of brush dabs that varies its colour, tilts its shading and adds bristle streaks; the painterly filter turns that into strokes.
+Camera: One continuous shot at walking height, like a picture book without page turns: it travels with the wind from the field toward the mill, cranes down to the door and drifts slowly across it while the stone works, then glides after the flour dust along the track and pushes in on the window sill, where it stops and holds on the thing that was made. Everything sharp, like a canvas. Each stop is composed like a painting, with the subject large in frame.
+Finish: Anisotropic Kuwahara brush filter, then a paint-relief and canvas-weave pass lit from the upper left, which also letters the caption on a bare corner of the linen. Soft bloom on the sun and the lamps before the filter, so the glow is painted too. No grain, no vignette.
+Good for: Stories, journeys and processes that happen in a place, told as a picture book: how something is made, where something comes from, a day in a life, a chain of cause and effect. Each beat is one stop in the landscape where one thing visibly happens and sets off the next; something that travels (wind, a road, a river, a character) leads the camera from stop to stop; one short caption per beat sits in the bare corner of the canvas and names what is happening. The filter carries any 3D scene, so the world can be a farm, a city, a workshop or a room, as long as each subject is a big simple shape.
+```
+
+## 14. Circuit City
+
+- Folder: `references/looks/14-circuit-city/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): IBM Plex Mono`
+- Tell it as: an explainer
+- Reference topic: A prompt's trip across a chip: PROMPT, MEMORY, PROCESSOR, ANSWER
+
+```
+STYLE CARD
+Name: Circuit City
+Family: Spaces and journeys
+Use: explainer
+Look: A real circuit board filmed as a city at night: matte black chips are the buildings, aluminium capacitors the towers, gold tracks the streets, and white silkscreen print names each district. Deep green solder mask, gold and tinned metal, warm signal light.
+Motion: A pulse of light races along the gold tracks from stop to stop and each landmark wakes as it arrives: chips glow from underneath, the processor dies light up in a diagonal wave. The camera flies low and forward after it, like a helicopter shot, and rises once over the big chip.
+Light: Night. The signals are the main light: a warm glow that travels with the pulse and throws moving shadows from every part. A soft cool moonlight from the back left rims the parts and rakes the board so metal glints and textures read; a few tiny indicator LEDs.
+Materials: Semi-gloss solder mask with fine grain and raised copper under it, satin gold tracks and pads, bright tinned pins, moulded black epoxy with laser-etched markings, brushed aluminium cans, iridescent bare silicon.
+Camera: Macro lens, very shallow focus that rides with the pulse. One continuous forward flight that starts low at the edge of the board, sways gently after the pulse, cranes up over the processor and glides on to settle above the last stop.
+Finish: Real depth of field and motion blur, bloom only on the signal and LEDs, filmic contrast with deep blacks, slight lens fringing, vignette, fine grain.
+Good for: Journeys and pipelines: something travels through a system and each stage does its part. Every stage is a landmark with a printed label; the pulse and the camera carry the order.
+```
+
+## 15. Glass and Light
+
+- Folder: `references/looks/15-glass-light/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Inter`
+- Tell it as: an explainer
+- Reference topic: How a vinaigrette comes together: 3 parts oil, 1 part vinegar
+
+```
+STYLE CARD
+Name: Glass and Light
+Family: Material worlds
+Use: explainer
+Look: Real glassware on a dark stone table in front of a glowing backdrop: thin clear jars and bottles turned on a lathe, holding coloured liquids with a visible surface, a meniscus and sharp boundaries between layers. Every liquid throws a pool of its own coloured light, with bright caustic lines, on the table in front of it. Small white measure marks are printed on the glass.
+Motion: Calm, with weight. Bottles lift, lean and pour a thin falling stream; levels rise against the marks while the bottle empties; rings spread where the stream lands; layers settle; a jar is shaken hard and set down. The lamp swings slowly behind the glass so the pools of light sweep across the table.
+Light: Back-lit like glass photography: a bright horizon behind, darkness above, and a lamp behind and above the glass, so light comes through the liquids towards the camera. Softboxes give every rounded edge a white rim; the backdrop gives the glass dark and bright lines to bend.
+Materials: Thin clear glass with real refraction and a thick foot; liquids that let the backdrop through, pale where they are thin and deep where they are thick, and turn milky when mixed; brushed steel for lids and spoons; dark matte stone with a faint sheen.
+Camera: One slow continuous dolly: it starts wide enough for the bottles to lift and pour, then moves in on the jar as the layers form and ends close on the finished mixture, still drifting.
+Finish: True colours (neutral tone curve), bloom on the light pools and rims, a soft vignette, fine grain. Captions are a crisp 2D overlay.
+Good for: Recipes, mixtures, ratios, amounts, chemistry: anything that fills, pours, layers or changes colour, told with real glassware. A beat is one action on the vessel (a pour, an addition, a shake, a wait). Amounts are levels against the marks on the glass, ingredients are colours, and a change of state is a change in the liquid (layers, cloudiness, colour). Labels are the measure marks plus one short caption line per beat.
+```
+
+## 16. Factory Line
+
+- Folder: `references/looks/16-factory-line/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Fredoka, Inter`
+- Tell it as: an explainer
+- Reference topic: How an AI agent finishes a task: plan, search, write, check
+
+```
+STYLE CARD
+Name: Factory Line
+Family: Machines that explain
+Use: explainer
+Look: A toy-grade production line on a clean studio floor: chunky cobalt machine housings with big white labels, safety-orange moving parts, a dark rubber belt and one white page riding an orange tray.
+Motion: The belt indexes: the tray glides to a station, stops, the machine does one heavy mechanical thing to it (a press slams, a light bar sweeps, a roller prints, a stamper punches), a lamp turns green and the belt moves on.
+Light: One low, warm key from the front-left so light reaches under the machine heads and every tool throws a soft shadow on the page, plus a cool sky light that darkens the gaps under the housings. Working tools add their own coloured light.
+Materials: Clear-coated enamel in cobalt, orange and cream; brushed steel rods and bolts; matte ribbed rubber; uncoated white paper with printed ink.
+Camera: A dolly beside the line that travels with the tray, looking down at about 35 degrees so the page stays readable. It drifts from just behind the tray to just ahead of it, then drops down in front of the finished page for the hold.
+Finish: Real motion blur (the world streaks past while the tray stays sharp), gentle depth of field, soft bloom only on lamps and the scanner light, true colours (neutral tone map), light vignette, almost no grain.
+Good for: Any step-by-step process: the raw input rides a belt, each labelled station is one step and visibly changes the item, and the finished result is presented at the end.
+```
+
+## 17. White Model
+
+- Folder: `references/looks/17-white-model/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Inter, IBM Plex Mono`
+- Tell it as: an explainer
+- Reference topic: How rooftop solar powers a home: sunlight, panels, inverter, home, and the surplus going out to the grid
+
+```
+STYLE CARD
+Name: White Model
+Family: Diagrams with depth
+Use: explainer
+Look: An architect's presentation model: everything is matte white card and foam on a white site board, and one saturated accent colour is reserved for the thing being explained.
+Motion: Nothing in the model moves. Only the accent moves: it starts at the source and travels through the model along thin conduits, switching each part on as it arrives, and a numbered label with a thin leader line draws in at every stop.
+Light: Soft daylight from one side plus sky light with real occlusion, so creases, window reveals and the ground under things darken gently and form does the work colour normally does. The accent glows a little and throws its own colour onto the white around it.
+Materials: Four slightly different whites (warm card, cool foam, bright paper, rough plaster) with a fine paper grain and a tiny bevel on every edge; scored pencil lines on the board; a mid-grey table behind, so the white reads as white.
+Camera: Long lens with shallow focus, like a photograph of a small model. One slow continuous crane: it starts low and close on the source and rises and pulls back until the whole path is in frame.
+Finish: Neutral tone mapping so the whites stay clean and the accent stays true, a light bloom on the accent only, soft vignette, almost no grain.
+Good for: How something flows through a system: energy, water, money, data, people. Build the system as a white model, lay the path through it as conduits, and let the accent travel the path in the right order while labels name each stop.
+```
+
+## 18. Voxel
+
+- Folder: `references/looks/18-voxel/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: (no line)
+- Tell it as: an explainer
+- Reference topic: How a tomato plant grows: seed, sprout, plant, fruit
+
+```
+STYLE CARD
+Name: Voxel
+Family: Filters over 3D
+Use: explainer
+Look: Everything is built from small cubes, like a hand-made voxel model on a display base: a short palette with every cube a shade apart from its neighbours, tiny bevels that catch the light, and the label spelled in cubes on the front of the base.
+Motion: The cubes do the animating: things drop in column by column, grow layer by layer, swell, pop and get knocked off, each with a small bounce on arrival. Nothing slides or fades.
+Light: One soft warm sun from the front left and an open sky that really gets blocked in corners and under things, so every cube sits in its own little shadow.
+Materials: Matte painted cubes with a narrow chamfer, a smooth off-white plinth under the model and a plain coloured tabletop, so the cubes are the only texture.
+Camera: A long lens looking down from about 26 degrees with a wide aperture: the model is sharp, the table in front and behind falls soft, and it reads as a miniature. One slow arc and pull-back that keeps pace with what is being built.
+Finish: Neutral tone mapping to keep the palette true, a little bloom on the cubes that glow, light vignette, almost no grain.
+Good for: Anything that can be shown as a small model that builds up in stages: how something grows, is made or is put together. One base, one subject in the middle, one voxel word per stage, weather or helpers as small cube events around it.
+```
+
+## 19. Data Skyline
+
+- Folder: `references/looks/19-data-skyline/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Space Grotesk, IBM Plex Mono, Fraunces`
+- Tell it as: an explainer
+- Reference topic: World population by the billion: 1 billion in 1804, 2 in 1927, 4 in 1974, 8 in 2022
+
+```
+STYLE CARD
+Name: Data Skyline
+Family: Diagrams with depth
+Use: explainer
+Look: A bar chart built as an architect's model: towers of stacked pale stone blocks on a printed plinth, with one tower in vermilion, tiny trees and people for scale, and thin drawn annotations on top.
+Motion: Towers push up out of the plinth one after another on a heavy spring, overshoot a little and settle while their value counts up on the roof. Taller towers take longer, so size is felt as time.
+Light: A low warm sun from the side, so every tower throws its shadow onto the next one and the last shadow runs long across the ground; cool sky light fills the shaded fronts and warm haze swallows the horizon.
+Materials: Honed limestone with fine strata and pores, the same stone stained vermilion for the accent tower, dark printed ink for scales, footprints and labels, a mid-grey ground so the pale model stands out.
+Camera: Starts at ground level beside the first tower, dollies along the row while the towers rise, tilts up as the tallest one climbs past the lens, then cranes up and back until the whole comparison is in frame.
+Finish: Shallow focus at ground level like a macro photo of a model, real motion blur, gentle bloom on the sunlit faces, soft filmic contrast, light vignette and fine grain.
+Good for: Any list of labelled values: a comparison, a ranking or a series over time. Each value is a tower, the label is printed at its foot, the unit is stacked in countable blocks and one accent colour marks the bar that matters.
+```
+
+## 20. Ink and Toon
+
+- Folder: `references/looks/20-ink-toon/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Anton, Caveat`
+- Tell it as: an explainer
+- Reference topic: Pour-over coffee in three steps: grind, bloom, pour
+
+```
+STYLE CARD
+Name: Ink and Toon
+Family: Filters over 3D
+Use: explainer
+Look: Real 3D that reads as a hand-inked animation cel: flat colour in two tones, a brush line round every shape, halftone dots where light turns to shadow and pen hatching inside cast shadows, printed on warm paper inside a ruled panel.
+Motion: Snap, not glide. Props are drawn on twos (15 drawings a second) and jump between held poses with a stretched in-between, an overshoot and a quick settle; speed lines, impact ticks and steam squiggles are drawn in for two or three frames. The camera alone moves on every frame.
+Light: One hard sun, low and from the side, placed for the shape of the shadow rather than for realism. No fill light: the shadow colour of each material is picked by hand, shifted towards the cool ground colour.
+Materials: No textures. Each material is a lit colour, a shadow colour and, on glossy things, one hard white glint. Paper, one ink and four spot colours do everything.
+Camera: Long lens, looking down at a table-top from the front. It drifts slowly while a pose is held and whips to the next framing in a third of a second, one framing per step.
+Finish: No blur, bloom or grain. A print filter lets every edge wander by a pixel and re-draws it six times a second, multiplies paper tooth through the colour and rules an ink border round the panel.
+Good for: Steps, recipes and how-tos with a few recognisable objects: each step is one bold action on the same hero object, named by a big lettered word and a hand-written caption box.
+```
+
+## 21. Pin Wall
+
+- Folder: `references/looks/21-pin-wall/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Oswald, Inter`
+- Tell it as: an explainer
+- Reference topic: How a volcanic island is born
+
+```
+STYLE CARD
+Name: Pin Wall
+Family: Flat content made physical
+Use: explainer
+Look: A pin-art toy the size of a wall, laid out like a relief model: tens of thousands of steel pins with rounded heads in a tight honeycomb, held in a dark bolted frame. The pin heights form a landscape you could put your hand on, and groups of pins carry a tint for what they stand for (here blue for sea, warm for rock, glowing orange for lava).
+Motion: The relief never stops moving. It is one height field that changes over time: swell travels across it, shapes push up from below, rings run outwards, and every pin follows a moment late with a little bounce, so anything sudden shivers and settles. What is finished stands still, what is alive keeps moving.
+Light: One low raking light from the far left, so every height difference throws a long soft shadow and every lit head carries a glint; a blue light from the opposite side fills the shadows; a small warm light sits wherever the relief glows.
+Materials: Satin steel pins with polished domed heads and darker shafts, tinted like anodised metal; a powder-coated black frame with bolts.
+Camera: One slow continuous crane seen from a raised three-quarter angle: it starts low, looking across the pin heads with shallow focus, and rises and drifts round the subject until the whole relief reads. The relief fills the frame the whole time.
+Finish: Real motion blur on the pins, depth of field in the low pass, bloom on the glints and on anything hot, filmic contrast, vignette, fine grain.
+Good for: Anything that can be shown as a moving relief or a moving greyscale picture: terrain, waves, growth, charts that rise, shapes that morph into each other. The content is one height function, relief(pin, time), which says how far each pin stands out and which tint it carries. A beat is a change in the relief that follows from the one before (calm, something rises, it breaks through, the result). Words are one short caption per beat on a small plate at the bottom; the pins never form words.
+```
+
+## 22. Toy Blocks
+
+- Folder: `references/looks/22-toy-blocks/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Fredoka, Fraunces`
+- Tell it as: an explainer
+- Reference topic: The 50/30/20 budget rule: 50% needs, 30% wants, 20% savings
+
+```
+STYLE CARD
+Name: Toy Blocks
+Family: Material worlds
+Use: explainer
+Look: Design-shop wooden blocks on a sunlit playroom floor: maple cubes and bricks with rounded edges, chalky milk paint worn back to bare wood at the corners, and letters, numbers and simple pictures screen-printed on the faces. The stacks are the chart.
+Motion: Blocks drop in from above with real weight: one corner hits first, the block bounces once, rocks from edge to edge and settles with a knock. A heavy block makes the whole tower teeter. Nothing eases; everything falls.
+Light: Low, warm afternoon sun through a window to the left, so the floor carries soft stripes of window-frame shadow and every block throws a long shadow. Cool sky light fills the shade and darkens the gaps between blocks. The far wall stays in shade with one patch of window light.
+Materials: Pale maple with drawn grain that runs the right way on every face (end grain on the ends), matte milk paint in dusty blue, coral, green, mustard and cream with chips and scratches, slightly patchy pressed-in print, an oak board floor with a soft sheen.
+Camera: Long lens at a child's eye height. It starts close on the word spelled in alphabet blocks, cranes up to the first tower as it grows, then makes one slow arc around the stacks with a slight push, close enough that the tallest tower nearly fills the height of the frame. Shallow focus keeps the room soft.
+Finish: Real motion blur on the falling blocks, real depth of field, colours kept true (neutral tone curve), a touch of warmth and contrast, light vignette, very fine grain. No bloom to speak of.
+Good for: Lists, comparisons, proportions, steps and "the building blocks of X". One cube is one unit, a tower is a bar, a brick is a label, alphabet blocks spell the headline; pictures on the faces say what each unit is.
+```

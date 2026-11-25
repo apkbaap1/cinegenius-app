@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Film</title>
+<!-- {FONTS}: one Google Fonts link for the families in style.fonts, or delete this line -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0b0d; color: #ddd; font: 13px system-ui, sans-serif; overflow: hidden; }
+  #wrap { position: absolute; inset: 0 0 44px 0; display: flex; align-items: center; justify-content: center; }
+  canvas { width: min(100vw, calc((100vh - 44px) * 16 / 9)); aspect-ratio: 16 / 9; display: block; }
+  #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 44px; display: flex; gap: 10px; align-items: center; padding: 0 12px; background: #151518; }
+  #bar button { background: #2a2a30; color: #eee; border: 0; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  #bar input[type=range] { flex: 1; }
+  #time { font-variant-numeric: tabular-nums; min-width: 92px; }
+  body.render #bar { display: none; } body.render #wrap { inset: 0; }
+</style>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js" } }</script>
+</head>
+<body>
+<div id="wrap"><canvas id="c" width="1920" height="1080"></canvas></div>
+<div id="bar"><button id="play">Pause</button><input id="scrub" type="range" min="0" max="1000" value="0"><span id="time">0.00 s</span><button id="snd">Sound: on</button><label><input id="loop" type="checkbox" checked> loop</label></div>
+<script type="module">
+import * as THREE from 'three';
+window.THREE = THREE;
+const load = (src) => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
+// bundle.mjs replaces these three lines with the libraries inlined, so the finished page is one file
+await load('lib/stage.js');
+await load('lib/sound.js');
+// await load('lib/text3d.js');      // only for looks that use TEXT3D
+// await load('lib/strokefont.js');  // only for looks that use STROKEFONT
+await load('style.js');              // the new style: content block first, then registerStyle({...})
+
+const style = window.STYLES[window.STYLES.length - 1], K = window.K, SOUND = window.SOUND;
+const RENDER = new URLSearchParams(location.search).has('render');
+if (RENDER) document.body.classList.add('render');
+const S = await K.run(document.getElementById('c'), style, { samples: RENDER ? style.render.samples : 3 });
+const D = S.duration;
+window.STYLE = style; window.DURATION = D; window.seek = (t) => S.seek(t); window.READY = true;
+if (RENDER) { S.seek(0); } else {
+  let t = 0, playing = true, last = performance.now(), sound = true, stop = null;
+  const $ = (id) => document.getElementById(id), scrub = $('scrub');
+  const startSound = () => { if (stop) stop(); stop = sound && playing ? SOUND.live((k) => style.sound(k), t, { voiceover: false }) : null; };
+  const stopSound = () => { if (stop) stop(); stop = null; };
+  $('play').onclick = () => { playing = !playing; $('play').textContent = playing ? 'Pause' : 'Play'; last = performance.now(); playing ? startSound() : stopSound(); };
+  $('snd').onclick = () => { sound = !sound; $('snd').textContent = 'Sound: ' + (sound ? 'on' : 'off'); sound ? startSound() : stopSound(); };
+  scrub.oninput = () => { t = scrub.value / 1000 * D; stopSound(); S.seek(t); };
+  scrub.onchange = () => startSound();
+  document.addEventListener('pointerdown', () => { if (playing && sound && !stop) startSound(); }, { once: true });   // browsers start audio only after a gesture
+  const frame = (now) => {
+    if (playing) {
+      t += (now - last) / 1000;
+      if (t >= D) { if ($('loop').checked) { t = 0; startSound(); } else { t = D; playing = false; $('play').textContent = 'Play'; stopSound(); } }
+      S.seek(t); scrub.value = Math.round(t / D * 1000);
+    }
+    last = now; $('time').textContent = t.toFixed(2) + ' s'; requestAnimationFrame(frame);
+  };
+  S.seek(0); requestAnimationFrame(frame);
+}
+</script>
+</body>
+</html>

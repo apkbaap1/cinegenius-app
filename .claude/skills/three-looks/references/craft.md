@@ -17,31 +17,32 @@
   (HemisphereLight, low intensity) and, if the look calls for it, a **rim** behind the
   subject. Turn on `renderer.shadowMap` (PCFSoft) and set `castShadow` /
   `receiveShadow` on what matters - contact shadows make miniatures feel real.
-- Use `ACESFilmicToneMapping` and sRGB output (the template does). Adjust exposure, not
-  light intensities, when everything is too bright or too dark.
+- Tone mapping and grade come from `style.render` in the STAGE kit (`tone: 'filmic' | 'neutral' | 'agx'`,
+  `exposure`, `contrast`, `saturation`). Adjust exposure, not light intensities, when everything is too
+  bright or too dark.
 - Glossy looks (Inflated, Glass and Light, Neon) need something to reflect: build a
-  `RoomEnvironment` with `PMREMGenerator` (the template has `kit.studioEnv()`).
+  code-built environment with bright panels: `K.env(S, { panels: [...] })`.
 - Dark looks (Spotlight Stage, Neon, Circuit City) are lit by the objects: emissive
-  materials + `UnrealBloomPass` (`kit.bloom()`), plus fog to push the background away.
+  materials + the kit's bloom (`render.bloom`, `bloomThreshold`), plus fog to push the background away.
 
 ## Materials without image files
 
 - `MeshStandardMaterial` with `roughness`/`metalness` covers most surfaces;
   `MeshPhysicalMaterial` adds `clearcoat` (plastic, vinyl, lacquer) and
   `transmission`/`thickness`/`ior` (glass, liquid).
-- Surface detail comes from `kit.canvasTexture(w, h, draw)`: draw noise, grain, paper
+- Surface detail comes from `K.canvasTex(w, h, draw)`: draw noise, grain, paper
   fibres, fingerprints, brick courses, grid lines or circuit traces with 2D canvas calls
   and use the result as `map`, `roughnessMap` or `bumpMap`.
 - Faceted look: `flatShading: true`. Soft look: more segments plus a small seeded
-  vertex wobble (`kit.wobble(geometry, amount, seed)`).
+  vertex wobble seeded with `K.rng(seed)` or `K.noise(seed)`.
 
 ## Camera
 
 - Pick a lens per look: miniatures use a long lens (FOV 20-30) from high up so they
   read as small; stages use 35-45; interiors and machines 40-50.
-- Move on a path, never cut mid-move. Use `kit.ease` and `kit.beat(t, start, dur)`
-  to blend between named camera stops. A slow drift (2-4% per second) keeps stills alive.
-- Miniature trick: tilt-shift with `BokehPass` or simply a shallow fog near and far.
+- Move on a path, never cut mid-move. Use `K.path` (flows through keys) or `K.track`
+  with `K.ease` to blend between camera stops. A slow drift (2-4% per second) keeps stills alive.
+- Miniature trick: real depth of field from the kit (`K.focus(camera, point, aperture)`).
 
 ## Motion
 
