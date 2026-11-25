@@ -1,6 +1,6 @@
 ---
 name: three-looks
-description: Make short 3D motion graphics (explainers and stories, 7-12 s) built entirely in code with three.js 0.187 and the STAGE and SOUND kits, in 37 named looks from the 3D Style Atlas - Low-Poly, Paper Pop-Up, Soft Clay, Tiny Diorama, Blueprint Build, Spotlight Stage, Neon Sign, Exploded View, Marble Run, X-Ray, LED Wall, Inflated, Painted, Circuit City, Glass and Light, Factory Line, White Model, Voxel, Data Skyline, Ink and Toon, Pin Wall, Toy Blocks, Particle Swarm, Museum Gallery, Pencil Sketch, Domino Chain, Node Network, Shadow Box, Layer Stack, Dithered, Floating Screens, Device Hero, Studio Product, Split-Flap Board, Hero Icon, Embossed, Monument Type - with a storyboard of rendered stills first, then a self-contained HTML player and an MP4 with synthesized sound. Use when the user asks for a 3D explainer or animated story, a three.js film, names one of these looks, or pastes a "3D motion graphic ... style" prompt.
+description: Make short 3D motion graphics (explainers, stories, product films and titles, 7-12 s) built entirely in code with three.js 0.187 and the STAGE and SOUND kits, in 37 named looks from the 3D Style Atlas - Low-Poly, Paper Pop-Up, Soft Clay, Tiny Diorama, Blueprint Build, Spotlight Stage, Neon Sign, Exploded View, Marble Run, X-Ray, LED Wall, Inflated, Painted, Circuit City, Glass and Light, Factory Line, White Model, Voxel, Data Skyline, Ink and Toon, Pin Wall, Toy Blocks, Particle Swarm, Museum Gallery, Pencil Sketch, Domino Chain, Node Network, Shadow Box, Layer Stack, Dithered, Floating Screens, Device Hero, Studio Product, Split-Flap Board, Hero Icon, Embossed, Monument Type - with a storyboard of rendered stills first, then a self-contained HTML player and an MP4 with synthesized sound. Use when the user asks for a 3D explainer or animated story, a three.js film, names one of these looks, or pastes a "3D motion graphic ... style" prompt.
 ---
 
 # three-looks
@@ -116,6 +116,8 @@ is already here.
 - Add a `card.md` holding its style card and slot values.
 - Append it to `CARDS.md` and to the table above.
 - If the prompt brings a new library, add it to `assets/lib/`.
+- Add it to the `style-menu` skill too: its family in the menu, the matching Recommend rows
+  and the list in that skill's description.
 
 ### Classic cards
 
@@ -132,9 +134,10 @@ with its signature move and traps. They run on the simpler single-file scaffold
   kits run. No addons, models, images, HDRIs or texture files: build everything in code.
 - `update(t)` sets the whole scene for time `t`. Nothing may build up between calls: the kit
   calls it many times per frame. No `Math.random`, `Date` or timers; use `K.rng(seed)`.
-- 7-12 seconds unless the content needs more. Tell the content as the card's Use (an
-  explainer or a story) over three or four beats that follow from each other. End on the
-  result, not on a slogan or logo.
+- 7-12 seconds unless the content needs more. Tell the content as the card's Use. For an
+  explainer or a story, use three or four beats that follow from each other and end on the
+  result, not on a slogan or logo. Product and title looks (32-37) have no "Tell my content
+  as" line in their brief: the product or the text itself is the subject.
 - Words are small captions and labels. Keep them large enough for a phone and on screen
   long enough to read. Keep the subject filling the frame for the whole move. The first
   frame and the last second must both hold up.
