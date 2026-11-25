@@ -65,5 +65,5 @@ Slot values:
 - `{LIBS}`: empty, or `, and the TEXT3D library (load it after the STAGE kit)`, or `, and the STROKEFONT library`.
 - `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): <families>`, or nothing
   when the look uses no web fonts.
-- Product and title looks (Use: product or title, e.g. Device Hero, Studio Product, Split-Flap Board, Hero Icon): the "HOW TO STAY IN THE STYLE" list has no
+- Product and title looks (Use: product or title, e.g. Device Hero, Studio Product, Split-Flap Board, Hero Icon, Embossed): the "HOW TO STAY IN THE STYLE" list has no
   "Tell my content as ..." bullet at all. Drop that bullet instead of filling it.
