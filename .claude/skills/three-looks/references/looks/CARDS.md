@@ -30,6 +30,7 @@ Each card is copied word for word from the atlas prompt for that look. The slot 
 | 24 | Museum Gallery | `24-museum-gallery` | an explainer | DM Serif Display, Oswald, Space Mono | none | Four moments that led to AI today: Turing's question, Deep Blue, AlphaGo and ChatGPT |
 | 25 | Pencil Sketch | `25-pencil-sketch` | an explainer | none | STROKEFONT | How a house goes up: foundation, frame, walls, roof |
 | 26 | Domino Chain | `26-domino-chain` | an explainer | Anton, Oswald, Fraunces | none | Small starts, big finishes: a domino can knock over one 1.5 times its size, so 13 dominoes take you from 5 mm to 65 cm |
+| 27 | Node Network | `27-node-network` | an explainer | Oswald, Fraunces | none | How word of mouth grows a small business: 1 happy customer, then 3, 9, 27 |
 
 ## 01. Low-Poly
 
@@ -601,4 +602,26 @@ Materials: Bone with a soft lacquer and black or red paint in the engraving, ebo
 Camera: A long lens that travels with the falling front like a tracking shot and backs away as the dominoes grow, rising from table height to a high three-quarter view. Shallow focus on the domino that is falling.
 Finish: Real motion blur and depth of field, long soft shadows, filmic contrast, a warm vignette and fine grain.
 Good for: Cause and effect, chain reactions, step-by-step plans and anything that compounds: every domino is one step, printed with a word or a number, and the fall carries the story from the first to the last. Sizes can grow, the row can bend and branch.
+```
+
+## 27. Node Network
+
+- Folder: `references/looks/27-node-network/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Oswald, Fraunces`
+- Tell it as: an explainer
+- Reference topic: How word of mouth grows a small business: 1 happy customer, then 3, 9, 27
+
+```
+STYLE CARD
+Name: Node Network
+Family: Diagrams with depth
+Use: explainer
+Look: A physical model of a network mounted on a painted wall: glazed porcelain tokens in brass rings, joined by thin brass rods, like a museum's molecular model. Each token is two-sided and turns over to its coloured enamel face when the news reaches it.
+Motion: It is constructed link by link: a rod extends from a token carrying an empty ring, a blank token drops into the ring with a click, a bead of light slides along the rod and the token spins over to its coloured side. Each ring of the model goes faster than the last, and a number plaque clicks on when a ring is complete.
+Light: One warm, soft gallery spot from above, so every rod and token throws a soft shadow down the wall, longer the further it stands off. The pool of light opens as the model grows and always falls off to the corners.
+Materials: Ivory glazed porcelain, one enamel colour (cobalt), polished brass, enamel number plaques, and a terracotta plaster wall with a hand-painted title.
+Camera: Long lens. Starts close on the first token with the wall out of focus, then one continuous pull-back that keeps pace with the growing model while drifting from left to right. It ends with the finished model filling the frame edge to edge and keeps drifting slowly through the hold.
+Finish: Real depth of field and motion blur, neutral tone mapping to keep the enamel colour true, light vignette, very fine grain.
+Good for: Anything that is things and the connections between them: spread, referrals, teams, systems, flows. Nodes sit in oval rings around a centre, sized so the finished model fills a 16:9 frame; links are rods, a pulse travelling along a link is the story, and a number plaque per ring carries the count.
 ```

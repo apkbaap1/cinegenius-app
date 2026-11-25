@@ -1,6 +1,6 @@
 ---
 name: three-looks
-description: Make short 3D motion graphics (explainers and stories, 7-12 s) built entirely in code with three.js 0.187 and the STAGE and SOUND kits, in 26 named looks from the 3D Style Atlas - Low-Poly, Paper Pop-Up, Soft Clay, Tiny Diorama, Blueprint Build, Spotlight Stage, Neon Sign, Exploded View, Marble Run, X-Ray, LED Wall, Inflated, Painted, Circuit City, Glass and Light, Factory Line, White Model, Voxel, Data Skyline, Ink and Toon, Pin Wall, Toy Blocks, Particle Swarm, Museum Gallery, Pencil Sketch, Domino Chain - with a storyboard of rendered stills first, then a self-contained HTML player and an MP4 with synthesized sound. Use when the user asks for a 3D explainer or animated story, a three.js film, names one of these looks, or pastes a "3D motion graphic ... style" prompt.
+description: Make short 3D motion graphics (explainers and stories, 7-12 s) built entirely in code with three.js 0.187 and the STAGE and SOUND kits, in 27 named looks from the 3D Style Atlas - Low-Poly, Paper Pop-Up, Soft Clay, Tiny Diorama, Blueprint Build, Spotlight Stage, Neon Sign, Exploded View, Marble Run, X-Ray, LED Wall, Inflated, Painted, Circuit City, Glass and Light, Factory Line, White Model, Voxel, Data Skyline, Ink and Toon, Pin Wall, Toy Blocks, Particle Swarm, Museum Gallery, Pencil Sketch, Domino Chain, Node Network - with a storyboard of rendered stills first, then a self-contained HTML player and an MP4 with synthesized sound. Use when the user asks for a 3D explainer or animated story, a three.js film, names one of these looks, or pastes a "3D motion graphic ... style" prompt.
 ---
 
 # three-looks
@@ -93,6 +93,7 @@ look is the one named in it; the sources in it match the files here.
 | 24 | Museum Gallery | Spaces and journeys | explainer | lists and timelines of 3-5 points, last one the conclusion |
 | 25 | Pencil Sketch | Filters over 3D | explainer | how something is built, step by step, with numbered notes; anatomy, plans, exploded views |
 | 26 | Domino Chain | Machines that explain | explainer | cause and effect, chain reactions, step-by-step plans, anything that compounds |
+| 27 | Node Network | Diagrams with depth | explainer | things and the connections between them: spread, referrals, teams, systems, flows |
 
 For fonts, extra libraries and reference topics, see `CARDS.md`.
 
