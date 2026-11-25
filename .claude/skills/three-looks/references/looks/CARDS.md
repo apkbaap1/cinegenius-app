@@ -29,6 +29,7 @@ Each card is copied word for word from the atlas prompt for that look. The slot 
 | 23 | Particle Swarm | `23-particle-swarm` | an explainer | Inter | none | Why popcorn pops |
 | 24 | Museum Gallery | `24-museum-gallery` | an explainer | DM Serif Display, Oswald, Space Mono | none | Four moments that led to AI today: Turing's question, Deep Blue, AlphaGo and ChatGPT |
 | 25 | Pencil Sketch | `25-pencil-sketch` | an explainer | none | STROKEFONT | How a house goes up: foundation, frame, walls, roof |
+| 26 | Domino Chain | `26-domino-chain` | an explainer | Anton, Oswald, Fraunces | none | Small starts, big finishes: a domino can knock over one 1.5 times its size, so 13 dominoes take you from 5 mm to 65 cm |
 
 ## 01. Low-Poly
 
@@ -578,4 +579,26 @@ Materials: Graphite on cream cartridge paper. Soft dark pencil for outlines and 
 Camera: One slow, continuous arc round the subject on a long lens, about 35 degrees from nearly front-on to a three-quarter view, rising and pulling back a little as the drawing grows. Everything is sharp, like a drawing. The subject sits left of centre so the notes have a clear column of paper.
 Finish: No motion blur, bloom, grain or vignette. One paper pass: tooth that breaks up light lines, a hand smudge that drags graphite, an eraser mark, slight mottling and darker page edges.
 Good for: How something is built or put together, step by step: parts are drawn in order, each with a numbered note. Also good for anatomy of an object, plans, exploded views and anything that benefits from seeing the structure through the surface.
+```
+
+## 26. Domino Chain
+
+- Folder: `references/looks/26-domino-chain/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Anton, Oswald, Fraunces`
+- Tell it as: an explainer
+- Reference topic: Small starts, big finishes: a domino can knock over one 1.5 times its size, so 13 dominoes take you from 5 mm to 65 cm
+
+```
+STYLE CARD
+Name: Domino Chain
+Family: Machines that explain
+Use: explainer
+Look: A row of hand-made dominoes on a polished walnut table: bone faces riveted to ebony backs, each engraved and paint-filled with one step of the story, the last one in red. When a domino falls its label lies down the right way up, so the fallen row reads like a chart.
+Motion: Each domino hesitates, tips, accelerates, strikes the next at the right moment and comes to rest leaning on it. Small ones go in quick ticks and big ones fall slowly, so the run has a natural ritardando that ends on one heavy landing.
+Light: One low warm lamp behind the start of the row, so every domino throws a long soft shadow up the face of the next one and across the table, and its own face brightens as it tips; a faint cool fill from the camera side; the table falls off into darkness.
+Materials: Bone with a soft lacquer and black or red paint in the engraving, ebony backs, a French-polished walnut top that reflects the row, and one matchstick for scale.
+Camera: A long lens that travels with the falling front like a tracking shot and backs away as the dominoes grow, rising from table height to a high three-quarter view. Shallow focus on the domino that is falling.
+Finish: Real motion blur and depth of field, long soft shadows, filmic contrast, a warm vignette and fine grain.
+Good for: Cause and effect, chain reactions, step-by-step plans and anything that compounds: every domino is one step, printed with a word or a number, and the fall carries the story from the first to the last. Sizes can grow, the row can bend and branch.
 ```
