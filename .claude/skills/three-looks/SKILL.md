@@ -1,6 +1,6 @@
 ---
 name: three-looks
-description: Make short 3D motion graphics (explainers and stories, 7-12 s) built entirely in code with three.js 0.187 and the STAGE and SOUND kits, in 36 named looks from the 3D Style Atlas - Low-Poly, Paper Pop-Up, Soft Clay, Tiny Diorama, Blueprint Build, Spotlight Stage, Neon Sign, Exploded View, Marble Run, X-Ray, LED Wall, Inflated, Painted, Circuit City, Glass and Light, Factory Line, White Model, Voxel, Data Skyline, Ink and Toon, Pin Wall, Toy Blocks, Particle Swarm, Museum Gallery, Pencil Sketch, Domino Chain, Node Network, Shadow Box, Layer Stack, Dithered, Floating Screens, Device Hero, Studio Product, Split-Flap Board, Hero Icon, Embossed - with a storyboard of rendered stills first, then a self-contained HTML player and an MP4 with synthesized sound. Use when the user asks for a 3D explainer or animated story, a three.js film, names one of these looks, or pastes a "3D motion graphic ... style" prompt.
+description: Make short 3D motion graphics (explainers and stories, 7-12 s) built entirely in code with three.js 0.187 and the STAGE and SOUND kits, in 37 named looks from the 3D Style Atlas - Low-Poly, Paper Pop-Up, Soft Clay, Tiny Diorama, Blueprint Build, Spotlight Stage, Neon Sign, Exploded View, Marble Run, X-Ray, LED Wall, Inflated, Painted, Circuit City, Glass and Light, Factory Line, White Model, Voxel, Data Skyline, Ink and Toon, Pin Wall, Toy Blocks, Particle Swarm, Museum Gallery, Pencil Sketch, Domino Chain, Node Network, Shadow Box, Layer Stack, Dithered, Floating Screens, Device Hero, Studio Product, Split-Flap Board, Hero Icon, Embossed, Monument Type - with a storyboard of rendered stills first, then a self-contained HTML player and an MP4 with synthesized sound. Use when the user asks for a 3D explainer or animated story, a three.js film, names one of these looks, or pastes a "3D motion graphic ... style" prompt.
 ---
 
 # three-looks
@@ -103,6 +103,7 @@ look is the one named in it; the sources in it match the files here.
 | 34 | Split-Flap Board | Flat content made physical | title | lists, rankings and numbers, one fact per row, the key row in amber |
 | 35 | Hero Icon | Products and screens | title | a tool or product as one icon tile: one symbol per feature, the brand mark last |
 | 36 | Embossed | Flat content made physical | title | one quote, name, number or simple logo pressed into paper, one small mark in foil |
+| 37 | Monument Type | Spaces and journeys | title | a 2-5 word statement as colossal letters, one hero word in weathered steel |
 
 For fonts, extra libraries and reference topics, see `CARDS.md`.
 
