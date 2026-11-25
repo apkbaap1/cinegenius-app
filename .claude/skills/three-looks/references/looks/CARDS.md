@@ -37,6 +37,8 @@ Each card is copied word for word from the atlas prompt for that look. The slot 
 | 31 | Floating Screens | `31-floating-screens` | an explainer | Fraunces, Inter | none | Ordering bread online from a small bakery in three steps: choose the loaf, check the basket, order confirmed |
 | 32 | Device Hero | `32-device-hero` | a product (the brief has no "Tell my content as" line) | Fraunces, Inter | none | Streak, a habit tracker: ticking off today's last habit closes the ring and turns a 29-day streak into 30 |
 | 33 | Studio Product | `33-studio-product` | a product (the brief has no "Tell my content as" line) | Inter, Space Grotesk | none | Launch film for "Tide", a made-up insulated steel water bottle: cold for 24 hours |
+| 34 | Split-Flap Board | `34-split-flap` | a title (the brief has no "Tell my content as" line) | Oswald | none | How long it took to reach 100 million users, from the telephone to ChatGPT |
+| 35 | Hero Icon | `35-hero-icon` | a title (the brief has no "Tell my content as" line) | Fredoka | none | Otto, a made-up assistant app that handles mail, calendar and notes |
 
 ## 01. Low-Poly
 
@@ -762,4 +764,48 @@ Materials: Real product finishes with small precise details: powder coat with a 
 Camera: A long lens on a slider, one continuous move: two macro passes with very shallow focus (the collar, then the etched mark), a pull-back to the full product standing off-centre, and a slow push that never quite stops.
 Finish: True depth of field and motion blur, a soft bloom only where polished metal catches a strip light, filmic contrast with deep blacks, a light vignette and very fine grain.
 Good for: One product and one claim. The macro passes show what it is made of, the moving light and the counter act out the claim (here: a full day passes, it is still cold), and the lock-up states it in one line.
+```
+
+## 34. Split-Flap Board
+
+- Folder: `references/looks/34-split-flap/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Oswald`
+- Tell it as: a title (the brief has no "Tell my content as" line)
+- Reference topic: How long it took to reach 100 million users, from the telephone to ChatGPT
+
+```
+STYLE CARD
+Name: Split-Flap Board
+Family: Flat content made physical
+Use: title
+Look: A mechanical departure board: rows of black flaps with white lettering in a dark steel frame, lit like a station hall at night, with one amber row for the point that matters.
+Motion: Every character rattles forward through the alphabet until it lands, column after column, so words resolve out of a blur of flaps. The camera starts close enough to see single flaps fall, then pulls back until the whole board reads.
+Light: One soft overhead lamp in front of the board, so every falling flap catches a flash of light and the frame throws a soft shadow across the top row; a faint cool fill from the side; everything else falls to black.
+Materials: Satin black plastic flaps with slightly worn off-white print, a brushed dark-steel frame, a small back-lit amber sign for the heading.
+Camera: Long lens with shallow focus. A slow sideways track across the first rows, one continuous pull-back to the full board, then a gentle push toward the highlighted row.
+Finish: Real motion blur on the flaps, soft bloom only on the back-lit sign, filmic contrast, a clear vignette and fine grain.
+Good for: Lists, rankings and numbers: each row is one fact, revealed top to bottom, with the last or most important row picked out in colour.
+```
+
+## 35. Hero Icon
+
+- Folder: `references/looks/35-hero-icon/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Fredoka`
+- Tell it as: a title (the brief has no "Tell my content as" line)
+- Reference topic: Otto, a made-up assistant app that handles mail, calendar and notes
+
+```
+STYLE CARD
+Name: Hero Icon
+Family: Products and screens
+Use: title
+Look: One big, chunky app-icon tile floats in a bright seamless studio of a single colour. A raised symbol built from thick rounded pieces sits on its face, and the whole thing looks like a toy you could pick up.
+Motion: Tactile and mechanical. The tile winds up, flips over and clicks home a few degrees past the mark; then the parts of the new symbol slide, hinge, drop and press into place one after another, and every contact knocks the tile back a little. Each landing sends the next colour across the studio from behind the tile.
+Light: One large soft key from the upper right, so a big soft shadow of the tile falls on the backdrop down to the left. Softboxes above and at the sides give the gloss, a dark flag behind the camera keeps the face clean, and the backdrop bounces its colour up into the white parts.
+Materials: Clear-coated plastic for the tile and the coloured parts, matt soft-touch white for paper-like parts, a polished metal band around the waist of the tile and metal pins where a symbol has them. Every edge is rounded over.
+Camera: Long lens, almost square on, a little above and to the right of the tile so its top and side show. A very slow push in while the symbols change, then one pull back and sideways track that leaves room for the words.
+Finish: Clean and colour-true: neutral tone mapping, real motion blur on the flips, a faint bloom on the brightest highlights, almost no vignette or grain.
+Good for: A tool, product or idea as one object. Each thing it does (or each option, or each step) becomes one symbol on the tile with its own colour; the last face is the brand mark or the answer, with a short line of raised lettering on the wall beside it.
 ```
