@@ -35,6 +35,8 @@ Each card is copied word for word from the atlas prompt for that look. The slot 
 | 29 | Layer Stack | `29-layer-stack` | an explainer | Space Grotesk, Inter, IBM Plex Mono | none | What's inside an AI app: interface, agent, model, your data, chips |
 | 30 | Dithered | `30-dithered` | an explainer | Archivo Black | none | The Pomodoro technique: 25 minutes of work, 5 minutes of rest, repeat |
 | 31 | Floating Screens | `31-floating-screens` | an explainer | Fraunces, Inter | none | Ordering bread online from a small bakery in three steps: choose the loaf, check the basket, order confirmed |
+| 32 | Device Hero | `32-device-hero` | a product (the brief has no "Tell my content as" line) | Fraunces, Inter | none | Streak, a habit tracker: ticking off today's last habit closes the ring and turns a 29-day streak into 30 |
+| 33 | Studio Product | `33-studio-product` | a product (the brief has no "Tell my content as" line) | Inter, Space Grotesk | none | Launch film for "Tide", a made-up insulated steel water bottle: cold for 24 hours |
 
 ## 01. Low-Poly
 
@@ -716,4 +718,48 @@ Materials: Matt printed card stock on thick glass with polished, slightly green 
 Camera: Long lens on a dolly that rolls past the row at one steady speed and never stops. It pans to stay on the newest card, hands over to the next one as it flies in, and finally cranes back until the whole sequence is in frame. Focus always sits on the newest card.
 Finish: Neutral tone mapping so interface colours stay exact, real depth of field and motion blur, a faint vignette, almost no grain. Bloom is set so that only a glass edge that lights up glows.
 Good for: Anything made of steps or screens: an app flow, a workflow, a process, a set of stats or quotes. One card per step, the action on each card acted out, a cable from each step to the next.
+```
+
+## 32. Device Hero
+
+- Folder: `references/looks/32-device-hero/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Fraunces, Inter`
+- Tell it as: a product (the brief has no "Tell my content as" line)
+- Reference topic: Streak, a habit tracker: ticking off today's last habit closes the ring and turns a 29-day streak into 30
+
+```
+STYLE CARD
+Name: Device Hero
+Family: Products and screens
+Use: product
+Look: A phone filmed like a launch video: a titanium body with a polished frame standing on black gloss in a dark studio, its screen the brightest thing in the room. Then the screen fills the frame and the interface becomes white cards floating over the glass.
+Motion: The phone turns to face the lens while strip lights slide across its glass. The camera dollies into the screen in one move and the interface peels off in layers, the top of each stack first. Inside, things behave the way the app would: a press sinks the card, the ring sweeps round, the digits roll.
+Light: Studio half: nothing lights the phone directly; it is shaped by tall strip lights and a soft box reflected in metal and glass. Screen half: one large soft light from the upper left, so every floating layer drops a soft shadow down and to the right that grows with its height.
+Materials: Satin titanium, black cover glass with a real reflection, a mirror-gloss floor. The interface is a canvas texture that glows like a display in the studio and turns into thin, bevelled white card stock once it lifts.
+Camera: Long lens. A low, slow drift past the standing phone, one continuous push that drops below the screen and looks up along it, then a slow arc so the layers slide against each other. Focus follows the action: the checkbox, then the number.
+Finish: Neutral tone mapping so interface colours stay exact, soft bloom only on metal highlights, shallow depth of field, a light vignette, almost no grain.
+Good for: An app, a feature or any on-screen moment: show the device first so the viewer knows what they are looking at, then go inside and let two or three interface elements act out the one thing the feature does.
+```
+
+## 33. Studio Product
+
+- Folder: `references/looks/33-studio-product/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Inter, Space Grotesk`
+- Tell it as: a product (the brief has no "Tell my content as" line)
+- Reference topic: Launch film for "Tide", a made-up insulated steel water bottle: cold for 24 hours
+
+```
+STYLE CARD
+Name: Studio Product
+Family: Products and screens
+Use: product
+Look: One physical product in a near-black seamless studio, filmed like a flagship launch: the object is carved out of the dark by strip softboxes and stands on a black mirror floor, with a single restrained line of type beside it.
+Motion: The product stays still and the light moves: a tall strip light glides across its surfaces again and again, changing colour as it goes, while the lens travels over the details in macro and then pulls back to the whole object. A counter ticks with the light and lands on the number in the copy.
+Light: Softboxes only, placed relative to the lens: a graded key strip that sweeps from side to side, two thin rim strips from behind that draw the outline, a soft box overhead for the top. Everything they do not touch stays black.
+Materials: Real product finishes with small precise details: powder coat with a fine orange-peel texture, turned steel with lathe lines and bevelled edges, a diamond-knurled ring, black anodised flutes with a bright cut chamfer, a laser-etched mark, a seam and a rubber foot.
+Camera: A long lens on a slider, one continuous move: two macro passes with very shallow focus (the collar, then the etched mark), a pull-back to the full product standing off-centre, and a slow push that never quite stops.
+Finish: True depth of field and motion blur, a soft bloom only where polished metal catches a strip light, filmic contrast with deep blacks, a light vignette and very fine grain.
+Good for: One product and one claim. The macro passes show what it is made of, the moving light and the counter act out the claim (here: a full day passes, it is still cold), and the lock-up states it in one line.
 ```
