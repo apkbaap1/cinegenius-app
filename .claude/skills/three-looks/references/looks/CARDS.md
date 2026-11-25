@@ -32,6 +32,7 @@ Each card is copied word for word from the atlas prompt for that look. The slot 
 | 26 | Domino Chain | `26-domino-chain` | an explainer | Anton, Oswald, Fraunces | none | Small starts, big finishes: a domino can knock over one 1.5 times its size, so 13 dominoes take you from 5 mm to 65 cm |
 | 27 | Node Network | `27-node-network` | an explainer | Oswald, Fraunces | none | How word of mouth grows a small business: 1 happy customer, then 3, 9, 27 |
 | 28 | Shadow Box | `28-shadow-box` | an explainer | Anton | none | Computers keep shrinking: a room-sized mainframe, a desktop, a laptop, a phone in your hand |
+| 29 | Layer Stack | `29-layer-stack` | an explainer | Space Grotesk, Inter, IBM Plex Mono | none | What's inside an AI app: interface, agent, model, your data, chips |
 
 ## 01. Low-Poly
 
@@ -647,4 +648,26 @@ Materials: Thick cream paper with visible fibre and bright cut edges, dark walnu
 Camera: Long lens with a very wide aperture, like photographing a miniature. It starts close and at an angle, slides sideways so the sheets shift against each other, and pulls back in one move to a square-on view where the box fills the frame; the focus steps forward from sheet to sheet.
 Finish: Real depth of field and motion blur, soft bloom on the lit paper, filmic contrast, a light vignette, fine grain.
 Good for: Sequences with a natural order in depth: timelines, eras, layers of a system, before and after. Each sheet is one stage, a big silhouette with a cut-out label, and the light shows which stage we are at.
+```
+
+## 29. Layer Stack
+
+- Folder: `references/looks/29-layer-stack/style.js`
+- `{LIBS}`: ``
+- `{FONTS}`: `- Load these Google Fonts before building (the kit awaits the specs in style.fonts): Space Grotesk, Inter, IBM Plex Mono`
+- Tell it as: an explainer
+- Reference topic: What's inside an AI app: interface, agent, model, your data, chips
+
+```
+STYLE CARD
+Name: Layer Stack
+Family: Diagrams with depth
+Use: explainer
+Look: A system shown as a stack of thin glass sheets, each with its own diagram printed in white, floating one above the other over a dark machined plinth. Aqua edges glow like edge-lit acrylic against near-black; one amber is kept for the answer.
+Motion: The stack starts closed as one block. Sheets lift off one at a time from the top, float a little past their place and settle, and each label draws in beside its sheet as it lands. Then a bead of light drops through the same pad on every sheet, each sheet flashing white as it passes, and climbs back in amber; the sheets cool again behind it and only the top one stays lit.
+Light: One small key from high behind, so every sheet and its printed lines throw a crisp shadow onto the sheet below; a soft panel mirrored in the glass tops; a cool rim; the rest falls to black. The bead carries a real light that spills onto the sheets it passes.
+Materials: Lightly frosted glass that stays clear but keeps full-strength reflections, brighter aqua edges, matt white print that takes light and shadow, dark anodised aluminium, a satin floor with a faint reflection.
+Camera: Long lens, three-quarter view from above. It starts close on the closed block, cranes up and back with the first sheet as it rises, then keeps a very slow push toward the open stack.
+Finish: Motion blur on the lifts, bloom only on lit edges and the bead, a neutral grade that keeps the aqua and amber true, deep blacks, a soft vignette and very fine grain.
+Good for: Anything built in layers: a tech stack, a product teardown, how a request travels through a system. One sheet per layer with a simple diagram, a name and a short line beside it, and a pulse that shows the order things happen in.
 ```
