@@ -14,8 +14,9 @@ This 3D cartoon style needs a graphics card. The cloud container that built it h
 The finished file is `out/telangana-te-2k.mp4` (picture + the mixed Telugu voice, score and effects).
 
 ## If something goes wrong
-- Black or empty frames: try another WebGL backend, e.g. `REMOTION_GL=angle node scripts/render-final.mjs` (Windows PowerShell: `$env:REMOTION_GL="angle"; node scripts/render-final.mjs`). Other values: `egl`, `vulkan`, `swangle` (slow, no GPU).
-- Out of memory: `CONCURRENCY=2 node scripts/render-final.mjs`.
+- The script uses your graphics card (`--gl angle` on Windows and Mac). Black frames or a GPU error: try `set REMOTION_GL=vulkan` (Windows) or `export REMOTION_GL=vulkan` (Mac/Linux) and run again.
+- "Timed out" or stuck at 0/3530 for minutes: each browser tab builds the whole world first (about a minute). Use fewer tabs: `set CONCURRENCY=1`.
+- Out of memory: `set CONCURRENCY=1` (Windows) or `export CONCURRENCY=1`, then run again.
 - Disk: each Remotion bundle copies `public/` into your temp folder; it is small here (about 0.3 MB), so this should not matter.
 
 ## What is where

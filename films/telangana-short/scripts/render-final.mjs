@@ -10,7 +10,10 @@ fs.mkdirSync("out", { recursive: true });
 const silent = draft ? "out/draft-silent.mp4" : "out/video-silent.mp4";
 const final = draft ? "out/telangana-te-draft.mp4" : "out/telangana-te-2k.mp4";
 run(["remotion", "render", "src/index.ts", "TelanganaShort", silent, "--codec", "h264", "--crf", draft ? "23" : "16", "--scale", draft ? "0.5" : "1.3333",
-  ...(process.env.REMOTION_GL ? ["--gl", process.env.REMOTION_GL] : []), "--concurrency", process.env.CONCURRENCY || "50%"]);
+  // use the graphics card: Chrome's default for a headless render is software WebGL (very slow, frames time out)
+  "--gl", process.env.REMOTION_GL || (process.platform === "linux" ? "angle-egl" : "angle"),
+  // every browser tab builds the whole world once (about a minute): few tabs, generous timeout
+  "--concurrency", process.env.CONCURRENCY || "3", "--timeout", "600000"]);
 // Remotion writes a silent audio track: take the video from the render and the audio from the mix
 run(["remotion", "ffmpeg", "-y", "-i", silent, "-i", "audio/final/mix.m4a", "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy", "-c:a", "copy",
   "-movflags", "+faststart", "-shortest", final]);
