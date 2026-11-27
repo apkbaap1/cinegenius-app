@@ -5,6 +5,9 @@ import { parseScript } from './services/geminiService';
 import ScriptInput from './components/ScriptInput';
 import Dashboard from './components/Dashboard';
 import { FilmIcon, SparklesIcon } from './components/icons';
+import CelStand from './components/celstand/CelStand';
+
+type Mode = 'script' | 'celstand';
 
 export default function App() {
   const [script, setScript] = useState('');
@@ -13,6 +16,12 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [language, setLanguage] = useState<Language>('English');
+  const [mode, setMode] = useState<Mode>(() => (window.location.hash === '#cel-stand' ? 'celstand' : 'script'));
+
+  const switchMode = (m: Mode) => {
+    setMode(m);
+    window.history.replaceState(null, '', m === 'celstand' ? '#cel-stand' : window.location.pathname);
+  };
 
   const fileToBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -73,7 +82,17 @@ export default function App() {
               <FilmIcon className="w-8 h-8 text-brand-primary" />
               <h1 className="text-xl sm:text-2xl font-bold text-gray-100 tracking-tight">CineGenius</h1>
             </div>
-            {analysis && (
+            <nav className="flex items-center gap-1 bg-base-300/50 rounded-lg p-1">
+              <button onClick={() => switchMode('script')}
+                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${mode === 'script' ? 'bg-brand-primary text-white' : 'text-gray-400 hover:text-gray-100'}`}>
+                Script Studio
+              </button>
+              <button onClick={() => switchMode('celstand')}
+                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${mode === 'celstand' ? 'bg-brand-primary text-white' : 'text-gray-400 hover:text-gray-100'}`}>
+                Cel Stand
+              </button>
+            </nav>
+            {mode === 'script' && analysis && (
                  <button
                     onClick={resetApp}
                     className="px-4 py-2 text-sm font-semibold text-white bg-brand-primary rounded-md hover:bg-brand-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-brand-secondary transition-colors"
@@ -85,6 +104,9 @@ export default function App() {
         </div>
       </header>
       
+      {mode === 'celstand' ? (
+        <main><CelStand /></main>
+      ) : (
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!analysis ? (
           <ScriptInput
@@ -110,9 +132,10 @@ export default function App() {
             </div>
         )}
       </main>
+      )}
 
        <footer className="text-center py-6 text-sm text-gray-500 border-t border-base-200 mt-12">
-            <p>Powered by Gemini API. Created for demonstration purposes.</p>
+            <p>{mode === 'celstand' ? 'Cel Stand: layered cel animation drawn in your browser. No generative video.' : 'Powered by Gemini API. Created for demonstration purposes.'}</p>
         </footer>
     </div>
   );
