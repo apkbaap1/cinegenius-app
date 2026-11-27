@@ -96,8 +96,7 @@ export function clipScene(): Scene {
     dialogue: LINES.map((l, i) => ({ id: `d${i}`, characterId: l.who, start: l.start, end: l.start + l.dur, text: l.text })),
     audio: [
       ...LINES.map((l, i) => ({ id: `v${i}`, name: `Line ${i + 1}`, role: 'voice' as const, src: AU(`clip_line${i + 1}.wav`), start: l.start, gain: 1, loop: false, characterId: l.who, duration: l.dur })),
-      { id: 'amb_r', name: 'River ambience', role: 'ambient', src: AU('amb_river.wav'), start: 0, gain: 0.5, loop: true, until: SWAP + 0.3 },
-      { id: 'amb_s', name: 'Sea waves', role: 'ambient', src: AU('amb_sea.wav'), start: SWAP - 0.1, gain: 0.55, loop: true },
+      // (no ambience bed: it read as background noise under the voices)
       { id: 'whoosh', name: 'Whoosh', role: 'sfx', src: AU('sfx_whoosh.wav'), start: SWAP - 0.45, gain: 0.8, loop: false },
       { id: 'shimmer', name: 'Shimmer', role: 'sfx', src: AU('sfx_shimmer.wav'), start: SWAP + 0.05, gain: 0.6, loop: false },
     ],
