@@ -1,7 +1,7 @@
 // 3D layer breakdown: every cel on its own sheet of glass, spread out in depth,
 // tilted and labelled, so you can see how the shot is built. Plain DOM + CSS 3D.
 
-import { Layer, Scene } from './types';
+import { Layer, Scene, shownAt } from './types';
 import { renderLayer, stageSize } from './renderer';
 
 export const eio = (x: number) => { x = Math.max(0, Math.min(1, x)); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
@@ -76,7 +76,8 @@ export class Breakdown {
   }
 
   /** k: 0 = assembled (hidden), 1 = fully spread. intro: seconds since the opening flourish began. */
-  draw(scene: Scene, t: number, k: number, intro: number | null) {
+  /** focus: ids of layers to spotlight (others dim), for explainers. */
+  draw(scene: Scene, t: number, k: number, intro: number | null, focus?: Set<string>) {
     if (k <= 0.001) { this.root.style.display = 'none'; return; }
     this.root.style.display = 'block';
     this.sync(scene);
@@ -97,7 +98,10 @@ export class Breakdown {
         alpha = a;
       }
       it.el.style.transform = `translateZ(${z}px)`;
-      it.el.style.opacity = String((L.visible ? 1 : 0.25) * alpha);
+      const dim = focus && focus.size ? (focus.has(L.id) ? 1 : 0.18) : 1;
+      it.el.style.opacity = String((shownAt(L, t) ? 1 : 0.25) * alpha * dim);
+      it.tag.style.transform = focus && focus.has(L.id) ? 'scale(1.25)' : '';
+      it.tag.style.transformOrigin = 'left top';
       it.frame.style.opacity = String(0.9 * k);
       it.tag.style.opacity = String(Math.max(0, Math.min(1, k * 1.6 - 0.4)) * (L.visible ? 1 : 0.4));
       const g = it.cv.getContext('2d')!;

@@ -42,11 +42,19 @@ export class AudioEngine {
       this.gains.set(clip.id, g);
       src.connect(g).connect(this.master);
       const localStart = from - clip.start;
+      const stopAt = Math.min(end, clip.until ?? end);
+      if (from >= stopAt) continue;
+      if (clip.until !== undefined) {
+        // fade out over 0.4 s before the stop time
+        const fadeAt = now + Math.max(0, stopAt - 0.4 - from);
+        g.gain.setValueAtTime(g.gain.value, fadeAt);
+        g.gain.linearRampToValueAtTime(0, now + (stopAt - from));
+      }
       if (clip.loop) {
         const offset = ((Math.max(0, localStart) % buf.duration) + buf.duration) % buf.duration;
         const when = localStart < 0 ? now - localStart : now;
         src.start(when, offset);
-        src.stop(now + Math.max(0, end - from));
+        src.stop(now + Math.max(0, stopAt - from));
       } else {
         if (localStart >= buf.duration) continue;
         if (localStart < 0) src.start(now - localStart, 0);

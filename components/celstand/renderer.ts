@@ -1,7 +1,7 @@
 // Draws one frame of a scene at time t. Used by the live editor and the exporter,
 // so what you see in the editor is exactly what gets rendered.
 
-import { ASPECTS, CameraKey, CharacterLayer, ImageLayer, Layer, Pose, Scene, lookOf } from './types';
+import { ASPECTS, CameraKey, CharacterLayer, ImageLayer, Layer, Pose, Scene, lookOf, shownAt } from './types';
 import { drawFx } from './fx';
 import { applyLook, letterboxBar } from './look';
 import { getHueShifted, getImage, getTinted } from './assets';
@@ -180,6 +180,13 @@ function drawCharacter(g: CanvasRenderingContext2D, scene: Scene, ch: CharacterL
   applyCamera(g, scene, t, ch);
   g.globalAlpha = ch.opacity;
   g.translate(ch.x, ch.y);
+  if (ch.idleBob) {
+    // float / breathe: a gentle bob plus a hint of squash from the feet
+    const ph = Math.sin(t * Math.PI * 2 * (ch.idleSpeed ?? 0.5) + ch.id.length);
+    g.translate(0, -ch.idleBob * ph);
+    const sq = 1 + ph * Math.min(0.012, ch.idleBob / 900);
+    g.translate(0, dh / 2); g.scale(1 / Math.sqrt(sq), sq); g.translate(0, -dh / 2);
+  }
   if (ch.flip) g.scale(-1, 1);
   const x = -dw / 2, y = -dh / 2;
   g.drawImage(body, x, y, dw, dh);
@@ -256,7 +263,7 @@ export function renderFrame(g: CanvasRenderingContext2D, scene: Scene, t: number
   g.save();
   g.fillStyle = scene.background || '#000';
   g.fillRect(0, 0, w, h);
-  for (const L of scene.layers) if (L.visible) renderLayer(g, scene, L, t);
+  for (const L of scene.layers) if (shownAt(L, t)) renderLayer(g, scene, L, t);
   applyLook(g, lookOf(scene), t, w, h);
   if (scene.subtitles) drawSubtitles(g, scene, t);
 
@@ -283,7 +290,7 @@ export function renderFrame(g: CanvasRenderingContext2D, scene: Scene, t: number
 
 /** Topmost unlocked layer under a stage point. Characters win over backgrounds. */
 export function hitTest(scene: Scene, t: number, sx: number, sy: number): Layer | null {
-  const order = [...scene.layers].reverse().filter(l => l.visible && !l.locked);
+  const order = [...scene.layers].reverse().filter(l => shownAt(l, t) && !l.locked);
   const inside = (L: Layer) => {
     const box = layerBox(L);
     if (!box) return false;

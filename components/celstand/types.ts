@@ -48,6 +48,9 @@ interface LayerBase {
   flip: boolean;
   /** How much the layer follows camera pans (0 = fixed sky, 1 = foreground). */
   parallax: number;
+  /** Optional timed visibility: shown only from / until these seconds (e.g. swap river → sea at 9s). */
+  showFrom?: number;
+  showUntil?: number;
 }
 
 export interface ImageLayer extends LayerBase {
@@ -117,6 +120,9 @@ export interface CharacterLayer extends LayerBase {
   pinnedPoseId?: string;
   /** Hand edits on the exposure sheet: frame index → "poseId|slot". */
   sheetEdits?: Record<number, string>;
+  /** Idle life: float/breathe in stage px and cycles per second (0 = still). */
+  idleBob?: number;
+  idleSpeed?: number;
   /** Face area in cel pixels [x, y, w, h], for the table thumbnails. */
   faceBox?: [number, number, number, number];
 }
@@ -188,6 +194,8 @@ export interface AudioClip {
   loop: boolean;
   /** For voice clips: whose mouth this audio drives. */
   characterId?: string;
+  /** Optional stop time (seconds on the timeline), with a short fade. */
+  until?: number;
   /** Ambience that only plays while this layer is visible (crossfades when you swap backgrounds). */
   linkLayerId?: string;
   /** Filled in after decoding (seconds). */
@@ -260,3 +268,7 @@ export const FX_PRESETS: Record<FxKind, { name: string; jp: string; density: num
   fireflies: { name: 'Fireflies', jp: '蛍', density: 28, size: 1, speed: 0.4, wind: 0, color: '#d9ff7a' },
   speedlines: { name: 'Speed lines', jp: '集中線', density: 90, size: 1, speed: 1, wind: 0, color: '#ffffff' },
 };
+
+/** Whether a layer is on screen at time t (visibility switch + optional timed window). */
+export const shownAt = (L: { visible: boolean; showFrom?: number; showUntil?: number }, t: number) =>
+  L.visible && (L.showFrom === undefined || t >= L.showFrom) && (L.showUntil === undefined || t < L.showUntil);

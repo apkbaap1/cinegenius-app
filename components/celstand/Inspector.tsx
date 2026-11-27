@@ -52,6 +52,15 @@ const Transform: React.FC<{ L: Layer; set: (p: Partial<Layer>) => void }> = ({ L
       onChange={scale => set(L.kind === 'character' ? { scale, y: bottomAnchoredY(L, scale) } : { scale })} fmt={v => `${Math.round(v * 100)}%`} />
     <Slider label="Opacity" value={L.opacity} min={0} max={1} onChange={opacity => set({ opacity })} fmt={v => `${Math.round(v * 100)}%`} />
     <Slider label="Parallax (follows camera)" value={L.parallax} min={0} max={1.5} onChange={parallax => set({ parallax })} />
+    <div className="grid grid-cols-2 gap-2">
+      <NumField label="Show from" step={0.05} value={L.showFrom ?? 0} onChange={v => set({ showFrom: v > 0 ? v : undefined })} />
+      <NumField label="until" step={0.05} value={L.showUntil ?? 0} onChange={v => set({ showUntil: v > 0 ? v : undefined })} />
+    </div>
+    <p className="text-[10px] text-gray-500 -mt-1">0 = no limit. Use it to swap backgrounds at a set time.</p>
+    {L.kind === 'character' && <>
+      <Slider label="Idle float / breathe" value={L.idleBob ?? 0} min={0} max={30} step={0.5} onChange={idleBob => set({ idleBob } as Partial<Layer>)} fmt={v => v ? `${v.toFixed(1)} px` : 'still'} />
+      {(L.idleBob ?? 0) > 0 && <Slider label="Idle speed" value={L.idleSpeed ?? 0.5} min={0.1} max={2} onChange={idleSpeed => set({ idleSpeed } as Partial<Layer>)} fmt={v => `${v.toFixed(2)}/s`} />}
+    </>}
     <div className="flex gap-3">
       <Toggle label="Flip" checked={L.flip} onChange={flip => set({ flip })} />
       <Toggle label="Lock on stage" checked={L.locked} onChange={locked => set({ locked })} />

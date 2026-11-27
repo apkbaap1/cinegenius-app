@@ -50,7 +50,12 @@ async function mixAudio(scene: Scene, sampleRate: number): Promise<AudioBuffer |
     g.gain.value = clip.gain * linkFactor(scene, clip);
     src.connect(g).connect(ctx.destination);
     src.start(Math.max(0, clip.start));
-    if (clip.loop) src.stop(scene.duration);
+    const stopAt = Math.min(scene.duration, clip.until ?? scene.duration);
+    if (clip.until !== undefined) {
+      g.gain.setValueAtTime(g.gain.value, Math.max(0, stopAt - 0.4));
+      g.gain.linearRampToValueAtTime(0, stopAt);
+    }
+    if (clip.loop || clip.until !== undefined) src.stop(stopAt);
   }
   return ctx.startRendering();
 }
