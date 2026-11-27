@@ -87,11 +87,14 @@ function rr(x: number, y: number, w: number, h: number, r: number) {
   o.arcTo(x, y + h, x, y, r); o.arcTo(x, y, x + w, y, r); o.closePath();
 }
 
-const TEL = '"Noto Sans Telugu", "Inter", sans-serif';
+// Telugu caption font: rounded and friendly to match the clay characters (?font= to compare others)
+const FONT = new URLSearchParams(location.search).get('font') || 'Baloo Tammudu 2';
+const TEL = `"${FONT}", "Noto Sans Telugu", "Inter", sans-serif`;
+const FW = /Ramabhadra|Mandali/.test(FONT) ? 400 : 800;
 const isLatin = (w: string) => /[A-Za-z0-9"“”]/.test(w);
 
 /** Text with Latin (English) words in an accent colour. Returns width. */
-function richText(text: string, x: number, y: number, size: number, fg: string, accent: string, align: 'center' | 'left' = 'center', weight = 800) {
+function richText(text: string, x: number, y: number, size: number, fg: string, accent: string, align: 'center' | 'left' = 'center', weight = FW, stroke = 0) {
   o.font = `${weight} ${size}px ${TEL}`;
   const words = text.split(' ');
   const space = o.measureText(' ').width;
@@ -99,7 +102,10 @@ function richText(text: string, x: number, y: number, size: number, fg: string, 
   const total = widths.reduce((a, b) => a + b, 0) + space * (words.length - 1);
   let cx = align === 'center' ? x - total / 2 : x;
   o.textAlign = 'left'; o.textBaseline = 'middle';
-  words.forEach((w, i) => { o.fillStyle = isLatin(w) ? accent : fg; o.fillText(w, cx, y); cx += widths[i] + space; });
+  words.forEach((w, i) => {
+    if (stroke) { o.lineJoin = 'round'; o.lineWidth = stroke; o.strokeStyle = 'rgba(24,14,10,0.92)'; o.strokeText(w, cx, y); }
+    o.fillStyle = isLatin(w) ? accent : fg; o.fillText(w, cx, y); cx += widths[i] + space;
+  });
   return total;
 }
 
@@ -111,7 +117,7 @@ function card(text: string, x: number, y: number, age: number, life: number, o2:
   if (k <= 0.01) return;
   o.save();
   o.translate(x, y); o.rotate((o2.rot ?? 0) * Math.PI / 180); o.scale(k, k);
-  o.font = `800 ${size}px ${TEL}`;
+  o.font = `${FW} ${size}px ${TEL}`;
   const tw = text.split(' ').reduce((a, w) => a + o.measureText(w).width, 0) + o.measureText(' ').width * (text.split(' ').length - 1);
   const w = tw + size * pad * 2, h = size * 1.55;
   o.shadowColor = 'rgba(0,0,0,0.28)'; o.shadowBlur = 30; o.shadowOffsetY = 10;
@@ -158,32 +164,36 @@ function captionAt(t: number): { text: string; age: number; life: number; who?: 
   return null;
 }
 
+/** Captions sit on the chest, below the chin (chin ≈ y 1336 in the wide shot), above Instagram's bottom UI. */
+export const CAPTION_Y = 1470;
 function drawCaption(t: number) {
   const c = captionAt(t);
   if (!c) return;
-  const y = 1335;
-  const k = eo(c.age / 0.12);
+  const k = eo(c.age / 0.14) * (c.life < 0.1 ? cl(c.life / 0.1) : 1);
+  const pop = 0.92 + 0.08 * backOut(c.age / 0.2);
   o.save();
   o.globalAlpha = k;
-  o.translate(470, y + (1 - k) * 14);
-  o.font = `800 60px ${TEL}`;
-  const words = c.text.split(' ');
-  const tw = words.reduce((a, w) => a + o.measureText(w).width, 0) + o.measureText(' ').width * (words.length - 1);
-  const w = Math.min(860, tw + 70), h = 96;
-  o.shadowColor = 'rgba(0,0,0,0.35)'; o.shadowBlur = 24; o.shadowOffsetY = 6;
-  rr(-w / 2, -h / 2, w, h, 26);
-  o.fillStyle = 'rgba(20,16,14,0.78)'; o.fill();
+  o.translate(540, CAPTION_Y);
+  o.scale(pop, pop);
+  let size = 68;
+  o.font = `${FW} ${size}px ${TEL}`;
+  const measure = () => { const ws = c.text.split(' '); return ws.reduce((a, w) => a + o.measureText(w).width, 0) + o.measureText(' ').width * (ws.length - 1); };
+  let tw = measure();
+  while (tw > 900 && size > 44) { size -= 2; o.font = `${FW} ${size}px ${TEL}`; tw = measure(); }
+  // soft dark glow behind the words, no hard box
+  o.shadowColor = 'rgba(0,0,0,0.55)'; o.shadowBlur = 26; o.shadowOffsetY = 4;
+  richText(c.text, 0, 0, size, '#ffffff', '#FFD166', 'center', FW, size * 0.2);
   o.shadowColor = 'transparent';
+  richText(c.text, 0, 0, size, '#ffffff', '#FFD166', 'center', FW, 0);
   if (c.who) {
     const tag = c.who === 'ashok' ? 'Ashok' : 'Claude';
-    o.font = `800 30px Inter, sans-serif`;
-    const tw2 = o.measureText(tag).width + 28;
-    rr(-w / 2 + 10, -h / 2 - 34, tw2, 44, 14);
+    o.font = `800 28px Inter, sans-serif`;
+    const tw2 = o.measureText(tag).width + 30;
+    rr(-tw2 / 2, -size * 0.95 - 30, tw2, 40, 20);
     o.fillStyle = c.who === 'ashok' ? GREEN : ORANGE; o.fill();
-    o.fillStyle = '#fff'; o.textAlign = 'left'; o.textBaseline = 'middle';
-    o.fillText(tag, -w / 2 + 24, -h / 2 - 11);
+    o.fillStyle = '#fff'; o.textAlign = 'center'; o.textBaseline = 'middle';
+    o.fillText(tag, 0, -size * 0.95 - 10);
   }
-  richText(c.text, 0, 4, tw + 70 > 860 ? 52 : 60, '#ffffff', ORANGE2);
   o.restore();
 }
 
@@ -365,7 +375,7 @@ function toggle(x: number, y: number, sea: boolean, age: number) {
 
 function commentBubble(age: number) {
   const k = backOut(age / 0.35);
-  o.save(); o.translate(540, 700); o.scale(k, k);
+  o.save(); o.translate(540, 620); o.scale(k, k);
   o.shadowColor = 'rgba(0,0,0,0.35)'; o.shadowBlur = 40; o.shadowOffsetY = 14;
   rr(-430, -150, 860, 300, 48); o.fillStyle = CREAM; o.fill();
   o.beginPath(); o.moveTo(-120, 148); o.lineTo(-40, 148); o.lineTo(-150, 230); o.closePath(); o.fill();
@@ -377,7 +387,7 @@ function commentBubble(age: number) {
   o.font = `900 150px Inter, sans-serif`; o.fillStyle = ORANGE;
   o.fillText(`“${word.slice(0, n)}${n < word.length && Math.floor(age * 4) % 2 ? '|' : ''}”`, 0, 40);
   o.restore();
-  if (age > 1.3) card('Tools list + steps → మీ DM 📩', 540, 1000, age - 1.3, 99, { size: 46 });
+  if (age > 1.3) card('Tools list + steps → మీ DM 📩', 540, 905, age - 1.3, 99, { size: 42 });
 }
 
 // ------------------------------------------------------------------ frame
@@ -450,11 +460,11 @@ function frame(t: number) {
     g.drawImage(sceneAt(base, 3 + (e - S[1][0])), 0, 0);
     if (e < S[2][0]) {
       codeRain(t, at(1), eo(prog(e, S[1][0], S[1][0] + 0.25)));
-      card('మొత్తం code 💻', 540, 1180, e - S[1][0] - 0.1, S[2][0] - e, { size: 72 });
+      card('మొత్తం code 💻', 540, 940, e - S[1][0] - 0.1, S[2][0] - e, { size: 72 });
     } else {
       drawBg(sceneCanvas, { blur: 14, dim: 0.45 });
       browserWindow(editorShot.complete ? editorShot : undefined, 540, 760, 1000, e - S[2][0]);
-      card('Web app · browser లో', 540, 1150, e - S[2][0] - 0.2, S[3][0] - e, { size: 60 });
+      card('Web app · browser లో', 540, 1160, e - S[2][0] - 0.2, S[3][0] - e, { size: 60 });
     }
   } else if (e < S[4][0]) {
     // ---------------- E: the canvas paints the frame, layer by layer
@@ -471,12 +481,12 @@ function frame(t: number) {
       const age = e - a - i * 0.55;
       const k = eo(age / 0.2);
       o.globalAlpha = k;
-      rr(60, 270 + i * 78, 640, 62, 16); o.fillStyle = 'rgba(22,18,16,0.82)'; o.fill();
+      rr(60, 320 + i * 78, 640, 62, 16); o.fillStyle = 'rgba(22,18,16,0.82)'; o.fill();
       o.font = '600 30px "JetBrains Mono", monospace'; o.fillStyle = i === n - 1 ? ORANGE2 : '#efe6dd'; o.textAlign = 'left'; o.textBaseline = 'middle';
-      o.fillText(c, 84, 301 + i * 78);
+      o.fillText(c, 84, 351 + i * 78);
     });
     o.restore();
-    card('HTML canvas · ప్రతి frame code', 540, 1120, e - a - 0.4, S[4][0] - e, { size: 52 });
+    card('🎨 HTML canvas', 260, 250, e - a - 0.1, S[4][0] - e, { size: 44 });
   } else if (e < S[9][0]) {
     // ---------------- F + G: 3D layers, spotlighting each as it's named
     g.fillStyle = '#0d0b0a'; g.fillRect(0, 0, W, H);
@@ -520,11 +530,11 @@ function frame(t: number) {
     // ---------------- I: voice → lip-sync, 12 drawings a second
     const a = S[11][0];
     const ct = LINES[0].start + ((e - a) % LINES[0].dur);
-    zoomed(g, sceneAt(variant({ bg: 'river' }), ct), 470, 1150, 1.9);
+    zoomed(g, sceneAt(variant({ bg: 'river' }), ct), 470, 1125, 1.6);
     g.fillStyle = 'rgba(10,8,6,0.25)'; g.fillRect(0, 0, W, H);
-    waveform(base.audio[0].src, LINES[0].start, LINES[0].dur, ct, 120, 330, 840, 120);
-    poseTable(base, byId('ashok') as CharacterLayer, ct, 120, 560, 180, e - a - 0.3);
-    card('12 నోరు మార్పులు / second', 540, 1150, e - S[12][0] - 0.3, S[13][0] - e, { size: 56 });
+    waveform(base.audio[0].src, LINES[0].start, LINES[0].dur, ct, 120, 310, 840, 100);
+    poseTable(base, byId('ashok') as CharacterLayer, ct, 150, 520, 150, e - a - 0.3);
+    card('12 నోరు మార్పులు / second', 540, 430, e - S[12][0] - 0.3, S[13][0] - e, { size: 44 });
   } else if (e < S[16][0]) {
     // ---------------- J: one click, river → sea, no re-generation
     const clickAt = S[15][0];
@@ -616,9 +626,9 @@ async function boot() {
   // decode the voice lines so lip-sync can read their loudness
   for (const c of base.audio) if (c.role === 'voice') await decodeAudio(c.src);
   const allText = [...CAPS.flat(), ...LINES.map(l => l.text), 'ఇది AI video కాదు 👀 మొత్తం code నోరు మార్పులు బ్రౌజర్ లో ఒక్క click మీ DM కి పంపిస్తా చేయండి కావాలంటే అని రాయండి'].join(' ');
-  for (const wt of [600, 700, 800, 900]) await document.fonts.load(`${wt} 60px "Noto Sans Telugu"`, allText);
+  for (const fam of [FONT, 'Noto Sans Telugu']) for (const wt of [400, 600, 700, 800]) await document.fonts.load(`${wt} 60px "${fam}"`, allText).catch(() => null);
   // draw every caption once off-screen so glyph caches are warm before frame 0
-  o.font = `800 60px ${TEL}`; for (const c of CAPS.flat()) o.measureText(c);
+  o.font = `${FW} 60px ${TEL}`; for (const c of CAPS.flat()) o.measureText(c);
   await document.fonts.load(`900 60px Inter`);
   await document.fonts.load(`700 30px "JetBrains Mono"`);
   await document.fonts.ready;
