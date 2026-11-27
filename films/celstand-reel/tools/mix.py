@@ -40,7 +40,7 @@ if not clip:
     filters.append("[mus][key]sidechaincompress=threshold=0.03:ratio=6:attack=20:release=350[duck]")
     filters.append("[fx][duck]amix=inputs=2:normalize=0[pre]")
     final = '[pre]'
-filters.append(f"{final}atrim=0:{DUR:.3f},alimiter=limit=0.95,loudnorm=I=-14:TP=-1.0:LRA=11[aout]")
+filters.append(f"{final}apad,atrim=0:{DUR:.3f},alimiter=limit=0.95,loudnorm=I=-14:TP=-1.0:LRA=11[aout]")
 
 cmd = ['ffmpeg', '-v', 'error', '-y', '-framerate', '30', '-i', os.path.join(frames, 'f%05d.jpg')] + inputs + [
     '-filter_complex', ';'.join(filters).replace('[0:a]', '[0:a]'),
