@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="te">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1080" />
+  <title>Cel Stand reel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@600;800;900&family=Inter:wght@600;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    html, body { margin: 0; background: #000; }
+    #reel { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+    #reel canvas { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+    #x3d { position: absolute; inset: 0; }
+  </style>
+</head>
+<body>
+  <div id="reel">
+    <canvas id="cv" width="1080" height="1920"></canvas>
+    <div id="x3d"></div>
+    <canvas id="ov" width="1080" height="1920"></canvas>
+  </div>
+  <script type="module" src="./reel.ts"></script>
+</body>
+</html>

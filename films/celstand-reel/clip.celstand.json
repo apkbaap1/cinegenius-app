@@ -1,0 +1,482 @@
+{
+ "version": 1,
+ "title": "Claude & Ashok by the river",
+ "aspect": "9:16",
+ "duration": 16.4,
+ "fps": 30,
+ "background": "#000000",
+ "layers": [
+  {
+   "id": "sky",
+   "kind": "image",
+   "name": "Sky · 空",
+   "src": "http://localhost:5173/films/celstand-reel/assets/bg_sky.webp",
+   "visible": true,
+   "locked": true,
+   "opacity": 1,
+   "x": 540,
+   "y": 960,
+   "scale": 1.04,
+   "flip": false,
+   "parallax": 0.05,
+   "scroll": {
+    "enabled": false,
+    "speed": -20
+   },
+   "ripple": {
+    "enabled": false,
+    "top": 0.6,
+    "bottom": 1,
+    "amplitude": 4,
+    "wavelength": 26,
+    "speed": 0.6
+   }
+  },
+  {
+   "id": "clouds",
+   "kind": "image",
+   "name": "Clouds · 雲",
+   "src": "http://localhost:5173/films/celstand-reel/assets/bg_clouds.webp",
+   "visible": true,
+   "locked": true,
+   "opacity": 1,
+   "x": 540,
+   "y": 960,
+   "scale": 1.04,
+   "flip": false,
+   "parallax": 0.12,
+   "scroll": {
+    "enabled": true,
+    "speed": -16
+   },
+   "ripple": {
+    "enabled": false,
+    "top": 0.6,
+    "bottom": 1,
+    "amplitude": 4,
+    "wavelength": 26,
+    "speed": 0.6
+   }
+  },
+  {
+   "id": "river",
+   "kind": "image",
+   "name": "River · 川",
+   "src": "http://localhost:5173/films/celstand-reel/assets/bg_river.webp",
+   "visible": true,
+   "locked": true,
+   "opacity": 1,
+   "x": 540,
+   "y": 960,
+   "scale": 1.04,
+   "flip": false,
+   "parallax": 0.4,
+   "scroll": {
+    "enabled": false,
+    "speed": -20
+   },
+   "ripple": {
+    "enabled": true,
+    "top": 0.515,
+    "bottom": 0.66,
+    "amplitude": 5,
+    "wavelength": 22,
+    "speed": 0.5,
+    "maskSrc": "http://localhost:5173/films/celstand-reel/assets/mask_river.webp"
+   },
+   "showUntil": 13.5
+  },
+  {
+   "id": "sea",
+   "kind": "image",
+   "name": "Sea · 海",
+   "src": "http://localhost:5173/films/celstand-reel/assets/bg_sea.webp",
+   "visible": true,
+   "locked": true,
+   "opacity": 1,
+   "x": 540,
+   "y": 960,
+   "scale": 1.04,
+   "flip": false,
+   "parallax": 0.4,
+   "scroll": {
+    "enabled": false,
+    "speed": -20
+   },
+   "ripple": {
+    "enabled": true,
+    "top": 0.515,
+    "bottom": 0.7,
+    "amplitude": 6,
+    "wavelength": 26,
+    "speed": 0.45,
+    "maskSrc": "http://localhost:5173/films/celstand-reel/assets/mask_sea.webp",
+    "shoreTop": 0.68,
+    "shoreBottom": 0.705,
+    "shoreAmount": 6
+   },
+   "showFrom": 13.5
+  },
+  {
+   "id": "ashok",
+   "kind": "character",
+   "name": "Ashok",
+   "visible": true,
+   "locked": false,
+   "opacity": 1,
+   "x": 470,
+   "y": 1445,
+   "scale": 0.78,
+   "flip": false,
+   "parallax": 1,
+   "poses": [
+    {
+     "id": "seated",
+     "name": "Seated",
+     "src": "http://localhost:5173/films/celstand-reel/assets/ashok_seated_closed.webp",
+     "variants": {
+      "closed": "http://localhost:5173/films/celstand-reel/assets/ashok_seated_closed.webp",
+      "half": "http://localhost:5173/films/celstand-reel/assets/ashok_seated_half.webp",
+      "open": "http://localhost:5173/films/celstand-reel/assets/ashok_seated_open.webp",
+      "blink": "http://localhost:5173/films/celstand-reel/assets/ashok_seated_blink.webp"
+     }
+    },
+    {
+     "id": "surprised",
+     "name": "Surprised",
+     "src": "http://localhost:5173/films/celstand-reel/assets/ashok_surprised_closed.webp",
+     "variants": {
+      "closed": "http://localhost:5173/films/celstand-reel/assets/ashok_surprised_closed.webp",
+      "half": "http://localhost:5173/films/celstand-reel/assets/ashok_surprised_half.webp",
+      "open": "http://localhost:5173/films/celstand-reel/assets/ashok_surprised_open.webp",
+      "blink": "http://localhost:5173/films/celstand-reel/assets/ashok_surprised_blink.webp"
+     }
+    }
+   ],
+   "defaultPoseId": "seated",
+   "poseCues": [
+    {
+     "id": "c1",
+     "t": 9.8,
+     "poseId": "surprised"
+    },
+    {
+     "id": "c2",
+     "t": 14.2,
+     "poseId": "seated"
+    }
+   ],
+   "mouths": [],
+   "autoBlink": true,
+   "jacketColor": "",
+   "jacketStrength": 0.9,
+   "jacketMode": "tint",
+   "jacketHue": 0,
+   "idleBob": 2.5,
+   "idleSpeed": 0.22,
+   "faceBox": [
+    445,
+    225,
+    300,
+    243
+   ]
+  },
+  {
+   "id": "claude",
+   "kind": "character",
+   "name": "Claude",
+   "visible": true,
+   "locked": false,
+   "opacity": 1,
+   "x": 812,
+   "y": 735,
+   "scale": 0.42,
+   "flip": false,
+   "parallax": 0.85,
+   "poses": [
+    {
+     "id": "happy",
+     "name": "Happy",
+     "src": "http://localhost:5173/films/celstand-reel/assets/claude_happy_closed.webp",
+     "variants": {
+      "closed": "http://localhost:5173/films/celstand-reel/assets/claude_happy_closed.webp",
+      "half": "http://localhost:5173/films/celstand-reel/assets/claude_happy_half.webp",
+      "open": "http://localhost:5173/films/celstand-reel/assets/claude_happy_open.webp",
+      "blink": "http://localhost:5173/films/celstand-reel/assets/claude_happy_blink.webp"
+     }
+    },
+    {
+     "id": "think",
+     "name": "Thinking",
+     "src": "http://localhost:5173/films/celstand-reel/assets/claude_think_closed.webp",
+     "variants": {
+      "closed": "http://localhost:5173/films/celstand-reel/assets/claude_think_closed.webp",
+      "blink": "http://localhost:5173/films/celstand-reel/assets/claude_think_blink.webp"
+     }
+    }
+   ],
+   "defaultPoseId": "happy",
+   "poseCues": [
+    {
+     "id": "k1",
+     "t": 9.9,
+     "poseId": "think"
+    },
+    {
+     "id": "k2",
+     "t": 13.5,
+     "poseId": "happy"
+    }
+   ],
+   "mouths": [],
+   "autoBlink": true,
+   "jacketColor": "",
+   "jacketStrength": 0.9,
+   "jacketMode": "tint",
+   "jacketHue": 0,
+   "idleBob": 14,
+   "idleSpeed": 0.45,
+   "faceBox": [
+    200,
+    250,
+    500,
+    405
+   ]
+  },
+  {
+   "id": "motes",
+   "kind": "fx",
+   "fx": "sparkles",
+   "name": "Light particles · 光の粒",
+   "visible": true,
+   "locked": true,
+   "opacity": 0.7,
+   "x": 540,
+   "y": 960,
+   "scale": 1,
+   "flip": false,
+   "parallax": 0,
+   "start": 0,
+   "end": 16.4,
+   "density": 22,
+   "size": 1,
+   "speed": 0.6,
+   "wind": 0.05,
+   "color": "#fff6c8",
+   "seed": 11
+  },
+  {
+   "id": "lines",
+   "kind": "fx",
+   "fx": "speedlines",
+   "name": "Speed lines · 集中線",
+   "visible": true,
+   "locked": true,
+   "opacity": 0.6,
+   "x": 540,
+   "y": 960,
+   "scale": 1,
+   "flip": false,
+   "parallax": 0,
+   "start": 13.35,
+   "end": 14.4,
+   "density": 120,
+   "size": 1.1,
+   "speed": 0.6,
+   "wind": 0.05,
+   "color": "#ffffff",
+   "seed": 5
+  },
+  {
+   "id": "sakura",
+   "kind": "fx",
+   "fx": "sakura",
+   "name": "Sakura · 桜",
+   "visible": true,
+   "locked": true,
+   "opacity": 1,
+   "x": 540,
+   "y": 960,
+   "scale": 1,
+   "flip": false,
+   "parallax": 0,
+   "start": 13.6,
+   "end": 16.4,
+   "density": 34,
+   "size": 1,
+   "speed": 0.8,
+   "wind": 0.3,
+   "color": "#ffc6d9",
+   "seed": 21
+  }
+ ],
+ "dialogue": [
+  {
+   "id": "d0",
+   "characterId": "ashok",
+   "start": 0.6,
+   "end": 5.4399999999999995,
+   "text": "Claude, ఈ నది దగ్గర కూర్చుంటే anime scene లా ఉంది కదా?"
+  },
+  {
+   "id": "d1",
+   "characterId": "claude",
+   "start": 5.75,
+   "end": 9.47,
+   "text": "అవును Ashok! కానీ ఇది video కాదు. మొత్తం code!"
+  },
+  {
+   "id": "d2",
+   "characterId": "ashok",
+   "start": 9.8,
+   "end": 13.38,
+   "text": "Code ఆ? మరి background ని sea కి మార్చగలవా?"
+  },
+  {
+   "id": "d3",
+   "characterId": "claude",
+   "start": 13.75,
+   "end": 15.46,
+   "text": "ఒక్క click! ఇదే anime magic!"
+  }
+ ],
+ "audio": [
+  {
+   "id": "v0",
+   "name": "Line 1",
+   "role": "voice",
+   "src": "http://localhost:5173/films/celstand-reel/assets/audio/clip_line1.wav",
+   "start": 0.6,
+   "gain": 1,
+   "loop": false,
+   "characterId": "ashok",
+   "duration": 4.84
+  },
+  {
+   "id": "v1",
+   "name": "Line 2",
+   "role": "voice",
+   "src": "http://localhost:5173/films/celstand-reel/assets/audio/clip_line2.wav",
+   "start": 5.75,
+   "gain": 1,
+   "loop": false,
+   "characterId": "claude",
+   "duration": 3.72
+  },
+  {
+   "id": "v2",
+   "name": "Line 3",
+   "role": "voice",
+   "src": "http://localhost:5173/films/celstand-reel/assets/audio/clip_line3.wav",
+   "start": 9.8,
+   "gain": 1,
+   "loop": false,
+   "characterId": "ashok",
+   "duration": 3.58
+  },
+  {
+   "id": "v3",
+   "name": "Line 4",
+   "role": "voice",
+   "src": "http://localhost:5173/films/celstand-reel/assets/audio/clip_line4.wav",
+   "start": 13.75,
+   "gain": 1,
+   "loop": false,
+   "characterId": "claude",
+   "duration": 1.71
+  },
+  {
+   "id": "amb_r",
+   "name": "River ambience",
+   "role": "ambient",
+   "src": "http://localhost:5173/films/celstand-reel/assets/audio/amb_river.wav",
+   "start": 0,
+   "gain": 0.5,
+   "loop": true,
+   "until": 13.8
+  },
+  {
+   "id": "amb_s",
+   "name": "Sea waves",
+   "role": "ambient",
+   "src": "http://localhost:5173/films/celstand-reel/assets/audio/amb_sea.wav",
+   "start": 13.4,
+   "gain": 0.55,
+   "loop": true
+  },
+  {
+   "id": "whoosh",
+   "name": "Whoosh",
+   "role": "sfx",
+   "src": "http://localhost:5173/films/celstand-reel/assets/audio/sfx_whoosh.wav",
+   "start": 13.05,
+   "gain": 0.8,
+   "loop": false
+  },
+  {
+   "id": "shimmer",
+   "name": "Shimmer",
+   "role": "sfx",
+   "src": "http://localhost:5173/films/celstand-reel/assets/audio/sfx_shimmer.wav",
+   "start": 13.55,
+   "gain": 0.6,
+   "loop": false
+  }
+ ],
+ "camera": [
+  {
+   "id": "k0",
+   "t": 0,
+   "x": 0,
+   "y": 0,
+   "zoom": 1
+  },
+  {
+   "id": "k1",
+   "t": 9.6,
+   "x": -20,
+   "y": 30,
+   "zoom": 1.05
+  },
+  {
+   "id": "k2",
+   "t": 13.45,
+   "x": -40,
+   "y": 60,
+   "zoom": 1.1
+  },
+  {
+   "id": "k3",
+   "t": 13.85,
+   "x": 0,
+   "y": 0,
+   "zoom": 1
+  },
+  {
+   "id": "k4",
+   "t": 16.4,
+   "x": 10,
+   "y": -10,
+   "zoom": 1.04
+  }
+ ],
+ "subtitles": false,
+ "mouthRate": 12,
+ "look": {
+  "preset": "tv",
+  "diffusion": 0.32,
+  "punch": 0.12,
+  "desaturate": 0,
+  "fade": 0,
+  "gradeTop": "#a9d2ff",
+  "gradeBottom": "#ffd7b5",
+  "grade": 0.12,
+  "vignette": 0.2,
+  "grain": 0,
+  "rays": 0.4,
+  "raysX": 0.82,
+  "raysY": 0.13,
+  "raysColor": "#fff1c9",
+  "letterbox": false
+ }
+}
