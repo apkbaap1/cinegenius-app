@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { AudioClip, CharacterLayer, ClipRole, FX_PRESETS, FxKind, FxLayer, ImageLayer, LOOKS, Layer, Look, Pose, Scene, ASPECTS, AspectId, lookOf, uid } from './types';
+import { AudioClip, CharacterLayer, ClipRole, MouthSlot, FX_PRESETS, FxKind, FxLayer, ImageLayer, LOOKS, Layer, Look, Pose, Scene, ASPECTS, AspectId, lookOf, uid } from './types';
 import { Selection } from './Timeline';
 import { Btn, FileBtn, NumField, Section, Slider, Toggle, fmtTime } from './ui';
 import { decodeAudio, fileToDataURL, getImage } from './assets';
-import { cropToContent, isolateColor, keyOutBackground, sampleColor } from './imageTools';
+import { autoWaterMask, cropToContent, isolateColor, keyOutBackground, sampleColor } from './imageTools';
+import PoseTable from './PoseTable';
 import { cameraAt, poseAt } from './renderer';
 
 type Update = (fn: (s: Scene) => Scene) => void;
@@ -33,13 +34,22 @@ const CelThumb: React.FC<{ src: string }> = ({ src }) => {
 
 // ------------------------------------------------------------------ common
 
+/** New centre y so a character keeps its feet (bottom edge) where they are when resized. */
+export function bottomAnchoredY(L: Layer, newScale: number): number {
+  if (L.kind !== 'character') return L.y;
+  const img = getImage(L.poses[0]?.src);
+  if (!img) return L.y;
+  return L.y + (img.naturalHeight * (L.scale - newScale)) / 2;
+}
+
 const Transform: React.FC<{ L: Layer; set: (p: Partial<Layer>) => void }> = ({ L, set }) => (
   <Section title="Placement">
     <div className="grid grid-cols-2 gap-2">
       <NumField label="X" value={L.x} onChange={x => set({ x })} />
       <NumField label="Y" value={L.y} onChange={y => set({ y })} />
     </div>
-    <Slider label="Size" value={L.scale} min={0.1} max={3} onChange={scale => set({ scale })} fmt={v => `${Math.round(v * 100)}%`} />
+    <Slider label={L.kind === 'character' ? 'Size (grows from the feet)' : 'Size'} value={L.scale} min={0.1} max={3}
+      onChange={scale => set(L.kind === 'character' ? { scale, y: bottomAnchoredY(L, scale) } : { scale })} fmt={v => `${Math.round(v * 100)}%`} />
     <Slider label="Opacity" value={L.opacity} min={0} max={1} onChange={opacity => set({ opacity })} fmt={v => `${Math.round(v * 100)}%`} />
     <Slider label="Parallax (follows camera)" value={L.parallax} min={0} max={1.5} onChange={parallax => set({ parallax })} />
     <div className="flex gap-3">
@@ -74,6 +84,34 @@ const ImageInspector: React.FC<{ L: ImageLayer; update: Update; run: Props['run'
         <Slider label="Strength" value={L.ripple.amplitude} min={0} max={20} step={0.5} onChange={amplitude => set({ ripple: { ...L.ripple, amplitude } })} fmt={v => v.toFixed(1)} />
         <Slider label="Wave size" value={L.ripple.wavelength} min={6} max={80} step={1} onChange={wavelength => set({ ripple: { ...L.ripple, wavelength } })} fmt={v => v.toFixed(0)} />
         <Slider label="Speed" value={L.ripple.speed} min={0} max={3} onChange={speed => set({ ripple: { ...L.ripple, speed } })} />
+        <div className="rounded border border-base-300 p-2 space-y-2">
+          <div className="text-[11px] text-gray-300 font-medium">Water mask · 水面マスク</div>
+          <p className="text-[11px] text-gray-500">With a mask only the water moves: poles, rocks or people inside the band stay still.</p>
+          {L.ripple.maskSrc && (
+            <div className="relative rounded overflow-hidden">
+              <img src={L.src} alt="" className="w-full block opacity-50" />
+              <img src={L.ripple.maskSrc} alt="water mask" className="absolute inset-0 w-full h-full" style={{ filter: 'sepia(1) hue-rotate(170deg) saturate(6) brightness(1.1)', opacity: 0.85 }} />
+            </div>
+          )}
+          <div className="flex flex-wrap gap-1.5">
+            <Btn tone="primary" onClick={() => run('Finding the water', async () => {
+              const maskSrc = await autoWaterMask(L.src, L.ripple.top, L.ripple.bottom);
+              set({ ripple: { ...L.ripple, maskSrc, enabled: true } });
+            })} title="Picks the water colour in the middle of the band and masks every pixel like it">Auto from water colour</Btn>
+            <FileBtn accept="image/*" title="A PNG the same size as this image; opaque = water" onFiles={([f]) => run('Importing water mask', async () => {
+              set({ ripple: { ...L.ripple, maskSrc: await fileToDataURL(f), enabled: true } });
+            })}>Upload mask</FileBtn>
+            {L.ripple.maskSrc && <Btn tone="danger" onClick={() => set({ ripple: { ...L.ripple, maskSrc: undefined } })}>Remove mask</Btn>}
+          </div>
+        </div>
+        <div className="rounded border border-base-300 p-2 space-y-2">
+          <div className="text-[11px] text-gray-300 font-medium">Shoreline wash · 波打ち際</div>
+          <Slider label="Wash amount" value={L.ripple.shoreAmount ?? 0} min={0} max={12} step={0.5} onChange={shoreAmount => set({ ripple: { ...L.ripple, shoreAmount } })} fmt={v => v ? `${v.toFixed(1)} px` : 'off'} />
+          {(L.ripple.shoreAmount ?? 0) > 0 && <>
+            <Slider label="Shore top" value={L.ripple.shoreTop ?? 0.8} min={0} max={1} onChange={shoreTop => set({ ripple: { ...L.ripple, shoreTop } })} fmt={v => `${Math.round(v * 100)}%`} />
+            <Slider label="Shore bottom" value={L.ripple.shoreBottom ?? 0.86} min={0} max={1} onChange={shoreBottom => set({ ripple: { ...L.ripple, shoreBottom } })} fmt={v => `${Math.round(v * 100)}%`} />
+          </>}
+        </div>
       </Section>
     </>
   );
@@ -141,6 +179,24 @@ const CharacterInspector: React.FC<{ ch: CharacterLayer; scene: Scene; time: num
     }));
   });
 
+  /** Full drawings per pose (mouth/eyes drawn in), matched to columns by file name. */
+  const addVariants = (poseId: string, files: File[]) => run('Importing drawings', async () => {
+    const order: MouthSlot[] = ['closed', 'half', 'open', 'blink'];
+    const sorted = [...files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    const found: Partial<Record<MouthSlot, string>> = {};
+    const rest: string[] = [];
+    for (const f of sorted) {
+      let src = await fileToDataURL(f);
+      if (keyBg) src = await keyOutBackground(src);
+      const n = f.name.toLowerCase();
+      const slot: MouthSlot | undefined = /blink|closed[-_ ]?eyes|まばたき/.test(n) ? 'blink' : /half|small|mid|半/.test(n) ? 'half'
+        : /open|wide|開/.test(n) ? 'open' : /closed|close|とじ|neutral|_0\b/.test(n) ? 'closed' : undefined;
+      if (slot && !found[slot]) found[slot] = src; else rest.push(src);
+    }
+    for (const slot of order) if (!found[slot] && rest.length) found[slot] = rest.shift();
+    update(s => patchLayer(s, ch.id, l => ({ ...(l as CharacterLayer), poses: (l as CharacterLayer).poses.map(q => q.id === poseId ? { ...q, variants: { ...(q.variants ?? {}), ...found } } : q) })));
+  });
+
   const addMouths = (files: File[]) => run('Importing mouths', async () => {
     const sorted = [...files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
     const mouths = [];
@@ -179,6 +235,10 @@ const CharacterInspector: React.FC<{ ch: CharacterLayer; scene: Scene; time: num
         </div>
       </Section>
 
+      <Section title="Pose × mouth table · ポーズ×口">
+        <PoseTable scene={scene} ch={ch} time={time} update={update} />
+      </Section>
+
       <Section title={`Poses (${ch.poses.length})`} right={<FileBtn accept="image/*" multiple onFiles={addPoses}>+ Pose cels</FileBtn>}>
         <Toggle label="Remove flat background on import" checked={keyBg} onChange={setKeyBg} />
         {!ch.poses.length && <p className="text-[11px] text-amber-300/80">Upload one PNG per pose. All cels of a character should be the same size and lined up (same canvas), like sheets on a cel stand.</p>}
@@ -193,6 +253,9 @@ const CharacterInspector: React.FC<{ ch: CharacterLayer; scene: Scene; time: num
               </div>
               <div className="flex flex-wrap gap-1 mt-1.5">
                 <Btn className={ch.defaultPoseId === p.id ? '!bg-violet-600/60' : ''} onClick={() => set({ defaultPoseId: p.id })}>{ch.defaultPoseId === p.id ? '★ Start pose' : 'Set start'}</Btn>
+                <FileBtn accept="image/*" multiple title="Complete drawings of this pose with the mouth drawn in: name them …closed, …half, …open, …blink" onFiles={files => addVariants(p.id, files)}>
+                  {p.variants && Object.keys(p.variants).length ? `Drawings ${Object.keys(p.variants).length}/4` : 'Drawings…'}
+                </FileBtn>
                 <Btn onClick={() => setJacketFor(jacketFor === p.id ? null : p.id)}>{p.jacketSrc ? 'Jacket ✓' : 'Jacket…'}</Btn>
                 <FileBtn accept="image/*" title="Upload a ready-made jacket cel" onFiles={([f]) => run('Importing jacket cel', async () => {
                   const src = await fileToDataURL(f);
@@ -210,7 +273,20 @@ const CharacterInspector: React.FC<{ ch: CharacterLayer; scene: Scene; time: num
         </div>
       </Section>
 
-      <Section title="Jacket colour">
+      <Section title="Jacket colour · 上着の色">
+        <div className="flex rounded-md overflow-hidden border border-base-300 w-fit text-[11px]">
+          <button onClick={() => set({ jacketMode: 'tint' })} className={`px-2 py-1 ${ch.jacketMode !== 'hue' ? 'bg-violet-600 text-white' : 'text-gray-400'}`}>Paint a colour</button>
+          <button onClick={() => set({ jacketMode: 'hue' })} className={`px-2 py-1 ${ch.jacketMode === 'hue' ? 'bg-violet-600 text-white' : 'text-gray-400'}`}>Turn the hue</button>
+        </div>
+        {ch.jacketMode === 'hue' ? (
+          <>
+            <input type="range" min={-180} max={180} step={2} value={ch.jacketHue ?? 0} onChange={e => set({ jacketHue: parseFloat(e.target.value) })}
+              className="w-full h-3 rounded-full appearance-none cursor-pointer"
+              style={{ background: 'linear-gradient(90deg,hsl(0,60%,50%),hsl(60,60%,50%),hsl(120,60%,45%),hsl(180,60%,45%),hsl(240,60%,55%),hsl(300,60%,50%),hsl(360,60%,50%))' }} />
+            <div className="flex justify-between text-[11px] text-gray-400"><span>Hue shift</span><span className="font-mono">{Math.round(ch.jacketHue ?? 0)}°</span></div>
+            <p className="text-[11px] text-gray-500">Rotates the jacket's own colours, so its shading and colour variation stay as drawn.</p>
+          </>
+        ) : (<>
         <div className="flex flex-wrap gap-1.5">
           {JACKET_SWATCHES.map(c => (
             <button key={c || 'orig'} onClick={() => set({ jacketColor: c })}
@@ -221,6 +297,7 @@ const CharacterInspector: React.FC<{ ch: CharacterLayer; scene: Scene; time: num
           <input type="color" value={ch.jacketColor || '#3b6fb6'} onChange={e => set({ jacketColor: e.target.value })} className="w-7 h-6 bg-transparent" />
         </div>
         <Slider label="Strength" value={ch.jacketStrength} min={0} max={1} onChange={jacketStrength => set({ jacketStrength })} fmt={v => `${Math.round(v * 100)}%`} />
+        </>)}
         {!ch.poses.some(p => p.jacketSrc) && <p className="text-[11px] text-gray-500">No jacket cel yet: use “Jacket…” on a pose.</p>}
       </Section>
 
@@ -313,6 +390,16 @@ const ClipInspector: React.FC<{ scene: Scene; id: string; update: Update; select
       </div>
       <Slider label="Volume" value={clip.gain} min={0} max={2} onChange={gain => set({ gain })} fmt={v => `${Math.round(v * 100)}%`} />
       <Toggle label="Loop to the end of the scene" checked={clip.loop} onChange={loop => set({ loop })} />
+      {clip.role !== 'voice' && (
+        <label className="block text-[11px] text-gray-400">Plays only while this layer is visible
+          <select value={clip.linkLayerId || ''} onChange={e => set({ linkLayerId: e.target.value || undefined })}
+            className="mt-0.5 w-full bg-base-100 border border-base-300 rounded px-2 py-1 text-sm text-gray-100">
+            <option value="">— always —</option>
+            {scene.layers.filter(l => l.kind === 'image').map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+          </select>
+          <span className="block mt-1 text-gray-500">Link river sounds to the river layer and waves to the sea layer: swapping backgrounds crossfades the sound.</span>
+        </label>
+      )}
       <div className="flex flex-wrap gap-1.5">
         <Btn onClick={() => set({ start: time })}>Start = playhead</Btn>
         {clip.role === 'voice' && clip.characterId && clip.duration && (

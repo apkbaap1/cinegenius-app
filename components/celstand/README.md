@@ -46,6 +46,22 @@ Open it from the header (**Cel Stand**) or go to `/#cel-stand`.
 - The demo scene is drawn in anime style: glossy two-highlight eyes, pointed bangs with a highlight ring,
   two-tone cel shading, 入道雲 cumulonimbus, utility poles (電柱) and a riverbank.
 
+## Like a real cel stand (exposure sheet, table, masks, 3D)
+
+- **Exposure sheet (タイムシート)**: every character has a per-frame drawing schedule at the mouth rate
+  (12/s = on twos). It's built from pose cues, lip-sync and blinks; ticks on each character's timeline lane mark every drawing change.
+- **Pose × mouth table (ポーズ×口)**: face close-ups of every drawing, closed / half / open / blink for each pose.
+  The drawing on screen lights up gold. *Click = lock pose* pins a pose while the mouths keep following the dialogue;
+  *Click = set frame* paints that frame of the sheet by hand (clear edits any time).
+- **Complete drawings per pose**: *Drawings…* on a pose takes full cels with the mouth or eyes drawn in
+  (`…closed`, `…half`, `…open`, `…blink`), like hand-animated drawings. Without them, mouth and blink overlays are used.
+- **Water mask (水面マスク)**: only masked pixels ripple (*Auto from water colour*, or upload a mask). The background
+  splitter builds one automatically. **Shoreline wash (波打ち際)** moves a beach line up and down.
+- **3D layers (分解)**: the cels spread out in depth on tilted glass with labels. Scenes open with this as an intro,
+  sheets flying in back to front, then settle into the picture (skipped for reduced-motion users; click to skip).
+- Characters **resize from their feet**. Ambience can be **linked to a layer**: it plays only while that layer is
+  visible, so swapping river → sea crossfades the sound. Jackets can **turn the hue** (keeps the drawn colour variation) as well as paint a colour.
+
 Shortcuts: Space play/pause · ←/→ step a frame · arrows nudge the selected cel · Del remove · Ctrl+Z / Ctrl+Shift+Z.
 
 ## Code map
@@ -59,6 +75,9 @@ Shortcuts: Space play/pause · ←/→ step a frame · arrows nudge the selected
 | `exporter.ts` | WebCodecs H.264 + AAC/Opus → MP4 (`mp4-muxer`) |
 | `playback.ts` | Audio playback in sync with the timeline; real-time recording fallback |
 | `look.ts` | Anime compositing finish (撮影) |
+| `sheet.ts` | Exposure sheet: which drawing shows on each frame |
+| `PoseTable.tsx` | Pose × mouth table |
+| `breakdown.ts` | 3D layer breakdown and intro |
 | `fx.ts` | Anime effects: petals, particles, snow, rain, fireflies, speed lines |
 | `demo.ts`, `demoArt.ts` | The starter scene and its anime-style art, drawn in code |
 | `ArtPrompts.tsx` | Image-generator prompt builder for cels that line up |

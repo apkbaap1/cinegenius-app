@@ -18,6 +18,12 @@ export interface ScrollFx {
 
 export interface RippleFx {
   enabled: boolean;
+  /** Optional mask (same size as the layer image): only its opaque pixels ripple. */
+  maskSrc?: string;
+  /** Up-and-down wash of a shoreline band (sea), 0 = off. */
+  shoreTop?: number;
+  shoreBottom?: number;
+  shoreAmount?: number;
   /** Band of the layer image (0 = top, 1 = bottom) that ripples. */
   top: number;
   bottom: number;
@@ -58,7 +64,21 @@ export interface Pose {
   src: string;
   /** Optional jacket/costume cel, same size and alignment as `src`, recoloured live. */
   jacketSrc?: string;
+  /**
+   * Optional complete drawings of this pose with the mouth (or eyes) already drawn in,
+   * like hand-animated cels. When present they replace the mouth/blink overlays.
+   */
+  variants?: Partial<Record<MouthSlot, string>>;
 }
+
+/** Columns of the pose × mouth table (as on an animator's exposure sheet). */
+export type MouthSlot = 'closed' | 'half' | 'open' | 'blink';
+export const MOUTH_SLOTS: { id: MouthSlot; name: string; jp: string; level: number }[] = [
+  { id: 'closed', name: 'Closed', jp: '口とじ', level: 0 },
+  { id: 'half', name: 'Half', jp: '半開き', level: 0.5 },
+  { id: 'open', name: 'Open', jp: '開き', level: 1 },
+  { id: 'blink', name: 'Blink', jp: 'まばたき', level: 0 },
+];
 
 export interface MouthShape {
   id: string;
@@ -89,6 +109,16 @@ export interface CharacterLayer extends LayerBase {
   jacketColor: string;
   /** 0..1, how strongly the jacket colour is applied. */
   jacketStrength: number;
+  /** 'tint' = paint with a colour, 'hue' = rotate the jacket's own colours. */
+  jacketMode?: 'tint' | 'hue';
+  /** Degrees, for hue mode. */
+  jacketHue?: number;
+  /** Pose locked by clicking the pose × mouth table; mouths keep following the dialogue. */
+  pinnedPoseId?: string;
+  /** Hand edits on the exposure sheet: frame index → "poseId|slot". */
+  sheetEdits?: Record<number, string>;
+  /** Face area in cel pixels [x, y, w, h], for the table thumbnails. */
+  faceBox?: [number, number, number, number];
 }
 
 export type FxKind = 'sakura' | 'sparkles' | 'snow' | 'rain' | 'fireflies' | 'speedlines';
@@ -158,6 +188,8 @@ export interface AudioClip {
   loop: boolean;
   /** For voice clips: whose mouth this audio drives. */
   characterId?: string;
+  /** Ambience that only plays while this layer is visible (crossfades when you swap backgrounds). */
+  linkLayerId?: string;
   /** Filled in after decoding (seconds). */
   duration?: number;
 }

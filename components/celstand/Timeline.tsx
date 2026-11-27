@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { changeFrames, sheetRate } from './sheet';
 import { CharacterLayer, FxLayer, Scene } from './types';
 
 export type Selection =
@@ -71,6 +72,14 @@ const Timeline: React.FC<Props> = ({ scene, time, selection, onSeek, onSelect, o
   };
 
   const characters = scene.layers.filter((l): l is CharacterLayer => l.kind === 'character');
+  // exposure-sheet ticks: one mark wherever a character's drawing changes
+  const ticksByChar = useMemo(() => {
+    const m = new Map<string, number[]>();
+    for (const ch of characters) m.set(ch.id, changeFrames(scene, ch));
+    return m;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene]);
+  const rate = sheetRate(scene);
   const ticks: number[] = [];
   const step = scene.duration > 40 ? 5 : scene.duration > 15 ? 2 : 1;
   for (let t = 0; t <= scene.duration + 1e-6; t += step) ticks.push(t);
@@ -104,6 +113,9 @@ const Timeline: React.FC<Props> = ({ scene, time, selection, onSeek, onSelect, o
               </div>
             );
           })}
+          {(ticksByChar.get(ch.id) ?? []).map(f => (
+            <div key={`tk${f}`} className="absolute bottom-0 h-[5px] w-px pointer-events-none" style={{ left: (f / rate) * pps, background: color, opacity: 0.9 }} />
+          ))}
           {ch.poseCues.map(c => {
             const pose = ch.poses.find(p => p.id === c.poseId);
             const sel = selection.type === 'cue' && selection.id === c.id;

@@ -163,3 +163,72 @@ export function cropToContent(src: string, pad = 12): Promise<string> {
   cropCache.set(src, p);
   return p;
 }
+
+const boxCache = new Map<string, Promise<[number, number, number, number] | null>>();
+/** Bounding box [x, y, w, h] of the visible pixels of a cel. */
+export function contentBox(src: string): Promise<[number, number, number, number] | null> {
+  const hit = boxCache.get(src);
+  if (hit) return hit;
+  const p = (async () => {
+    const { data, w, h } = await pixels(src);
+    const px = data.data;
+    let x0 = w, y0 = h, x1 = -1, y1 = -1;
+    for (let y = 0; y < h; y += 2) for (let x = 0; x < w; x += 2) {
+      if (px[(y * w + x) * 4 + 3] > 20) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    }
+    return x1 < 0 ? null : [x0, y0, x1 - x0, y1 - y0] as [number, number, number, number];
+  })();
+  boxCache.set(src, p);
+  return p;
+}
+
+/**
+ * Water mask from one painting: takes the typical colour in the middle of the band,
+ * keeps every pixel of a similar hue inside the band, then closes small gaps along
+ * each row so highlights on the water move with it. Opaque = water.
+ */
+export async function autoWaterMask(src: string, top: number, bottom: number): Promise<string> {
+  const { c, g, data, w, h } = await pixels(src);
+  const px = data.data;
+  const y0 = Math.max(0, Math.floor(top * h)), y1 = Math.min(h, Math.ceil(bottom * h));
+  const hsv = (i: number) => {
+    const r = px[i] / 255, gg = px[i + 1] / 255, b = px[i + 2] / 255, mx = Math.max(r, gg, b), mn = Math.min(r, gg, b), d = mx - mn + 1e-9;
+    let hu = mx === r ? ((gg - b) / d) % 6 : mx === gg ? (b - r) / d + 2 : (r - gg) / d + 4;
+    return [(hu * 60 + 360) % 360, mx > 0 ? (mx - mn) / mx : 0, mx];
+  };
+  // typical water hue: circular mean over the band's middle third
+  let sx = 0, sy = 0;
+  const m0 = y0 + Math.floor((y1 - y0) / 3), m1 = y0 + Math.floor((2 * (y1 - y0)) / 3);
+  for (let y = m0; y < m1; y += 2) for (let x = 0; x < w; x += 4) {
+    const [hu, s] = hsv((y * w + x) * 4);
+    if (s < 0.12) continue;
+    sx += Math.cos(hu * Math.PI / 180) * s; sy += Math.sin(hu * Math.PI / 180) * s;
+  }
+  const waterHue = (Math.atan2(sy, sx) * 180 / Math.PI + 360) % 360;
+  const on = new Uint8Array(w * h);
+  for (let y = y0; y < y1; y++) for (let x = 0; x < w; x++) {
+    const i = (y * w + x) * 4;
+    if (px[i + 3] < 30) continue;
+    const [hu, s] = hsv(i);
+    const dh = Math.min(Math.abs(hu - waterHue), 360 - Math.abs(hu - waterHue));
+    if (s > 0.12 && dh < 32) on[y * w + x] = 1;
+  }
+  // close gaps along rows (sparkles, foam) but not across thick objects
+  const R = 10;
+  const closed = new Uint8Array(on);
+  for (let y = y0; y < y1; y++) {
+    let last = -1;
+    for (let x = 0; x < w; x++) {
+      if (on[y * w + x]) {
+        if (last >= 0 && x - last > 1 && x - last <= R) for (let k = last + 1; k < x; k++) closed[y * w + k] = 1;
+        last = x;
+      }
+    }
+  }
+  for (let p = 0; p < w * h; p++) {
+    const i = p * 4;
+    px[i] = 255; px[i + 1] = 255; px[i + 2] = 255; px[i + 3] = closed[p] ? 255 : 0;
+  }
+  g.putImageData(data, 0, 0);
+  return toURL(c);
+}

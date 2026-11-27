@@ -158,6 +158,8 @@ export function animeRiver(): string {
   g.fillStyle = '#4a9339';
   g.beginPath(); g.moveTo(0, 1080); g.lineTo(0, 900); g.quadraticCurveTo(960, 860, 1920, 905); g.lineTo(1920, 1080); g.fill();
   grassBlades(g, 820, 1080, 700, '#3f8a31', '#8fd06a');
+  // far-bank pole belongs to the river painting (it stands above the water band, so it never ripples)
+  pole(g, 250, 630, 350, 0.7);
   return url(c);
 }
 
@@ -165,8 +167,7 @@ export function animeRiver(): string {
 export function animePoles(): string {
   const [c, g] = cv(1920, 1080);
   pole(g, 1650, 1080, 150, 1.25);
-  pole(g, 250, 630, 350, 0.7);
-  wires(g, [[-300, 330], [250, 350], [1650, 150], [2300, 120]], 40);
+  wires(g, [[-300, 300], [1650, 150], [2300, 120]], 60);
   return url(c);
 }
 
@@ -187,19 +188,32 @@ export function animeSea(): string {
     g.fillStyle = rand() > 0.25 ? 'rgba(255,255,255,0.85)' : 'rgba(20,70,140,0.5)';
     g.fillRect(x, y, 8 + (y - 560) * 0.3 * rand(), 1 + (y - 560) / 80);
   }
-  // sea wall (防波堤) with a guard rail and the coastal road
-  g.fillStyle = '#c9ccd4';
-  g.fillRect(0, 850, 1920, 60);
-  g.fillStyle = '#a3a7b3';
-  g.fillRect(0, 900, 1920, 14);
-  g.fillStyle = '#5c6070';
-  g.fillRect(0, 914, 1920, 166);
-  g.fillStyle = '#f2f2f2';
-  for (let x = 0; x < 1920; x += 160) g.fillRect(x, 1010, 90, 8);
-  g.strokeStyle = '#e8eaf0'; g.lineWidth = 7;
-  g.beginPath(); g.moveTo(0, 812); g.lineTo(1920, 812); g.moveTo(0, 836); g.lineTo(1920, 836); g.stroke();
-  g.fillStyle = '#e8eaf0';
-  for (let x = 40; x < 1920; x += 180) g.fillRect(x, 805, 9, 48);
+  // beach: foam line, wet sand, dry sand (the shoreline washes up and down on the stand)
+  g.fillStyle = '#c9b48a';
+  g.beginPath(); g.moveTo(0, 1080); g.lineTo(0, 872);
+  for (let x = 0; x <= 1920; x += 30) g.lineTo(x, 868 + 8 * Math.sin(x / 110));
+  g.lineTo(1920, 1080); g.fill();
+  g.fillStyle = '#f4f8fa';
+  g.beginPath(); g.moveTo(0, 878);
+  for (let x = 0; x <= 1920; x += 30) g.lineTo(x, 862 + 8 * Math.sin(x / 110) + 4 * Math.sin(x / 23));
+  for (let x = 1920; x >= 0; x -= 30) g.lineTo(x, 876 + 8 * Math.sin(x / 110));
+  g.fill();
+  g.fillStyle = '#ead7ad';
+  g.beginPath(); g.moveTo(0, 1080); g.lineTo(0, 905);
+  for (let x = 0; x <= 1920; x += 40) g.lineTo(x, 900 + 10 * Math.sin(x / 170 + 1));
+  g.lineTo(1920, 1080); g.fill();
+  for (let i = 0; i < 400; i++) { g.fillStyle = rand() > 0.5 ? 'rgba(160,130,90,0.35)' : 'rgba(255,255,255,0.35)'; g.fillRect(rand() * 1920, 910 + rand() * 170, 3, 2); }
+  return url(c);
+}
+
+/** Water masks for the demo backgrounds: opaque where the water is. */
+export function waterMask(top: number, bottom: number, waveEdge = false): string {
+  const [c, g] = cv(1920, 1080);
+  g.fillStyle = '#fff';
+  g.beginPath(); g.moveTo(0, top); g.lineTo(1920, top);
+  if (waveEdge) { for (let x = 1920; x >= 0; x -= 30) g.lineTo(x, bottom + 8 * Math.sin(x / 110)); }
+  else { g.lineTo(1920, bottom); g.lineTo(0, bottom); }
+  g.closePath(); g.fill();
   return url(c);
 }
 

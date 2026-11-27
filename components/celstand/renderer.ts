@@ -4,8 +4,8 @@
 import { ASPECTS, CameraKey, CharacterLayer, ImageLayer, Layer, Pose, Scene, lookOf } from './types';
 import { drawFx } from './fx';
 import { applyLook, letterboxBar } from './look';
-import { getImage, getTinted } from './assets';
-import { mouthState } from './lipsync';
+import { getHueShifted, getImage, getTinted } from './assets';
+import { drawingAt, drawingLayers } from './sheet';
 
 export const stageSize = (scene: Scene) => ASPECTS[scene.aspect];
 
@@ -44,6 +44,8 @@ function applyCamera(g: CanvasRenderingContext2D, scene: Scene, t: number, layer
 }
 
 export function poseAt(ch: CharacterLayer, t: number): Pose | undefined {
+  const pinned = ch.pinnedPoseId && ch.poses.find(p => p.id === ch.pinnedPoseId);
+  if (pinned) return pinned;
   let poseId = ch.defaultPoseId;
   let bestT = -Infinity;
   for (const c of ch.poseCues) if (c.t <= t && c.t >= bestT) { bestT = c.t; poseId = c.poseId; }
@@ -61,26 +63,72 @@ export function layerBox(layer: Layer): { w: number; h: number } | null {
 
 // --- image layers ---------------------------------------------------------
 
+const ripplePool = new Map<string, HTMLCanvasElement>();
+function rippleCanvas(key: string, w: number, h: number) {
+  let c = ripplePool.get(key);
+  if (!c) { c = document.createElement('canvas'); ripplePool.set(key, c); }
+  if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+  return c;
+}
+
+/** Offset in image px for row y of the ripple band. */
+function rowShift(r: ImageLayer['ripple'], y: number, top: number, bot: number, phase: number) {
+  const depth = (y - top) / Math.max(1, bot - top); // stronger near the viewer
+  const wl = r.wavelength * (0.5 + depth);
+  return r.amplitude * (0.35 + 0.65 * depth) *
+    (Math.sin(y / wl * Math.PI * 2 + phase) * 0.7 + Math.sin(y / (wl * 0.37) * Math.PI * 2 - phase * 1.7) * 0.3);
+}
+
+/**
+ * Water: rows of the band slide sideways. With a mask, the rippled rows are cut to the
+ * mask so only water moves (poles, boats, people standing in front stay still).
+ * A shore band can also wash up and down.
+ */
 function drawRippled(g: CanvasRenderingContext2D, img: HTMLImageElement, L: ImageLayer, t: number, dx: number, dy: number, dw: number, dh: number) {
   const iw = img.naturalWidth, ih = img.naturalHeight;
   const r = L.ripple;
   if (!r.enabled) { g.drawImage(img, dx, dy, dw, dh); return; }
   const top = Math.max(0, Math.min(ih, Math.round(r.top * ih)));
   const bot = Math.max(top, Math.min(ih, Math.round(r.bottom * ih)));
-  const sy = dh / ih;
-  const sx = dw / iw;
-  if (top > 0) g.drawImage(img, 0, 0, iw, top, dx, dy, dw, top * sy);
-  if (bot < ih) g.drawImage(img, 0, bot, iw, ih - bot, dx, dy + bot * sy, dw, (ih - bot) * sy);
-  const strip = 2;
   const phase = t * r.speed * Math.PI * 2;
-  for (let y = top; y < bot; y += strip) {
-    const depth = (y - top) / Math.max(1, bot - top); // stronger near the viewer
-    const wl = r.wavelength * (0.5 + depth);
-    const off = r.amplitude * (0.35 + 0.65 * depth) *
-      (Math.sin(y / wl * Math.PI * 2 + phase) * 0.7 + Math.sin(y / (wl * 0.37) * Math.PI * 2 - phase * 1.7) * 0.3);
-    const hgt = Math.min(strip, bot - y);
-    g.drawImage(img, 0, y, iw, hgt, dx + off * sx, dy + y * sy, dw, hgt * sy + 0.6);
+  const mask = r.maskSrc ? getImage(r.maskSrc) : undefined;
+  const shoreAmt = r.shoreAmount ?? 0;
+  const sTop = Math.round((r.shoreTop ?? 0) * ih), sBot = Math.round((r.shoreBottom ?? 0) * ih);
+  const shore = shoreAmt > 0 && sBot > sTop;
+
+  if (!mask && !shore) {
+    const sy = dh / ih, sx = dw / iw;
+    if (top > 0) g.drawImage(img, 0, 0, iw, top, dx, dy, dw, top * sy);
+    if (bot < ih) g.drawImage(img, 0, bot, iw, ih - bot, dx, dy + bot * sy, dw, (ih - bot) * sy);
+    for (let y = top; y < bot; y += 2) {
+      const hgt = Math.min(2, bot - y);
+      g.drawImage(img, 0, y, iw, hgt, dx + rowShift(r, y, top, bot, phase) * sx, dy + y * sy, dw, hgt * sy + 0.6);
+    }
+    return;
   }
+
+  // masked: the still picture, then the moving water cut to the mask on top
+  g.drawImage(img, dx, dy, dw, dh);
+  const c = rippleCanvas(L.id, iw, ih);
+  const x = c.getContext('2d')!;
+  x.globalCompositeOperation = 'source-over';
+  x.clearRect(0, 0, iw, ih);
+  const y0 = Math.min(top, shore ? sTop : top), y1 = Math.max(bot, shore ? sBot : bot);
+  for (let y = y0; y < y1; y += 1) {
+    let src = y;
+    if (shore && y >= sTop && y < sBot) {
+      const u = (y - sTop) / (sBot - sTop);
+      src = Math.round(y + shoreAmt * Math.sin(t * 1.1 * r.speed * 2) * Math.sin(Math.PI * u));
+    }
+    const shift = y >= top && y < bot ? rowShift(r, y, top, bot, phase) : 0;
+    x.drawImage(img, 0, Math.max(0, Math.min(ih - 1, src)), iw, 1, shift, y, iw, 1);
+  }
+  if (mask) {
+    x.globalCompositeOperation = 'destination-in';
+    x.drawImage(mask, 0, 0, iw, ih);
+    x.globalCompositeOperation = 'source-over';
+  }
+  g.drawImage(c, dx, dy, dw, dh);
 }
 
 function drawImageLayer(g: CanvasRenderingContext2D, scene: Scene, L: ImageLayer, t: number) {
@@ -114,18 +162,18 @@ function drawImageLayer(g: CanvasRenderingContext2D, scene: Scene, L: ImageLayer
 
 // --- characters --------------------------------------------------------------
 
-const blinking = (t: number, seed: string) => {
-  let s = 0;
-  for (let i = 0; i < seed.length; i++) s += seed.charCodeAt(i);
-  const period = 3.1 + (s % 17) / 10;
-  const local = (t + 1.3 + (s % 7) * 0.37) % period; // never mid-blink on frame 0
-  return local < 0.11;
-};
+/** Jacket cel recoloured either by tint or by rotating its own hues. */
+function jacketImage(ch: CharacterLayer, src: string): CanvasImageSource | undefined {
+  if (ch.jacketMode === 'hue') return getHueShifted(src, ch.jacketHue ?? 0);
+  return getTinted(src, ch.jacketColor, ch.jacketStrength);
+}
 
 function drawCharacter(g: CanvasRenderingContext2D, scene: Scene, ch: CharacterLayer, t: number) {
-  const pose = poseAt(ch, t);
+  const d = drawingAt(scene, ch, t);
+  const pose = d.pose;
   if (!pose) return;
-  const body = getImage(pose.src);
+  const { base, overlays } = drawingLayers(ch, d);
+  const body = getImage(base);
   if (!body) return;
   const dw = body.naturalWidth * ch.scale, dh = body.naturalHeight * ch.scale;
   g.save();
@@ -136,17 +184,22 @@ function drawCharacter(g: CanvasRenderingContext2D, scene: Scene, ch: CharacterL
   const x = -dw / 2, y = -dh / 2;
   g.drawImage(body, x, y, dw, dh);
   if (pose.jacketSrc) {
-    const j = getTinted(pose.jacketSrc, ch.jacketColor, ch.jacketStrength);
+    const j = jacketImage(ch, pose.jacketSrc);
     if (j) g.drawImage(j, x, y, dw, dh);
   }
-  if (ch.autoBlink && ch.blinkSrc && blinking(t, ch.id)) {
-    const b = getImage(ch.blinkSrc);
-    if (b) g.drawImage(b, x, y, dw, dh);
+  for (const o of overlays) {
+    const im = getImage(o);
+    if (im) g.drawImage(im, x, y, dw, dh);
   }
-  const m = mouthState(scene, ch, t).mouth;
-  const mi = getImage(m?.src);
-  if (mi) g.drawImage(mi, x, y, dw, dh);
   g.restore();
+}
+
+/** Draws a single layer (used by the 3D breakdown view). */
+export function renderLayer(g: CanvasRenderingContext2D, scene: Scene, L: Layer, t: number) {
+  const { w, h } = stageSize(scene);
+  if (L.kind === 'image') drawImageLayer(g, scene, L, t);
+  else if (L.kind === 'character') drawCharacter(g, scene, L, t);
+  else drawFx(g, L, t, w, h);
 }
 
 // --- subtitles -----------------------------------------------------------
@@ -195,8 +248,6 @@ function drawSubtitles(g: CanvasRenderingContext2D, scene: Scene, t: number) {
 export interface RenderOptions {
   selectedId?: string | null;
   guides?: boolean;
-  /** 'split' spreads layers apart to show the cel stack. */
-  explode?: number;
 }
 
 export function renderFrame(g: CanvasRenderingContext2D, scene: Scene, t: number, opts: RenderOptions = {}) {
@@ -205,37 +256,11 @@ export function renderFrame(g: CanvasRenderingContext2D, scene: Scene, t: number
   g.save();
   g.fillStyle = scene.background || '#000';
   g.fillRect(0, 0, w, h);
-  const visible = scene.layers.filter(l => l.visible);
-  const explode = opts.explode || 0;
-  visible.forEach((L, i) => {
-    g.save();
-    if (explode > 0) {
-      // Fan the cels out like sheets on a multiplane stand.
-      const n = visible.length;
-      const k = n > 1 ? i / (n - 1) - 0.5 : 0;
-      g.translate(w / 2, h / 2);
-      g.scale(1 - explode * 0.35, 1 - explode * 0.35);
-      g.translate(k * w * 0.5 * explode, -k * h * 0.5 * explode);
-      g.translate(-w / 2, -h / 2);
-      g.globalAlpha = 1;
-    }
-    if (L.kind === 'image') drawImageLayer(g, scene, L, t);
-    else if (L.kind === 'character') drawCharacter(g, scene, L, t);
-    else drawFx(g, L, t, w, h);
-    if (explode > 0.05) {
-      g.strokeStyle = 'rgba(255,255,255,0.6)';
-      g.lineWidth = 3;
-      g.strokeRect(0, 0, w, h);
-      g.fillStyle = 'rgba(255,255,255,0.9)';
-      g.font = `600 ${Math.round(h * 0.035)}px Inter, sans-serif`;
-      g.fillText(L.name, 16, h * 0.06);
-    }
-    g.restore();
-  });
-  if (!explode) applyLook(g, lookOf(scene), t, w, h);
-  if (scene.subtitles && !explode) drawSubtitles(g, scene, t);
+  for (const L of scene.layers) if (L.visible) renderLayer(g, scene, L, t);
+  applyLook(g, lookOf(scene), t, w, h);
+  if (scene.subtitles) drawSubtitles(g, scene, t);
 
-  if (opts.guides && opts.selectedId && !explode) {
+  if (opts.guides && opts.selectedId) {
     const L = scene.layers.find(l => l.id === opts.selectedId);
     const box = L && layerBox(L);
     if (L && box) {

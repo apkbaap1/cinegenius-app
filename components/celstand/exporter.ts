@@ -5,6 +5,7 @@
 import { Scene } from './types';
 import { decodeAudio, getBuffer, loadImage } from './assets';
 import { renderFrame, stageSize } from './renderer';
+import { linkFactor } from './playback';
 
 const H264 = ['avc1.640028', 'avc1.4d0028', 'avc1.42e028', 'avc1.42001f'];
 
@@ -46,7 +47,7 @@ async function mixAudio(scene: Scene, sampleRate: number): Promise<AudioBuffer |
     src.buffer = buf;
     src.loop = clip.loop;
     const g = ctx.createGain();
-    g.gain.value = clip.gain;
+    g.gain.value = clip.gain * linkFactor(scene, clip);
     src.connect(g).connect(ctx.destination);
     src.start(Math.max(0, clip.start));
     if (clip.loop) src.stop(scene.duration);

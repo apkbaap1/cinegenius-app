@@ -68,6 +68,58 @@ export function getTinted(src: string, color: string, strength: number): CanvasI
   return c;
 }
 
+// ---- Jacket hue rotation ------------------------------------------------
+// Rotates every pixel's hue (keeping its own saturation/value variation), with a
+// saturation lift as the shift grows, like turning a colour wheel on the cel.
+
+const hueCache = new Map<string, HTMLCanvasElement>();
+const hsvCache = new Map<string, { w: number; h: number; H: Float32Array; S: Float32Array; V: Float32Array; A: Uint8ClampedArray }>();
+
+export function getHueShifted(src: string, deg: number): CanvasImageSource | undefined {
+  const img = getImage(src);
+  if (!img) return undefined;
+  if (!deg) return img;
+  const step = Math.round(deg / 2) * 2;
+  const key = `${src.length}:${src.slice(-64)}|${step}`;
+  const hit = hueCache.get(key);
+  if (hit) return hit;
+  const ck = `${src.length}:${src.slice(-64)}`;
+  let hsv = hsvCache.get(ck);
+  const w = img.naturalWidth, h = img.naturalHeight;
+  if (!hsv) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d', { willReadFrequently: true })!;
+    x.drawImage(img, 0, 0);
+    const d = x.getImageData(0, 0, w, h).data;
+    const n = w * h, H = new Float32Array(n), S = new Float32Array(n), V = new Float32Array(n), A = new Uint8ClampedArray(n);
+    for (let p = 0; p < n; p++) {
+      const r = d[p * 4] / 255, g = d[p * 4 + 1] / 255, b = d[p * 4 + 2] / 255, a = d[p * 4 + 3];
+      A[p] = a;
+      if (!a) continue;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), dd = mx - mn + 1e-9;
+      let hu = mx === r ? ((g - b) / dd) % 6 : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4;
+      H[p] = (hu * 60 + 360) % 360; S[p] = mx > 0 ? (mx - mn) / mx : 0; V[p] = mx;
+    }
+    hsv = { w, h, H, S, V, A };
+    hsvCache.set(ck, hsv);
+  }
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d')!;
+  const out = x.createImageData(w, h), o = out.data;
+  const a = Math.min(1, Math.abs(step) / 40), sg = 1 + 0.4 * a, vg = 1 + 0.06 * a;
+  for (let p = 0; p < w * h; p++) {
+    if (!hsv.A[p]) continue;
+    const hu = ((hsv.H[p] + step) % 360 + 360) % 360, s = Math.min(1, hsv.S[p] * sg), v = Math.min(1, hsv.V[p] * vg);
+    const cc = v * s, xx = cc * (1 - Math.abs((hu / 60) % 2 - 1)), m = v - cc, q = Math.floor(hu / 60) % 6;
+    const R = [cc, xx, 0, 0, xx, cc][q], G = [xx, cc, cc, xx, 0, 0][q], B = [0, 0, xx, cc, cc, xx][q];
+    o[p * 4] = (R + m) * 255; o[p * 4 + 1] = (G + m) * 255; o[p * 4 + 2] = (B + m) * 255; o[p * 4 + 3] = hsv.A[p];
+  }
+  x.putImageData(out, 0, 0);
+  if (hueCache.size > 40) hueCache.clear();
+  hueCache.set(key, c);
+  return c;
+}
+
 // ---- Audio --------------------------------------------------------------
 
 let ctx: AudioContext | null = null;

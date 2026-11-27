@@ -4,8 +4,13 @@
 import { Scene } from './types';
 import { audioContext, decodeAudio, getBuffer } from './assets';
 
+/** 0 when the clip is linked to a hidden layer, else 1. */
+export const linkFactor = (scene: Scene, clip: Scene['audio'][number]) =>
+  clip.linkLayerId && scene.layers.some(l => l.id === clip.linkLayerId && !l.visible) ? 0 : 1;
+
 export class AudioEngine {
   private nodes: AudioScheduledSourceNode[] = [];
+  private gains = new Map<string, GainNode>();
   private master: GainNode | null = null;
   private recordDest: MediaStreamAudioDestinationNode | null = null;
 
@@ -33,7 +38,8 @@ export class AudioEngine {
       src.buffer = buf;
       src.loop = clip.loop;
       const g = ctx.createGain();
-      g.gain.value = clip.gain;
+      g.gain.value = clip.gain * linkFactor(scene, clip);
+      this.gains.set(clip.id, g);
       src.connect(g).connect(this.master);
       const localStart = from - clip.start;
       if (clip.loop) {
@@ -50,6 +56,17 @@ export class AudioEngine {
     }
   }
 
+  /** Crossfade ambience linked to layers that were just shown or hidden. */
+  updateLinks(scene: Scene) {
+    const ctx = audioContext();
+    for (const clip of scene.audio) {
+      const g = this.gains.get(clip.id);
+      if (!g || !clip.linkLayerId) continue;
+      g.gain.cancelScheduledValues(ctx.currentTime);
+      g.gain.setTargetAtTime(clip.gain * linkFactor(scene, clip), ctx.currentTime, 0.25);
+    }
+  }
+
   get recordStream(): MediaStream | null {
     return this.recordDest?.stream ?? null;
   }
@@ -57,6 +74,7 @@ export class AudioEngine {
   stop() {
     for (const n of this.nodes) { try { n.stop(); } catch { /* already stopped */ } }
     this.nodes = [];
+    this.gains.clear();
     this.master?.disconnect();
     this.master = null;
     this.recordDest = null;

@@ -2,7 +2,7 @@
 // artwork is uploaded. The art itself lives in demoArt.ts (anime style).
 
 import { CharacterLayer, FxLayer, ImageLayer, LOOKS, Scene, defaultRipple, defaultScroll, uid } from './types';
-import { CW, CH, Look as ArtLook, PoseName, animeClouds, animePoles, animeRiver, animeSea, animeSky, cv, drawBlink, drawBody, drawJacket, drawMouth, url } from './demoArt';
+import { CW, CH, Look as ArtLook, PoseName, animeClouds, animePoles, animeRiver, animeSea, animeSky, waterMask, cv, drawBlink, drawBody, drawJacket, drawMouth, url } from './demoArt';
 
 function makeCharacter(name: string, L: ArtLook, x: number, y: number, flip: boolean): CharacterLayer {
   const poseIds: Record<PoseName, string> = { idle: uid('pose'), wave: uid('pose'), happy: uid('pose') };
@@ -21,7 +21,8 @@ function makeCharacter(name: string, L: ArtLook, x: number, y: number, flip: boo
     x, y, scale: 0.9, flip, parallax: 1,
     poses, defaultPoseId: poseIds.idle, poseCues: [],
     mouths, blinkSrc: url(bl), autoBlink: true,
-    jacketColor: '', jacketStrength: 0.9,
+    jacketColor: '', jacketStrength: 0.9, jacketMode: 'tint', jacketHue: 0,
+    faceBox: [180, 236, 240, 195],
   };
 }
 
@@ -44,6 +45,24 @@ function wavDataURL(samples: Float32Array, rate: number): string {
 }
 
 /** Soft running-water bed: filtered noise with slow swells, loop-safe. */
+/** Sea: slow breaking-wave swells over a soft wash, loop-safe. */
+function seaAmbience(): string {
+  const rate = 22050, secs = 8, n = rate * secs;
+  const out = new Float32Array(n);
+  let lp = 0, lp2 = 0;
+  for (let i = 0; i < n; i++) {
+    const white = Math.random() * 2 - 1;
+    lp += (white - lp) * 0.05;
+    lp2 += (white - lp2) * 0.35;
+    const ph = (i / n) * 2; // two waves per loop
+    const wave = Math.pow(Math.max(0, Math.sin(Math.PI * (ph % 1))), 3);
+    out[i] = lp * 1.6 * (0.35 + 0.65 * wave) + lp2 * 0.25 * wave;
+  }
+  const fade = rate * 0.6;
+  for (let i = 0; i < fade; i++) { const k = i / fade; out[i] = out[i] * k + out[n - fade + i] * (1 - k); }
+  return wavDataURL(out.subarray(0, n - fade), rate);
+}
+
 function riverAmbience(): string {
   const rate = 22050, secs = 6, n = rate * secs;
   const out = new Float32Array(n);
@@ -75,10 +94,10 @@ export function demoScene(): Scene {
   const skyL = bg('Sky', animeSky(), { parallax: 0.05 });
   const cloudL = bg('Clouds · 入道雲', animeClouds(), { parallax: 0.1, scroll: { enabled: true, speed: -14 } });
   const riverL = bg('Scenery · River', animeRiver(), {
-    parallax: 0.4, ripple: { enabled: true, top: 0.6, bottom: 0.76, amplitude: 4, wavelength: 20, speed: 0.5 },
+    parallax: 0.4, ripple: { enabled: true, top: 0.6, bottom: 0.76, amplitude: 4, wavelength: 20, speed: 0.5, maskSrc: waterMask(645, 822) },
   });
   const seaL = bg('Scenery · Sea', animeSea(), {
-    parallax: 0.4, visible: false, ripple: { enabled: true, top: 0.52, bottom: 0.745, amplitude: 5, wavelength: 24, speed: 0.4 },
+    parallax: 0.4, visible: false, ripple: { enabled: true, top: 0.52, bottom: 0.8, amplitude: 5, wavelength: 24, speed: 0.4, maskSrc: waterMask(558, 878, true), shoreTop: 0.785, shoreBottom: 0.83, shoreAmount: 5 },
   });
   const polesL = bg('Poles & wires · 電柱', animePoles(), { parallax: 0.5 });
   const kiran = makeCharacter('Kiran', {
@@ -123,7 +142,8 @@ export function demoScene(): Scene {
       { id: uid('line'), characterId: anu.id, start: 9.3, end: 11.6, text: 'ఇదే cel animation magic రా!' },
     ],
     audio: [
-      { id: uid('clip'), name: 'River ambience (generated)', role: 'ambient', src: riverAmbience(), start: 0, gain: 0.35, loop: true },
+      { id: uid('clip'), name: 'River ambience (generated)', role: 'ambient', src: riverAmbience(), start: 0, gain: 0.35, loop: true, linkLayerId: riverL.id },
+      { id: uid('clip'), name: 'Sea waves (generated)', role: 'ambient', src: seaAmbience(), start: 0, gain: 0.4, loop: true, linkLayerId: seaL.id },
     ],
     camera: [
       { id: uid('cam'), t: 0, x: 0, y: 0, zoom: 1 },

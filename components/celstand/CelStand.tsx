@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CharacterLayer, FX_PRESETS, FxKind, FxLayer, ImageLayer, Layer, Scene, defaultRipple, defaultScroll, uid } from './types';
-import { decodeAudio, fileToDataURL, loadImage, onAssetLoaded } from './assets';
-import { hitTest, onScaleHandle, poseAt, renderFrame, stageSize, stageToLayer } from './renderer';
-import { mouthState } from './lipsync';
+import { CharacterLayer, MOUTH_SLOTS, FX_PRESETS, FxKind, FxLayer, ImageLayer, Layer, Scene, defaultRipple, defaultScroll, uid } from './types';
+import { decodeAudio, fileToDataURL, getImage, loadImage, onAssetLoaded } from './assets';
+import { hitTest, onScaleHandle, renderFrame, stageSize, stageToLayer } from './renderer';
 import { AudioEngine, pickVideoMime } from './playback';
-import { cropToContent, SplitResult } from './imageTools';
+import { autoWaterMask, cropToContent, SplitResult } from './imageTools';
 import { demoScene } from './demo';
+import { Breakdown, eio } from './breakdown';
+import { drawingAt, pickMouth, slotLevel } from './sheet';
 import { canExportMp4, exportMp4 } from './exporter';
 import Timeline, { CHAR_COLORS, DragKind, Selection } from './Timeline';
 import Inspector, { patchLayer } from './Inspector';
@@ -61,8 +62,9 @@ const LipSyncMonitor: React.FC<{ scene: Scene; time: number }> = ({ scene, time 
   return (
     <div className="flex flex-wrap gap-3">
       {chars.map((ch, i) => {
-        const st = mouthState(scene, ch, time);
-        const pose = poseAt(ch, time);
+        const d = drawingAt(scene, ch, time);
+        const st = { level: d.source === 'edit' ? slotLevel(d.slot) : d.level, source: d.source, mouth: d.pose?.variants && Object.keys(d.pose.variants).length ? undefined : pickMouth(ch.mouths, d.slot === 'blink' ? 0 : (d.source === 'edit' ? slotLevel(d.slot) : d.level)) };
+        const pose = d.pose;
         const mouths = [...ch.mouths].sort((a, b) => a.openness - b.openness);
         return (
           <div key={ch.id} className="flex items-center gap-2 bg-base-200 border border-base-300 rounded-lg px-2 py-1.5">
@@ -70,7 +72,8 @@ const LipSyncMonitor: React.FC<{ scene: Scene; time: number }> = ({ scene, time 
               <div className="flex items-center gap-1 text-xs text-gray-200 truncate">
                 <span className="w-2 h-2 rounded-full" style={{ background: CHAR_COLORS[i % CHAR_COLORS.length] }} />{ch.name}
               </div>
-              <div className="text-[10px] text-gray-500 truncate">{pose?.name ?? '—'} · {st.source === 'voice' ? '🎙 voice' : st.source === 'text' ? '📝 text' : 'silent'}</div>
+              <div className="text-[10px] text-gray-500 truncate">{ch.pinnedPoseId ? '📌 ' : ''}{pose?.name ?? '—'} · {MOUTH_SLOTS.find(m => m.id === d.slot)?.jp}</div>
+              <div className="text-[10px] text-gray-500 truncate">{st.source === 'voice' ? '🎙 voice' : st.source === 'text' ? '📝 text' : st.source === 'edit' ? '✎ hand-set' : 'silent'} · f{d.frame}</div>
               <div className="h-1 mt-1 bg-base-300 rounded overflow-hidden"><div className="h-full bg-violet-400" style={{ width: `${st.level * 100}%` }} /></div>
             </div>
             {mouths.length ? mouths.map(m => <MouthThumb key={m.id} src={m.src} active={st.mouth?.id === m.id} label={m.name} />)
@@ -106,6 +109,9 @@ const CelStand: React.FC = () => {
   const exportRef = useRef<{ wall: number; rec: MediaRecorder } | null>(null);
   const offlineRef = useRef<{ cancelled: boolean } | null>(null);
   const explodeRef = useRef(0);
+  const introRef = useRef<number | null>(null);
+  const x3dRef = useRef<HTMLDivElement>(null);
+  const breakdownRef = useRef<Breakdown | null>(null);
   const splitRef = useRef(false);
   const loopRef = useRef(loop);
   const engine = useMemo(() => new AudioEngine(), []);
@@ -159,6 +165,10 @@ const CelStand: React.FC = () => {
     setSelection({ type: 'scene' });
     timeRef.current = 0;
     setTime(0);
+    // opening flourish: the cels fly in as a 3D stack, then settle into the picture
+    let reduce = false;
+    try { reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { /* no media queries */ }
+    introRef.current = reduce ? null : performance.now();
   }, []);
 
   // first load: autosave, else demo
@@ -208,6 +218,12 @@ const CelStand: React.FC = () => {
     setPlaying(false);
   }, [engine]);
 
+  // linked ambience follows background visibility (crossfade)
+  const linkSig = scene ? scene.audio.filter(c => c.linkLayerId).map(c => `${c.id}:${scene.layers.find(l => l.id === c.linkLayerId)?.visible}`).join('|') : '';
+  useEffect(() => {
+    if (playRef.current && sceneRef.current) engine.updateLinks(sceneRef.current);
+  }, [linkSig, engine]);
+
   // keep audio in step with edits while playing (e.g. a moved clip)
   const audioSig = scene ? scene.audio.map(c => `${c.id}:${c.start}:${c.gain}:${c.loop}`).join('|') : '';
   useEffect(() => {
@@ -237,19 +253,32 @@ const CelStand: React.FC = () => {
         }
         timeRef.current = t;
       }
-      const target = splitRef.current && !ex ? 1 : 0;
-      explodeRef.current += (target - explodeRef.current) * 0.15;
-      if (Math.abs(target - explodeRef.current) < 0.002) explodeRef.current = target;
+      let intro: number | null = null;
+      if (introRef.current !== null && !ex) {
+        intro = (now - introRef.current) / 1000;
+        const HOLD = 0.4 + 0.22 * s.layers.length + 0.9;
+        explodeRef.current = intro < HOLD ? 1 : 1 - eio((intro - HOLD) / 0.8);
+        if (intro > HOLD + 0.8) { introRef.current = null; intro = null; explodeRef.current = splitRef.current ? 1 : 0; }
+      } else {
+        const target = splitRef.current && !ex ? 1 : 0;
+        explodeRef.current += (target - explodeRef.current) * 0.12;
+        if (Math.abs(target - explodeRef.current) < 0.002) explodeRef.current = target;
+      }
+      if (!breakdownRef.current && x3dRef.current) breakdownRef.current = new Breakdown(x3dRef.current);
+      const k = ex ? 0 : explodeRef.current;
+      breakdownRef.current?.draw(s, timeRef.current, k, intro);
 
       const { w, h } = stageSize(s);
       if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
-      const g = c.getContext('2d')!;
-      const sel = selRef.current;
-      renderFrame(g, s, timeRef.current, {
-        selectedId: sel.type === 'layer' ? sel.id : null,
-        guides: !ex,
-        explode: explodeRef.current,
-      });
+      c.style.visibility = k > 0.05 ? 'hidden' : 'visible';
+      if (k < 0.98) {
+        const g = c.getContext('2d')!;
+        const sel = selRef.current;
+        renderFrame(g, s, timeRef.current, {
+          selectedId: sel.type === 'layer' ? sel.id : null,
+          guides: !ex && k === 0,
+        });
+      }
       if ((playRef.current || ex) && now - lastUi > 50) { lastUi = now; setTime(timeRef.current); if (ex) setExporting(timeRef.current / s.duration); }
     };
     raf = requestAnimationFrame(tick);
@@ -267,7 +296,7 @@ const CelStand: React.FC = () => {
 
   const onStageDown = (e: React.PointerEvent) => {
     const s = sceneRef.current;
-    if (!s || split || exportRef.current) return;
+    if (!s || split || exportRef.current || introRef.current !== null) return;
     const p = toStage(e);
     const t = timeRef.current;
     const selLayer = selection.type === 'layer' ? s.layers.find(l => l.id === selection.id) : undefined;
@@ -292,7 +321,11 @@ const CelStand: React.FC = () => {
     if (d.mode === 'move') update(sc => patchLayer(sc, d.id, { x: Math.round(d.x0 + lp.x - d.ox), y: Math.round(d.y0 + lp.y - d.oy) }));
     else {
       const dist = Math.hypot(lp.x - d.x0, lp.y - d.y0);
-      update(sc => patchLayer(sc, d.id, { scale: Math.max(0.05, Math.round(d.s0 * (dist / d.d0) * 1000) / 1000) }));
+      const scale = Math.max(0.05, Math.round(d.s0 * (dist / d.d0) * 1000) / 1000);
+      // characters grow from their feet, like the reference stand's seat pivot
+      const img = L.kind === 'character' ? getImage(L.poses[0]?.src) : undefined;
+      const y = img ? Math.round(d.y0 + (img.naturalHeight * (d.s0 - scale)) / 2) : L.y;
+      update(sc => patchLayer(sc, d.id, { scale, y }));
     }
   };
   const onStageUp = () => { dragRef.current = null; };
@@ -347,7 +380,7 @@ const CelStand: React.FC = () => {
     const layers = [
       mk('Sky', r.sky, { parallax: 0.05 }),
       mk('Clouds', r.clouds, { parallax: 0.1, scroll: { enabled: true, speed: -25 } }),
-      mk('Scenery', r.scenery, { parallax: 0.4, ripple: water ? { ...defaultRipple(), enabled: true, top: water.top, bottom: water.bottom } : defaultRipple() }),
+      mk('Scenery', r.scenery, { parallax: 0.4, ripple: water ? { ...defaultRipple(), enabled: true, top: water.top, bottom: water.bottom, maskSrc: await autoWaterMask(r.scenery, water.top, water.bottom) } : defaultRipple() }),
     ];
     // put backgrounds under existing characters
     update(sc => {
@@ -506,6 +539,7 @@ const CelStand: React.FC = () => {
     if (typeof MediaRecorder === 'undefined' || !c.captureStream) { say('This browser cannot record video. Try Chrome or Edge.'); return; }
     pause();
     setSplit(false);
+    introRef.current = null;
     explodeRef.current = 0;
     await engine.prepare(s);
     const { mime, ext } = pickVideoMime();
@@ -636,6 +670,7 @@ const CelStand: React.FC = () => {
                 className={`block w-full h-auto touch-none ${split ? 'cursor-default' : 'cursor-crosshair'}`}
                 style={{ aspectRatio: `${w} / ${h}` }}
                 onPointerDown={onStageDown} onPointerMove={onStageMove} onPointerUp={onStageUp} onPointerCancel={onStageUp} />
+              <div ref={x3dRef} onClick={() => { if (introRef.current !== null) { introRef.current = null; explodeRef.current = splitRef.current ? 1 : 0; } }} />
               {exporting !== null && (
                 <div className="absolute inset-x-0 bottom-0 bg-black/70 px-3 py-2 flex items-center gap-3">
                   <span className="text-xs text-white">● {offlineRef.current ? 'Rendering MP4' : 'Recording (keep this tab visible)'} {Math.round(exporting * 100)}%</span>
@@ -655,7 +690,7 @@ const CelStand: React.FC = () => {
             <div className="flex-1" />
             <div className="flex rounded-md overflow-hidden border border-base-300">
               <button onClick={() => setSplit(false)} className={`px-2.5 py-1 text-xs ${!split ? 'bg-violet-600 text-white' : 'text-gray-400 hover:bg-base-300'}`}>Assembled</button>
-              <button onClick={() => setSplit(true)} className={`px-2.5 py-1 text-xs ${split ? 'bg-violet-600 text-white' : 'text-gray-400 hover:bg-base-300'}`}>Split cels</button>
+              <button onClick={() => setSplit(true)} className={`px-2.5 py-1 text-xs ${split ? 'bg-violet-600 text-white' : 'text-gray-400 hover:bg-base-300'}`}>3D layers · 分解</button>
             </div>
           </div>
           <LipSyncMonitor scene={scene} time={time} />
