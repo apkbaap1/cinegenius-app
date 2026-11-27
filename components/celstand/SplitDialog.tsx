@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Btn, FileBtn, Slider } from './ui';
 import { fileToDataURL } from './assets';
 import { SplitResult, splitBackground } from './imageTools';
@@ -12,6 +12,11 @@ const checker = 'bg-[repeating-conic-gradient(#374151_0%_25%,#1f2937_0%_50%)] bg
 
 /** Turns one background painting into three cels: sky, clouds, scenery. */
 const SplitDialog: React.FC<Props> = ({ onClose, onAdd }) => {
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, [onClose]);
   const [src, setSrc] = useState<string | null>(null);
   const [horizon, setHorizon] = useState(0.5);
   const [feather, setFeather] = useState(0.04);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AudioClip, CharacterLayer, ClipRole, ImageLayer, Layer, Pose, Scene, ASPECTS, AspectId, uid } from './types';
+import { AudioClip, CharacterLayer, ClipRole, FX_PRESETS, FxKind, FxLayer, ImageLayer, LOOKS, Layer, Look, Pose, Scene, ASPECTS, AspectId, lookOf, uid } from './types';
 import { Selection } from './Timeline';
 import { Btn, FileBtn, NumField, Section, Slider, Toggle, fmtTime } from './ui';
 import { decodeAudio, fileToDataURL, getImage } from './assets';
@@ -360,6 +360,102 @@ const CueInspector: React.FC<{ scene: Scene; id: string; layerId: string; update
   );
 };
 
+// ------------------------------------------------------------------ effects
+
+const FxInspector: React.FC<{ L: FxLayer; scene: Scene; time: number; update: Update }> = ({ L, scene, time, update }) => {
+  const set = (p: Partial<FxLayer>) => update(s => patchLayer(s, L.id, p as Partial<Layer>));
+  const isLines = L.fx === 'speedlines';
+  return (
+    <>
+      <Section title="Anime effect">
+        <div className="grid grid-cols-2 gap-1">
+          {(Object.keys(FX_PRESETS) as FxKind[]).map(k => (
+            <Btn key={k} className={L.fx === k ? '!bg-violet-600/70' : ''}
+              onClick={() => { const p = FX_PRESETS[k]; set({ fx: k, name: `${p.name} ${p.jp}`, density: p.density, size: p.size, speed: p.speed, wind: p.wind, color: p.color }); }}>
+              {FX_PRESETS[k].jp} <span className="text-gray-400">{FX_PRESETS[k].name}</span>
+            </Btn>
+          ))}
+        </div>
+      </Section>
+      <Section title="When">
+        <div className="grid grid-cols-2 gap-2">
+          <NumField label="From" step={0.05} value={L.start} onChange={start => set({ start: Math.max(0, Math.min(start, L.end - 0.1)) })} />
+          <NumField label="To" step={0.05} value={L.end} onChange={end => set({ end: Math.max(L.start + 0.1, end) })} />
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          <Btn onClick={() => set({ start: Math.min(time, L.end - 0.1) })}>From = playhead</Btn>
+          <Btn onClick={() => set({ end: Math.max(L.start + 0.1, time) })}>To = playhead</Btn>
+          <Btn onClick={() => set({ start: 0, end: scene.duration })}>Whole scene</Btn>
+        </div>
+        <p className="text-[11px] text-gray-500">Fades in and out over 0.4 s. Drag the pink block on the timeline to move it.</p>
+      </Section>
+      <Section title="Look">
+        <Slider label={isLines ? 'Number of lines' : 'Amount'} value={L.density} min={isLines ? 20 : 5} max={isLines ? 200 : 300} step={1} onChange={density => set({ density })} fmt={v => v.toFixed(0)} />
+        <Slider label={isLines ? 'Open centre (smaller = tighter)' : 'Size'} value={L.size} min={0.3} max={3} onChange={size => set({ size })} />
+        <Slider label={isLines ? 'Flicker rate' : 'Speed'} value={L.speed} min={0.1} max={3} onChange={speed => set({ speed })} />
+        {!isLines && <Slider label="Wind" value={L.wind} min={-1} max={1} onChange={wind => set({ wind })} />}
+        <Slider label="Opacity" value={L.opacity} min={0} max={1} onChange={opacity => set({ opacity })} fmt={v => `${Math.round(v * 100)}%`} />
+        <label className="flex items-center gap-2 text-[11px] text-gray-400">Colour
+          <input type="color" value={L.color} onChange={e => set({ color: e.target.value })} className="w-7 h-6 bg-transparent" />
+          {isLines && <><Btn onClick={() => set({ color: '#ffffff' })}>White</Btn><Btn onClick={() => set({ color: '#111111' })}>Black (manga)</Btn></>}
+        </label>
+        <div className="flex gap-3">
+          <Toggle label="Mirror" checked={L.flip} onChange={flip => set({ flip })} />
+          <Btn onClick={() => set({ seed: Math.floor(Math.random() * 1e6) })}>Shuffle</Btn>
+        </div>
+        <p className="text-[11px] text-gray-500">Move this effect up or down in the cel list to put it in front of or behind the characters.</p>
+      </Section>
+    </>
+  );
+};
+
+// ------------------------------------------------------------------ anime finish
+
+const LookSection: React.FC<{ scene: Scene; update: Update }> = ({ scene, update }) => {
+  const look = lookOf(scene);
+  const set = (p: Partial<Look>) => update(s => ({ ...s, look: { ...lookOf(s), ...p } }));
+  const pct = (v: number) => `${Math.round(v * 100)}%`;
+  return (
+    <Section title="Anime look · 撮影">
+      <div className="grid grid-cols-2 gap-1.5">
+        {LOOKS.map(o => (
+          <button key={o.id} title={o.hint}
+            onClick={() => update(s => ({ ...s, look: { ...o.look, letterbox: lookOf(s).letterbox } }))}
+            className={`text-left rounded-md px-2 py-1.5 border transition-colors ${look.preset === o.id ? 'border-violet-400 bg-violet-500/20' : 'border-base-300 hover:bg-base-300/50'}`}>
+            <div className="text-xs text-gray-100">{o.jp}</div>
+            <div className="text-[10px] text-gray-400">{o.name}</div>
+          </button>
+        ))}
+      </div>
+      <p className="text-[11px] text-gray-500">{LOOKS.find(o => o.id === look.preset)?.hint} Fine-tune below.</p>
+      <Toggle label="Cinema letterbox (2.39:1)" checked={look.letterbox} onChange={letterbox => set({ letterbox })} />
+      <details className="group">
+        <summary className="cursor-pointer text-[11px] text-violet-300 select-none">Adjust the finish</summary>
+        <div className="space-y-2 mt-2">
+          <Slider label="Diffusion glow" value={look.diffusion} min={0} max={1} onChange={diffusion => set({ diffusion })} fmt={pct} />
+          <Slider label="Punch (contrast)" value={look.punch} min={0} max={1} onChange={punch => set({ punch })} fmt={pct} />
+          <Slider label="Desaturate" value={look.desaturate} min={0} max={1} onChange={desaturate => set({ desaturate })} fmt={pct} />
+          <Slider label="Faded blacks" value={look.fade} min={0} max={1} onChange={fade => set({ fade })} fmt={pct} />
+          <div className="flex items-center gap-2 text-[11px] text-gray-400">
+            Grade <input type="color" value={look.gradeTop} onChange={e => set({ gradeTop: e.target.value })} className="w-7 h-6 bg-transparent" title="Top (sky)" />
+            → <input type="color" value={look.gradeBottom} onChange={e => set({ gradeBottom: e.target.value })} className="w-7 h-6 bg-transparent" title="Bottom (ground)" />
+          </div>
+          <Slider label="Grade strength" value={look.grade} min={0} max={1} onChange={grade => set({ grade })} fmt={pct} />
+          <Slider label="Sun rays" value={look.rays} min={0} max={1} onChange={rays => set({ rays })} fmt={pct} />
+          {look.rays > 0 && <>
+            <Slider label="Sun X" value={look.raysX} min={-0.2} max={1.2} onChange={raysX => set({ raysX })} fmt={pct} />
+            <Slider label="Sun Y" value={look.raysY} min={-0.2} max={1.2} onChange={raysY => set({ raysY })} fmt={pct} />
+            <label className="flex items-center gap-2 text-[11px] text-gray-400">Ray colour <input type="color" value={look.raysColor} onChange={e => set({ raysColor: e.target.value })} className="w-7 h-6 bg-transparent" /></label>
+          </>}
+          <Slider label="Night (darken)" value={look.darken ?? 0} min={0} max={1} onChange={darken => set({ darken })} fmt={pct} />
+          <Slider label="Vignette" value={look.vignette} min={0} max={1} onChange={vignette => set({ vignette })} fmt={pct} />
+          <Slider label="Film grain" value={look.grain} min={0} max={1} onChange={grain => set({ grain })} fmt={pct} />
+        </div>
+      </details>
+    </Section>
+  );
+};
+
 // ------------------------------------------------------------------ scene
 
 const SceneInspector: React.FC<{ scene: Scene; time: number; update: Update; select: Props['select']; run: Props['run'] }> = ({ scene, time, update, select, run }) => {
@@ -381,6 +477,7 @@ const SceneInspector: React.FC<{ scene: Scene; time: number; update: Update; sel
   const cam = cameraAt(scene, time);
   return (
     <>
+      <LookSection scene={scene} update={update} />
       <Section title="Scene">
         <div className="grid grid-cols-2 gap-2">
           <NumField label="Length (s)" step={0.5} value={scene.duration} onChange={duration => update(s => ({ ...s, duration: Math.max(1, duration) }))} />
@@ -422,6 +519,7 @@ const Inspector: React.FC<Props> = ({ scene, time, selection, update, select, ru
   if (selection.type === 'layer') {
     const L = scene.layers.find(l => l.id === selection.id);
     if (L?.kind === 'image') return <ImageInspector key={L.id} L={L} update={update} run={run} />;
+    if (L?.kind === 'fx') return <FxInspector key={L.id} L={L} scene={scene} time={time} update={update} />;
     if (L?.kind === 'character') return <CharacterInspector key={L.id} ch={L} scene={scene} time={time} update={update} select={select} run={run} />;
   }
   if (selection.type === 'line') return <LineInspector scene={scene} id={selection.id} update={update} select={select} time={time} />;

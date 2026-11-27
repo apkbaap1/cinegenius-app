@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CharacterLayer, Scene } from './types';
+import { CharacterLayer, FxLayer, Scene } from './types';
 
 export type Selection =
   | { type: 'layer'; id: string }
@@ -9,7 +9,7 @@ export type Selection =
   | { type: 'cue'; id: string; layerId: string }
   | { type: 'scene' };
 
-export type DragKind = 'line' | 'clip' | 'cam' | 'cue';
+export type DragKind = 'line' | 'clip' | 'cam' | 'cue' | 'fx';
 
 interface Props {
   scene: Scene;
@@ -121,6 +121,23 @@ const Timeline: React.FC<Props> = ({ scene, time, selection, onSeek, onSelect, o
         </>
       ),
     });
+  });
+
+  const fxLayers = scene.layers.filter((l): l is FxLayer => l.kind === 'fx');
+  if (fxLayers.length) lanes.push({
+    key: 'fx', label: '✨ Effects', render: () => fxLayers.map((f, i) => {
+      const sel = selection.type === 'layer' && selection.id === f.id;
+      const lane = i % 2;
+      return (
+        <div key={f.id}
+          onPointerDown={e => startDrag(e, 'fx', f.id, f.start, { type: 'layer', id: f.id })}
+          className={`absolute rounded px-1 text-[9px] leading-[12px] text-gray-900 overflow-hidden whitespace-nowrap cursor-grab ${sel ? 'ring-2 ring-white' : ''} ${f.visible ? '' : 'opacity-40'}`}
+          style={{ left: f.start * pps, width: Math.max(6, (f.end - f.start) * pps), top: 2 + lane * 13, height: 12, background: 'linear-gradient(90deg,#f9a8d4,#c4b5fd)' }}
+          title={f.name}>
+          {f.name}
+        </div>
+      );
+    }),
   });
 
   lanes.push({

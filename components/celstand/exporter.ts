@@ -24,7 +24,7 @@ function sceneImages(scene: Scene): string[] {
   const out: string[] = [];
   for (const l of scene.layers) {
     if (l.kind === 'image') out.push(l.src);
-    else {
+    else if (l.kind === 'character') {
       for (const p of l.poses) { out.push(p.src); if (p.jacketSrc) out.push(p.jacketSrc); }
       for (const m of l.mouths) out.push(m.src);
       if (l.blinkSrc) out.push(l.blinkSrc);

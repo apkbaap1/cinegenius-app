@@ -1,7 +1,9 @@
 // Draws one frame of a scene at time t. Used by the live editor and the exporter,
 // so what you see in the editor is exactly what gets rendered.
 
-import { ASPECTS, CameraKey, CharacterLayer, ImageLayer, Layer, Pose, Scene } from './types';
+import { ASPECTS, CameraKey, CharacterLayer, ImageLayer, Layer, Pose, Scene, lookOf } from './types';
+import { drawFx } from './fx';
+import { applyLook, letterboxBar } from './look';
 import { getImage, getTinted } from './assets';
 import { mouthState } from './lipsync';
 
@@ -50,6 +52,7 @@ export function poseAt(ch: CharacterLayer, t: number): Pose | undefined {
 
 /** Size of a layer's artwork in layer space (before camera). */
 export function layerBox(layer: Layer): { w: number; h: number } | null {
+  if (layer.kind === 'fx') return null;
   const src = layer.kind === 'image' ? layer.src : layer.poses[0]?.src;
   const img = getImage(src);
   if (!img) return null;
@@ -115,7 +118,7 @@ const blinking = (t: number, seed: string) => {
   let s = 0;
   for (let i = 0; i < seed.length; i++) s += seed.charCodeAt(i);
   const period = 3.1 + (s % 17) / 10;
-  const local = (t + (s % 7) * 0.37) % period;
+  const local = (t + 1.3 + (s % 7) * 0.37) % period; // never mid-blink on frame 0
   return local < 0.11;
 };
 
@@ -172,7 +175,12 @@ function drawSubtitles(g: CanvasRenderingContext2D, scene: Scene, t: number) {
   g.lineJoin = 'round';
   const rows = lines.flatMap(l => wrap(g, l.text, w * 0.86));
   const lh = size * 1.35;
-  let y = h - (scene.aspect === '9:16' ? h * 0.2 : h * 0.07) - (rows.length - 1) * lh;
+  const bar = letterboxBar(lookOf(scene), w, h);
+  // In letterbox, sit the subtitles in the bottom bar when they fit, like a film.
+  const inBar = bar > lh * rows.length + size * 0.4;
+  let y = inBar
+    ? h - bar / 2 - ((rows.length - 1) * lh) / 2 + size * 0.35
+    : h - Math.max(bar + size * 0.6, scene.aspect === '9:16' ? h * 0.2 : h * 0.07) - (rows.length - 1) * lh;
   for (const r of rows) {
     g.lineWidth = size * 0.22;
     g.strokeStyle = 'rgba(0,0,0,0.85)';
@@ -212,7 +220,8 @@ export function renderFrame(g: CanvasRenderingContext2D, scene: Scene, t: number
       g.globalAlpha = 1;
     }
     if (L.kind === 'image') drawImageLayer(g, scene, L, t);
-    else drawCharacter(g, scene, L, t);
+    else if (L.kind === 'character') drawCharacter(g, scene, L, t);
+    else drawFx(g, L, t, w, h);
     if (explode > 0.05) {
       g.strokeStyle = 'rgba(255,255,255,0.6)';
       g.lineWidth = 3;
@@ -223,6 +232,7 @@ export function renderFrame(g: CanvasRenderingContext2D, scene: Scene, t: number
     }
     g.restore();
   });
+  if (!explode) applyLook(g, lookOf(scene), t, w, h);
   if (scene.subtitles && !explode) drawSubtitles(g, scene, t);
 
   if (opts.guides && opts.selectedId && !explode) {

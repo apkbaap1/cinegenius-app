@@ -31,6 +31,21 @@ Open it from the header (**Cel Stand**) or go to `/#cel-stand`.
    Other browsers fall back to real-time recording (keep the tab visible). **Save project** writes one
    `.celstand.json` with all art, audio and timing, which you can open again later to edit.
 
+## Japanese anime style
+
+- **Anime look · 撮影** (Scene settings): one-click compositing finishes: テレビアニメ TV anime, 空と光 Sky drama,
+  水彩・田園 Watercolour pastoral, レトロ・セル Retro 80s cel, 夕焼け Golden hour, 夜景 Night lights. Each is
+  adjustable: diffusion glow, punch, desaturate, faded blacks, two-colour grade, sun rays (透過光), night darkening,
+  vignette, film grain, and a 2.39:1 cinema letterbox (subtitles move into the bar).
+- **Anime effects** (*✨ + Anime effect…*): 桜吹雪 sakura petals, 光の粒 light particles, 雪 snow, 雨 rain, 蛍 fireflies,
+  集中線 speed lines (white, or black for a manga feel). Each one is timed on the timeline's ✨ lane and can sit
+  in front of or behind the characters.
+- **🎨 Anime art prompts**: image-generator prompts in 7 anime styles (TV, cinematic sky, watercolour pastoral,
+  retro cel, shoujo, shounen, chibi) for a base cel plus *edit* prompts for poses, 4 mouths and blink, so the cels line up,
+  and a background prompt built for the splitter. Every prompt, with its negative, stays under 10,000 characters.
+- The demo scene is drawn in anime style: glossy two-highlight eyes, pointed bangs with a highlight ring,
+  two-tone cel shading, 入道雲 cumulonimbus, utility poles (電柱) and a riverbank.
+
 Shortcuts: Space play/pause · ←/→ step a frame · arrows nudge the selected cel · Del remove · Ctrl+Z / Ctrl+Shift+Z.
 
 ## Code map
@@ -43,5 +58,8 @@ Shortcuts: Space play/pause · ←/→ step a frame · arrows nudge the selected
 | `imageTools.ts` | Background split, flat-background removal, jacket isolation |
 | `exporter.ts` | WebCodecs H.264 + AAC/Opus → MP4 (`mp4-muxer`) |
 | `playback.ts` | Audio playback in sync with the timeline; real-time recording fallback |
-| `demo.ts` | The starter scene, drawn in code |
+| `look.ts` | Anime compositing finish (撮影) |
+| `fx.ts` | Anime effects: petals, particles, snow, rain, fireflies, speed lines |
+| `demo.ts`, `demoArt.ts` | The starter scene and its anime-style art, drawn in code |
+| `ArtPrompts.tsx` | Image-generator prompt builder for cels that line up |
 | `CelStand.tsx`, `Inspector.tsx`, `Timeline.tsx`, `SplitDialog.tsx` | Editor UI |

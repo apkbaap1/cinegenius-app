@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CharacterLayer, ImageLayer, Layer, Scene, defaultRipple, defaultScroll, uid } from './types';
+import { CharacterLayer, FX_PRESETS, FxKind, FxLayer, ImageLayer, Layer, Scene, defaultRipple, defaultScroll, uid } from './types';
 import { decodeAudio, fileToDataURL, loadImage, onAssetLoaded } from './assets';
 import { hitTest, onScaleHandle, poseAt, renderFrame, stageSize, stageToLayer } from './renderer';
 import { mouthState } from './lipsync';
@@ -10,6 +10,7 @@ import { canExportMp4, exportMp4 } from './exporter';
 import Timeline, { CHAR_COLORS, DragKind, Selection } from './Timeline';
 import Inspector, { patchLayer } from './Inspector';
 import SplitDialog from './SplitDialog';
+import ArtPrompts from './ArtPrompts';
 import { Btn, FileBtn, fmtTime } from './ui';
 
 // ---------------------------------------------------------------- autosave (IndexedDB)
@@ -91,6 +92,7 @@ const CelStand: React.FC = () => {
   const [loop, setLoop] = useState(true);
   const [split, setSplit] = useState(false);
   const [showSplitDialog, setShowSplitDialog] = useState(false);
+  const [showPrompts, setShowPrompts] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [exporting, setExporting] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -151,7 +153,7 @@ const CelStand: React.FC = () => {
     const audio = await Promise.all(s.audio.map(async c => {
       try { const b = await decodeAudio(c.src); return { ...c, duration: b.duration }; } catch { return c; }
     }));
-    await Promise.all(s.layers.flatMap(l => (l.kind === 'image' ? [l.src] : l.poses.map(p => p.src))).map(src => loadImage(src).catch(() => null)));
+    await Promise.all(s.layers.flatMap(l => (l.kind === 'image' ? [l.src] : l.kind === 'character' ? l.poses.map(p => p.src) : [])).map(src => loadImage(src).catch(() => null)));
     if (resetHistory) { past.current = []; future.current = []; }
     setSceneState({ ...s, audio });
     setSelection({ type: 'scene' });
@@ -303,6 +305,7 @@ const CelStand: React.FC = () => {
       if (kind === 'line') return { ...s, dialogue: s.dialogue.map(l => (l.id === id ? { ...l, start: t, end: t + (l.end - l.start) } : l)) };
       if (kind === 'clip') return { ...s, audio: s.audio.map(c => (c.id === id ? { ...c, start: t } : c)) };
       if (kind === 'cam') return { ...s, camera: s.camera.map(k => (k.id === id ? { ...k, t } : k)) };
+      if (kind === 'fx') return { ...s, layers: s.layers.map(l => (l.id === id && l.kind === 'fx' ? { ...l, start: t, end: t + (l.end - l.start) } : l)) };
       return { ...s, layers: s.layers.map(l => (l.kind === 'character' && l.poseCues.some(c => c.id === id) ? { ...l, poseCues: l.poseCues.map(c => (c.id === id ? { ...c, t } : c)) } : l)) };
     });
   }, [update]);
@@ -368,6 +371,21 @@ const CelStand: React.FC = () => {
     };
     update(sc => ({ ...sc, layers: [...sc.layers, ch] }));
     setSelection({ type: 'layer', id: ch.id });
+  };
+
+  const addFx = (fx: FxKind) => {
+    const s = sceneRef.current!;
+    const { w, h } = stageSize(s);
+    const p = FX_PRESETS[fx];
+    const t0 = Math.round(timeRef.current * 20) / 20;
+    const L: FxLayer = {
+      id: uid('fx'), kind: 'fx', fx, name: `${p.name} ${p.jp}`, visible: true, locked: true, opacity: 1,
+      x: w / 2, y: h / 2, scale: 1, flip: false, parallax: 0,
+      start: fx === 'speedlines' ? t0 : 0, end: fx === 'speedlines' ? Math.min(s.duration, t0 + 1.5) : s.duration,
+      density: p.density, size: p.size, speed: p.speed, wind: p.wind, color: p.color, seed: Math.floor(Math.random() * 1e6),
+    };
+    update(sc => ({ ...sc, layers: [...sc.layers, L] }));
+    setSelection({ type: 'layer', id: L.id });
   };
 
   const duplicateLayer = (id: string) => {
@@ -538,6 +556,7 @@ const CelStand: React.FC = () => {
           className="bg-transparent text-lg font-semibold text-gray-100 border-b border-transparent hover:border-base-300 focus:border-violet-400 outline-none min-w-0 w-56" />
         <span className="text-[11px] text-gray-500 font-mono">{w}×{h} · {scene.fps}fps · {scene.duration}s</span>
         <div className="flex-1" />
+        <Btn onClick={() => setShowPrompts(true)} title="Prompts for generating anime cels that line up">🎨 Anime art prompts</Btn>
         <Btn onClick={undo} disabled={!past.current.length} title="Undo (Ctrl+Z)">↶</Btn>
         <Btn onClick={redo} disabled={!future.current.length} title="Redo (Ctrl+Shift+Z)">↷</Btn>
         <Btn onClick={() => { if (confirm('Replace the current scene with the demo scene? (Save your project first if you need it.)')) { pause(); loadScene(demoScene()); } }}>Demo scene</Btn>
@@ -561,22 +580,28 @@ const CelStand: React.FC = () => {
             <Btn tone="primary" onClick={() => setShowSplitDialog(true)} className="col-span-2">✂ Background from 1 painting</Btn>
             <FileBtn accept="image/*" multiple onFiles={addImageLayers}>+ Image cel</FileBtn>
             <Btn onClick={addCharacter}>+ Character</Btn>
+            <select value="" onChange={e => { if (e.target.value) addFx(e.target.value as FxKind); }}
+              className="col-span-2 bg-base-300/60 hover:bg-base-300 text-gray-200 text-xs rounded-md px-2 py-1.5 cursor-pointer">
+              <option value="">✨ + Anime effect…</option>
+              {(Object.keys(FX_PRESETS) as FxKind[]).map(k => <option key={k} value={k}>{FX_PRESETS[k].name} · {FX_PRESETS[k].jp}</option>)}
+            </select>
           </div>
           <ul className="max-h-[52vh] overflow-auto">
             {layersTopFirst.map(L => {
               const sel = selection.type === 'layer' && selection.id === L.id;
-              const thumb = L.kind === 'image' ? L.src : L.poses[0]?.src;
+              const thumb = L.kind === 'image' ? L.src : L.kind === 'character' ? L.poses[0]?.src : undefined;
               return (
                 <li key={L.id}
                   onClick={() => setSelection({ type: 'layer', id: L.id })}
                   className={`group flex items-center gap-2 px-2 py-1.5 cursor-pointer border-l-2 ${sel ? 'bg-violet-500/15 border-violet-400' : 'border-transparent hover:bg-base-300/40'}`}>
                   <div className="w-10 h-7 rounded bg-base-300/60 overflow-hidden shrink-0 flex items-center justify-center">
-                    {thumb ? <img src={thumb} alt="" className="max-w-full max-h-full object-contain" /> : <span className="text-[10px] text-gray-500">empty</span>}
+                    {thumb ? <img src={thumb} alt="" className="max-w-full max-h-full object-contain" /> : <span className="text-[13px]">{L.kind === 'fx' ? '✨' : ''}</span>}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className={`text-xs truncate ${L.visible ? 'text-gray-200' : 'text-gray-500 line-through'}`}>{L.name}</div>
                     <div className="text-[10px] text-gray-500 truncate">
-                      {L.kind === 'character' ? `character · ${L.poses.length} poses · ${L.mouths.length} mouths` :
+                      {L.kind === 'fx' ? `${FX_PRESETS[L.fx].jp} · ${L.start.toFixed(1)}–${L.end.toFixed(1)}s` :
+                        L.kind === 'character' ? `character · ${L.poses.length} poses · ${L.mouths.length} mouths` :
                         [L.scroll.enabled && 'drift', L.ripple.enabled && 'ripple'].filter(Boolean).join(' · ') || 'image'}
                     </div>
                   </div>
@@ -660,6 +685,7 @@ const CelStand: React.FC = () => {
         </div>
       </div>
 
+      {showPrompts && <ArtPrompts onClose={() => setShowPrompts(false)} />}
       {showSplitDialog && <SplitDialog onClose={() => setShowSplitDialog(false)} onAdd={addSplitLayers} />}
       {(busy || toast) && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[70] bg-base-300 border border-white/10 text-gray-100 text-sm rounded-lg px-4 py-2 shadow-xl">
