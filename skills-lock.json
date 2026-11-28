@@ -1,11 +1,18 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
     "openfilm": {
       "source": "openfilm/openfilm",
       "sourceType": "github",
       "skillPath": "skills/openfilm/SKILL.md",
-      "computedHash": "a30f15632ebb29295dfff7131faf2c212e17f2bae2918a87ef0f716dcca8a157"
+      "computedHash": "b09c32234ec9d8e46f8ba8da435ac2409d875a567f9923e1110f075fbe57086a"
+    },
+    "papercraft": {
+      "source": "xikhar/papercraft",
+      "commit": "30e9aaff8aa244e2237f3ea8921952dcd2e8cda8",
+      "sourceType": "github",
+      "skillPath": "skills/papercraft/SKILL.md",
+      "computedHash": "0f9cda0c6b2456fe0d9e063134800acdc0bef305e3fd297182414da2156606dc"
     }
   }
 }
