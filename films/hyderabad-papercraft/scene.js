@@ -169,15 +169,12 @@ const paintHouseWall = (col, { door = false, floors = 2, doorCol = '#3f7a70', se
   P.layer((g) => { g.fillRect(box.x0 - 1, box.y0 - 1, W + 2, Hh * 0.1 + 1); }, shade(col, -0.22), { lip: 0.6 });               // plinth
   P.layer((g) => { g.fillRect(box.x0 - 1, box.y1 - Hh * 0.09, W + 2, Hh * 0.1); }, mix(col, C.cream, 0.45), { lip: 0.7 });    // parapet band
   const nWin = Math.max(1, Math.round(W / 2.2)), fh = (Hh * 0.8) / floors;
-  P.parts((g, ink) => {
-    for (let f = 0; f < floors; f++) for (let i = 0; i < nWin; i++) {
-      const cx = box.x0 + (i + 0.5) * W / nWin, y = box.y0 + Hh * 0.13 + f * fh + fh * 0.18, ww = Math.min(1.0, W / nWin * 0.45), wh = fh * 0.55;
-      if (door && f === 0 && i === Math.floor(nWin / 2)) { g.fillStyle = ink(doorCol); pathOf(g, arch(cx - 0.55, cx + 0.55, box.y0 + Hh * 0.1, fh * 0.55, 0.5, 6)); g.fill(); continue; }
-      g.fillStyle = ink(shade(col, -0.45)); pathOf(g, arch(cx - ww / 2 - 0.1, cx + ww / 2 + 0.1, y - 0.1, wh * 0.72, wh * 0.36, 6)); g.fill();
-      g.fillStyle = ink(r() < 0.5 ? '#2f5d7c' : '#3f7a70'); g.fillRect(cx - ww / 2 - 0.34, y, 0.26, wh * 0.8); g.fillRect(cx + ww / 2 + 0.08, y, 0.26, wh * 0.8);   // shutters
-    }
-    if (balcony) { g.fillStyle = ink(shade(col, -0.3)); g.fillRect(box.x0 + W * 0.15, box.y0 + Hh * 0.13 + fh - 0.1, W * 0.7, 0.32); }
-  }, { depth: 0.6 });
+  // batched layers (one lip-and-shadow pass each): window frames, then shutters, then the door
+  const win = (fn) => { for (let f = 0; f < floors; f++) for (let i = 0; i < nWin; i++) { const isDoor = door && f === 0 && i === Math.floor(nWin / 2); fn(box.x0 + (i + 0.5) * W / nWin, box.y0 + Hh * 0.13 + f * fh + fh * 0.18, Math.min(1.0, W / nWin * 0.45), fh * 0.55, isDoor); } };
+  P.layer((g) => { win((cx, y, ww, wh, isDoor) => { if (isDoor) return; pathOf(g, arch(cx - ww / 2 - 0.1, cx + ww / 2 + 0.1, y - 0.1, wh * 0.72, wh * 0.36, 6)); g.fill(); }); if (balcony) g.fillRect(box.x0 + W * 0.15, box.y0 + Hh * 0.13 + fh - 0.1, W * 0.7, 0.32); }, shade(col, -0.45), { lip: 0.5 });
+  const shut = r() < 0.5 ? '#2f5d7c' : '#3f7a70';
+  P.layer((g) => { win((cx, y, ww, wh, isDoor) => { if (isDoor) return; g.fillRect(cx - ww / 2 - 0.34, y, 0.26, wh * 0.8); g.fillRect(cx + ww / 2 + 0.08, y, 0.26, wh * 0.8); }); }, shut, { lip: 0.5 });
+  if (door) P.layer((g) => { win((cx, y, ww, wh, isDoor) => { if (!isDoor) return; pathOf(g, arch(cx - 0.55, cx + 0.55, box.y0 + Hh * 0.1, fh * 0.55, 0.5, 6)); g.fill(); }); }, doorCol, { lip: 0.6 });
   P.glow((g) => {
     for (let f = 0; f < floors; f++) for (let i = 0; i < nWin; i++) {
       if (door && f === 0 && i === Math.floor(nWin / 2)) continue;
@@ -199,7 +196,7 @@ const paintTerrace = (col, tank = true) => (P) => {
   P.gradient(shade(col, -0.02), shade(col, -0.14), 0.4); P.felt(0.5);
   P.marks('dab', { color: shade(col, -0.3), alpha: 0.2, size: 0.06, density: 0.3 });
   P.layer((g) => { g.lineWidth = Math.min(box.w, box.h) * 0.08; g.strokeStyle = '#000'; g.strokeRect(box.x0, box.y0, box.w, box.h); }, mix(col, C.cream, 0.4), { lip: 0.6 });
-  if (tank) P.parts((g, ink) => { g.fillStyle = ink('#2c2722'); D.ell(g, box.x0 + box.w * 0.7, box.y0 + box.h * 0.6, Math.min(box.w, box.h) * 0.16, Math.min(box.w, box.h) * 0.16); g.fillStyle = ink('#4a443c', 'print'); D.ell(g, box.x0 + box.w * 0.7, box.y0 + box.h * 0.6, Math.min(box.w, box.h) * 0.07, Math.min(box.w, box.h) * 0.07); });
+  if (tank) P.draw((g) => { const ink = (c) => c; g.fillStyle = ink('#2c2722'); D.ell(g, box.x0 + box.w * 0.7, box.y0 + box.h * 0.6, Math.min(box.w, box.h) * 0.16, Math.min(box.w, box.h) * 0.16); g.fillStyle = '#4a443c'; D.ell(g, box.x0 + box.w * 0.7, box.y0 + box.h * 0.6, Math.min(box.w, box.h) * 0.07, Math.min(box.w, box.h) * 0.07); });
 };
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -235,9 +232,9 @@ const palm = () => P2.drawnPiece((g, ink) => {
   const r = P2.rng(7), hh = 9;
   g.fillStyle = ink('#8a6a44'); P2.fillLimb(g, 0, 0, 0.6, hh * 0.5, 0.2, hh * 0.82, 0.55, 0.36);
   g.fillStyle = ink('#6b4e30', 'print'); for (let k = 1; k < 9; k++) { const t = k / 10, [x, y] = P2.limbPoint(0, 0, 0.6, hh * 0.5, 0.2, hh * 0.82, t); D.rect(g, x - 0.3, y, 0.6, 0.12); }
-  for (const [a, col] of [[-2.6, '#5b7a3e'], [-2.0, '#6e8f48'], [-1.3, '#5b7a3e'], [-0.4, '#6e8f48'], [0.3, '#5b7a3e'], [1.0, '#6e8f48'], [-0.95, '#7f9c52'], [2.4, '#5b7a3e']]) { g.fillStyle = ink(col); P2.fillLeaf(g, 0.2 + Math.cos(a + PI / 2) * 1.5, hh * 0.84 + Math.sin(a + PI / 2) * 0.6, 3.4, a + PI / 2, 0.24); }
+  for (const [a, col] of [[-0.45, '#5b7a3e'], [3.6, '#5b7a3e'], [0.1, '#6e8f48'], [3.05, '#6e8f48'], [0.65, '#7f9c52'], [2.5, '#7f9c52'], [1.15, '#5b7a3e'], [2.0, '#6e8f48'], [1.57, '#7f9c52']]) { g.fillStyle = ink(col); P2.fillLeaf(g, 0.2, hh * 0.84, 3.3, a, 0.26); }
   g.fillStyle = ink('#c8812e'); D.ell(g, 0.0, hh * 0.8, 0.32, 0.3); D.ell(g, 0.5, hh * 0.78, 0.3, 0.28);
-}, { w: 8, h: 10.2, name: 'palm' });
+}, { w: 8, h: 11.4, name: 'palm' });
 // bougainvillea: a dark scalloped body + a lighter card of magenta bracts in front (two cards on one hinge)
 function bougainvillea(x, z, s = 1) {
   const w = between(4.5, 6.5);
@@ -356,10 +353,8 @@ within('charminar', () => {
     plasterBase(P, col);
     P.layer((g) => { g.fillRect(0, Hh * 0.72, W, Hh * 0.28); }, C.red, { lip: 0.7 });                        // the awning band
     P.marks('stripe', { color: C.cream, alpha: 0.7, size: 0.12, region: { x0: 0, y0: Hh * 0.72, w: W, h: Hh * 0.28, x1: W, y1: Hh } });
-    P.parts((g, ink) => {                                               // the bangle racks: rows of coloured rings
-      g.fillStyle = ink('#6b4a2c'); g.fillRect(W * 0.08, Hh * 0.12, W * 0.84, Hh * 0.55);
-      for (let row = 0; row < 4; row++) for (let k = 0; k < Math.floor(W * 2.2); k++) { g.fillStyle = ink(pick([C.red, C.pink, C.gold, '#3f7a70', '#7a4a8a', '#e0952e']), 'print'); const x = W * 0.12 + k * 0.45, y = Hh * 0.18 + row * Hh * 0.12; if (x > W * 0.88) continue; D.ell(g, x, y, 0.2, 0.2); g.fillStyle = ink('#6b4a2c', 'print'); D.ell(g, x, y, 0.1, 0.1); }
-    }, { depth: 0.5 });
+    P.layer((g) => { g.fillRect(W * 0.08, Hh * 0.12, W * 0.84, Hh * 0.55); }, '#6b4a2c', { lip: 0.5 });
+    P.draw((g) => { for (let row = 0; row < 4; row++) for (let k = 0; k < Math.floor(W * 2.2); k++) { const x = W * 0.12 + k * 0.45, y = Hh * 0.18 + row * Hh * 0.12; if (x > W * 0.88) continue; g.fillStyle = [C.red, C.pink, C.gold, '#3f7a70', '#7a4a8a', '#e0952e'][(row * 7 + k * 3 + seed) % 6]; D.ell(g, x, y, 0.2, 0.2); g.fillStyle = '#6b4a2c'; D.ell(g, x, y, 0.1, 0.1); } });
     P.glow((g) => { g.fillRect(W * 0.1, Hh * 0.62, W * 0.8, Hh * 0.04); });
     P.innerShade(shade(col, -0.6), { alpha: 0.3, blurPx: 6 });
   };
@@ -432,7 +427,7 @@ within('golconda', () => {
   for (const [x, z] of [[gx - 10, gz + 14], [gx + 7, gz + 16], [gx - 24, gz + 12]]) bougainvillea(x, z, 0.8);
   for (const [x, z] of [[gx + 22, gz + 14], [gx - 28, gz + 16], [gx + 3, gz + 19]]) put(...palm(), { x, z, cross: true, scale: 0.85, sway: 0.4 });
   // the clap: two hands at the gate, then sound arcs climbing to the top
-  const hands = P2.drawnPiece((g, ink) => { for (const s of [-1, 1]) { g.fillStyle = ink('#c58a5c'); D.poly(g, [[s * 0.1, 0], [s * 0.7, 0.1], [s * 0.9, 1.6], [s * 0.6, 2.4], [s * 0.15, 2.2]]); g.fillStyle = ink('#9a6440', 'print'); for (let k = 0; k < 3; k++) D.rect(g, s * 0.25 + (s < 0 ? -0.5 : 0), 1.3 + k * 0.3, 0.5, 0.05); } g.fillStyle = ink(C.gold); for (const a of [-0.6, 0, 0.6]) D.rect(g, Math.sin(a) * 1.2 - 0.07, 2.6 + Math.cos(a) * 0.3, 0.14, 0.6); }, { w: 2.6, h: 3.6, name: 'clap' });
+  const hands = P2.drawnPiece((g, ink) => { for (const s of [-1, 1]) { g.fillStyle = ink('#c58a5c'); D.poly(g, [[-s * 0.08, 0], [s * 0.7, 0.1], [s * 0.9, 1.6], [s * 0.6, 2.4], [s * 0.15, 2.2]]); g.fillStyle = ink('#9a6440', 'print'); for (let k = 0; k < 3; k++) D.rect(g, s * 0.25 + (s < 0 ? -0.5 : 0), 1.3 + k * 0.3, 0.5, 0.05); } g.fillStyle = ink(C.gold, 'print'); for (const a of [-0.6, 0, 0.6]) D.rect(g, Math.sin(a) * 0.5 - 0.07, 1.6, 0.14, 0.5); }, { w: 2.6, h: 3.6, name: 'clap' });
   GK.hands = put(...hands, { x: gx + 2.5, z: gz + 11, scale: 1.4, group: 'clap' });
   const arcCard = (r) => { const pts = []; for (let i = 0; i <= 24; i++) { const a = PI * i / 24; pts.push([Math.cos(a) * r, Math.sin(a) * r]); } for (let i = 24; i >= 0; i--) { const a = PI * i / 24; pts.push([Math.cos(a) * (r - 0.55), Math.max(0, Math.sin(a) * (r - 0.55))]); } return pts; };
   const arcPaint = (P) => { P.gradient('#f6e3a8', C.gold, 0.5); P.marks('dot', { color: C.cream, alpha: 0.6, size: 0.06, density: 0.5 }); P.glow((g) => { g.fillRect(P.box.x0, P.box.y0, P.box.w, P.box.h); }); };
@@ -561,7 +556,8 @@ const glassWall = (col, seed, bands = false) => (P) => {
   const { box } = P, W = box.w, Hh = box.h, r = P2.rng(seed);
   P.gradient(shade(col, 0.12), shade(col, -0.12), 0.35); P.felt(0.35);
   const cw = 0.9, ch = 1.1;
-  P.parts((g, ink) => { for (let y = 0.6; y < Hh - 0.6; y += ch) for (let x = 0.3; x < W - 0.3; x += cw) { g.fillStyle = ink(shade(col, r() < 0.5 ? 0.18 : -0.05), 'print'); g.fillRect(x, y, cw - 0.16, ch - 0.18); } g.fillStyle = ink('#e9ecea'); g.fillRect(0, Hh - 0.6, W, 0.6); if (bands) for (let y = 2.4; y < Hh - 1; y += 3.3) g.fillRect(0, y, W, 0.32); }, { depth: 0.4 });
+  P.draw((g) => { for (let y = 0.6; y < Hh - 0.6; y += ch) for (let x = 0.3; x < W - 0.3; x += cw) { g.fillStyle = shade(col, r() < 0.5 ? 0.18 : -0.05); g.fillRect(x, y, cw - 0.16, ch - 0.18); } });
+  P.layer((g) => { g.fillRect(0, Hh - 0.6, W, 0.6); if (bands) for (let y = 2.4; y < Hh - 1; y += 3.3) g.fillRect(0, y, W, 0.32); }, '#e9ecea', { lip: 0.5 });
   P.glow((g) => { const rr = P2.rng(seed + 9); for (let y = 0.6; y < Hh - 0.6; y += ch) for (let x = 0.3; x < W - 0.3; x += cw) if (rr() < 0.32) g.fillRect(x, y, cw - 0.16, ch - 0.18); });
   P.draw((g) => { const rr = P2.rng(seed + 9); g.fillStyle = rgba('#ffe3a0', 0.55); for (let y = 0.6; y < Hh - 0.6; y += ch) for (let x = 0.3; x < W - 0.3; x += cw) if (rr() < 0.32) g.fillRect(x, y, cw - 0.16, ch - 0.18); });
   P.marks('stripe', { color: '#ffffff', alpha: 0.12, size: 0.2, angle: 0.8 });
@@ -651,10 +647,10 @@ within('ramoji', () => {
   RJ.stick = stickPivot; stickPivot.rotation.z = 0.5;
   RJ.clap = putNode(clap, { x: rx - 2, z: rz + 6, height: 5.4, yaw: 0.1, group: 'clapper' });
   // the camera crane: a dolly, a long arm, the camera (one card that turns slowly on its hinge's yaw)
-  const crane = P2.drawnPiece((g, ink) => { g.fillStyle = ink('#2a2622'); D.ell(g, -1.4, 0.4, 0.4, 0.4); D.ell(g, 1.4, 0.4, 0.4, 0.4); g.fillStyle = ink('#5a5a58'); D.rect(g, -2, 0.6, 4, 0.7, 0.1); D.rect(g, -0.25, 1.2, 0.5, 3.2); g.fillStyle = ink('#3a3a38'); D.poly(g, [[-4.5, 4.0], [5.5, 6.4], [5.6, 6.9], [-4.6, 4.5]]); g.fillStyle = ink('#2a2622'); D.rect(g, 5.0, 6.6, 1.9, 1.3, 0.15); D.ell(g, 7.1, 7.25, 0.5, 0.5); g.fillStyle = ink('#c33b4d', 'print'); D.ell(g, 5.4, 7.6, 0.12, 0.12); g.fillStyle = ink('#7a7a78'); D.rect(g, -5.2, 3.4, 1.4, 1.4, 0.1); }, { w: 12.6, h: 8.2, name: 'camera crane' });
+  const crane = P2.drawnPiece((g, ink) => { g.fillStyle = ink('#2a2622'); D.ell(g, -1.4, 0.4, 0.4, 0.4); D.ell(g, 1.4, 0.4, 0.4, 0.4); g.fillStyle = ink('#5a5a58'); D.rect(g, -2, 0.6, 4, 0.7, 0.1); D.rect(g, -0.25, 1.2, 0.5, 4.4); g.fillStyle = ink('#3a3a38'); D.poly(g, [[-4.5, 4.0], [5.5, 6.4], [5.6, 6.9], [-4.6, 4.5]]); g.fillStyle = ink('#2a2622'); D.rect(g, 5.0, 6.6, 1.9, 1.3, 0.15); D.ell(g, 7.1, 7.25, 0.5, 0.5); g.fillStyle = ink('#c33b4d', 'print'); D.ell(g, 5.4, 7.6, 0.12, 0.12); g.fillStyle = ink('#7a7a78'); D.rect(g, -5.2, 3.4, 1.4, 1.4, 0.1); }, { w: 12.6, h: 8.2, name: 'camera crane' });
   RJ.crane = put(...crane, { x: rx - 13, z: rz + 3, scale: 1.0, yaw: 0.2 });
   // the record badge: a gold star
-  const star = P2.drawnPiece((g, ink) => { g.fillStyle = ink('#6b4a2c'); D.rect(g, -0.12, 0, 0.24, 4.4); g.fillStyle = ink(C.gold); g.beginPath(); for (let i = 0; i <= 10; i++) { const a = PI / 2 + i / 10 * 2 * PI, r = i % 2 ? 1.25 : 2.9; g.lineTo(Math.cos(a) * r, 7 + Math.sin(a) * r); } g.fill(); g.fillStyle = ink('#f6ecd4', 'print'); D.ell(g, 0, 7, 1.15, 1.15); text(g, 'WORLD', 0, 7.35, 0.34, '#7a2a1a'); text(g, 'RECORD', 0, 6.8, 0.34, '#7a2a1a'); }, { w: 6.2, h: 10.2, name: 'record star' });
+  const star = P2.drawnPiece((g, ink) => { g.fillStyle = ink('#6b4a2c'); D.rect(g, -0.12, 0, 0.24, 6.2); g.fillStyle = ink(C.gold); g.beginPath(); for (let i = 0; i <= 10; i++) { const a = PI / 2 + i / 10 * 2 * PI, r = i % 2 ? 1.25 : 2.9; g.lineTo(Math.cos(a) * r, 7 + Math.sin(a) * r); } g.fill(); g.fillStyle = ink('#f6ecd4', 'print'); D.ell(g, 0, 7, 1.15, 1.15); text(g, 'WORLD', 0, 7.35, 0.34, '#7a2a1a'); text(g, 'RECORD', 0, 6.8, 0.34, '#7a2a1a'); }, { w: 6.2, h: 10.2, name: 'record star' });
   RJ.star = put(...star, { x: rx + 8, z: rz + 2, yaw: -0.15, group: 'record' });
   // spotlights, a director's chair, extras
   const spot = P2.drawnPiece((g, ink) => { g.fillStyle = ink('#3a3a38'); D.poly(g, [[-1, 0], [1, 0], [0.12, 3.2], [-0.12, 3.2]]); g.fillStyle = ink('#2a2622'); D.rect(g, -0.9, 3.0, 1.8, 1.3, 0.2); g.fillStyle = ink('#fff0c0', 'print'); D.ell(g, 0, 3.65, 0.55, 0.5); }, { w: 2.2, h: 4.4, name: 'spotlight' });

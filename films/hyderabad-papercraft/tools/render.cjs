@@ -12,7 +12,7 @@ const http = require('node:http'), fs = require('node:fs'), path = require('node
   const b = await chromium.launch({ args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const p = await b.newPage({ viewport: { width: W, height: Hh } });
   p.on('console', (m) => { const t = m.text(); if (!/GPU stall|willReadFrequently|GL Driver/.test(t)) console.log('  page:', t.slice(0, 400)); });
-  p.on('pageerror', (e) => console.log('  ERROR:', e.message));
+  p.on('pageerror', (e) => console.log('  ERROR:', e.stack));
   const t0 = Date.now();
   await p.goto(`http://localhost:8766/index.html?capture&size=${W}x${Hh}`);
   await p.waitForFunction('window.__papercraft && window.__papercraft.ready', null, { timeout: 1800000, polling: 2000 });
