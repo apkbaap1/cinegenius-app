@@ -34,6 +34,7 @@ import { renderScoreOffline } from 'papercraft/lib/paper-music.js';
 import { checkContinuity, polarCameraPos } from 'papercraft/lib/paper-motion.js';
 import { createHarness } from './harness.js';
 
+const T0 = performance.now(), stage = (n) => console.log('stage', n, Math.round(performance.now() - T0), 'ms');
 const D = P2.draw2, shade = P2.shade, mix = P2.mix, rgba = P2.rgba;
 const C = {
   ground: '#d6c6a0', groundB: '#cbb98f', groundC: '#ddd0ae', road: '#efe4c8', roadEdge: '#bfa77e', tile: '#e4d6b6',
@@ -205,10 +206,10 @@ const paintTerrace = (col, tank = true) => (P) => {
 // pieces
 // ---------------------------------------------------------------------------------------------------------------
 // a city house: a folded box with a flat terrace, pastel lime-plaster walls
-function house(x, z, { w = between(4.2, 6.2), d = between(3.6, 5), h = between(4.6, 8), col = pick(C.walls), yaw = null, floors = null } = {}) {
+function house(x, z, { w = between(4.2, 6.2), d = between(3.6, 5), h = between(4.6, 8), col = pick(C.walls), yaw = null, floors = null, ppu = 26 } = {}) {
   const seed = Math.floor(rnd() * 1000), fl = floors || (h > 6.4 ? 3 : 2), doorCol = pick(C.doors);
   const node = prismFold([[-w / 2, 0], [w / 2, 0], [w / 2, -d], [-w / 2, -d]], {
-    h, roof: 'flat', paper: H.paper, center: true, print: H.cardOpts(x, z),
+    h, roof: 'flat', paper: H.paper, center: true, print: { ...H.cardOpts(x, z), pxPerUnit: ppu },
     paints: { wall: [paintHouseWall(col, { door: true, floors: fl, doorCol, seed, balcony: rnd() < 0.4 }), paintHouseWall(shade(col, -0.04), { floors: fl, seed: seed + 1 }), paintHouseWall(col, { floors: fl, seed: seed + 2 }), paintHouseWall(shade(col, -0.04), { floors: fl, seed: seed + 3 })], roof: paintTerrace('#cbbd9e', rnd() < 0.7) },
   });
   mark(x, z, Math.max(w, d) * 0.62);
@@ -306,6 +307,7 @@ const scooter = () => P2.drawnPiece((g, ink) => {
 const streetLamp = () => [P2.fromDrawing((g) => { D.rect(g, -0.09, 0, 0.18, 4.6); D.rect(g, -0.32, 4.4, 0.64, 0.7, 0.08); D.poly(g, [[-0.42, 5.05], [0, 5.45], [0.42, 5.05]]); D.rect(g, -0.3, 0, 0.6, 0.22, 0.05); }, { w: 1.0, h: 5.5, name: 'lamp' }),
   (P) => { const { box, g } = P; P.fill('#3a3430'); P.draw(() => { g.fillStyle = '#ffd27a'; g.fillRect(box.x0 + box.w * 0.25, box.y0 + box.h * 0.82, box.w * 0.5, box.h * 0.1); }); P.glow((gc) => { gc.fillRect(box.x0 + box.w * 0.25, box.y0 + box.h * 0.82, box.w * 0.5, box.h * 0.1); }); P.innerShade('#1e120a', { alpha: 0.4, blurPx: 4 }); }];
 
+stage('1. CHARMINAR');
 // ---------------------------------------------------------------------------------------------------------------
 // 1. CHARMINAR and Laad Bazaar
 // ---------------------------------------------------------------------------------------------------------------
@@ -389,6 +391,7 @@ within('charminar', () => {
   bougainvillea(12, 2, 0.9); bougainvillea(-9, -11, 0.8);
 });
 
+stage('2. GOLCONDA');
 // ---------------------------------------------------------------------------------------------------------------
 // 2. GOLCONDA: granite terraces stepping up, battlements, the Baradari pavilion; sound arcs climbing on the clap
 // ---------------------------------------------------------------------------------------------------------------
@@ -436,6 +439,7 @@ within('golconda', () => {
   for (let i = 0; i < 4; i++) GK.arcs.push(put(arcCard(2.2 + i * 1.3), arcPaint, { x: gx + 2.5 + i * 0.3, z: gz + 8 - i * 3.6, yaw: 0.25, group: 'arcs' }));
 });
 
+stage('3. HUSSAIN');
 // ---------------------------------------------------------------------------------------------------------------
 // 3. HUSSAIN SAGAR: the Buddha on his rock island, Necklace Road lamps, paper boats
 // ---------------------------------------------------------------------------------------------------------------
@@ -475,6 +479,7 @@ within('lake', () => {
   for (const [k, a] of [[1, 0.6], [3, 1.3], [0, 2.0], [6, 2.9], [4, 3.6]]) { const x = LAKE.x + Math.cos(a) * (LAKE.rx + 5.6), z = LAKE.z + Math.sin(a) * (LAKE.rz + 5.2); put(...person(PEOPLE[k]), { x, z }); }
 });
 
+stage('4. FOOD');
 // ---------------------------------------------------------------------------------------------------------------
 // 4. FOOD: the dum biryani handi (sealed -> open), the UNESCO rosette, an Irani cafe with chai and Osmania biscuits
 // ---------------------------------------------------------------------------------------------------------------
@@ -547,6 +552,7 @@ within('food', () => {
   mark(fx, fz - 4, 12); mark(fx + 9, fz - 13, 7);
 });
 
+stage('5. HITEC');
 // ---------------------------------------------------------------------------------------------------------------
 // 5. HITEC CITY: glass towers, the curved Cyber Towers, a tower crane; DURGAM CHERUVU cable bridge (night colours)
 // ---------------------------------------------------------------------------------------------------------------
@@ -607,6 +613,7 @@ within('durgam', () => {
   for (let k = 0; k < 3; k++) H.lamp(dx - 10 + k * 10, 3, dz + 3, 0.7, 12);
 });
 
+stage('6. RAMOJI');
 // ---------------------------------------------------------------------------------------------------------------
 // 6. RAMOJI FILM CITY: film-set flats braced behind, a camera crane, the clapperboard, the record badge
 // ---------------------------------------------------------------------------------------------------------------
@@ -659,6 +666,7 @@ within('ramoji', () => {
   mark(rx, rz - 6, 16);
 });
 
+stage('7. the old-c');
 // ---------------------------------------------------------------------------------------------------------------
 // 7. the old-city LANES: houses close together, walkers and vehicles that move, kites in the air
 // ---------------------------------------------------------------------------------------------------------------
@@ -672,6 +680,7 @@ within('lanes', () => {
 // autos on the main roads (part of the city: up from the first shot)
 for (const [ri, off, sp] of [[0, 0.1, 5], [0, 0.6, 4.4], [1, 0.2, 5.5], [1, 0.7, 4.8], [2, 0.4, 4.6], [3, 0.3, 5.2], [4, 0.5, 4.6], [6, 0.2, 5]]) MOVERS.push({ h: put(...autoRickshaw(), { x: 0, z: 0, yaw: 0, group: 'city' }), path: ROADS[ri], speed: sp, offset: off, side: 0.9 });
 
+stage('8. the city ');
 // ---------------------------------------------------------------------------------------------------------------
 // 8. the city fill: houses, trees and granite between the districts (seeded, varied, never on roads or water)
 // ---------------------------------------------------------------------------------------------------------------
@@ -679,7 +688,7 @@ const nearest = (x, z) => { let best = 'city', bd = 1e9; for (const [k, r] of [[
 rnd = P2.rng(505);
 {
   let n = 0;
-  for (let gz = -128; gz < 100; gz += 7.2) for (let gx = -130; gx < 140; gx += 7.4) {
+  for (let gz = -128; gz < 100; gz += 8.6) for (let gx = -130; gx < 140; gx += 8.8) {
     const x = gx + (rnd() - 0.5) * 4.5, z = gz + (rnd() - 0.5) * 4.5;
     if (!free(x, z, 1.2)) continue;
     const g = nearest(x, z), roll = rnd();
@@ -697,6 +706,7 @@ rnd = P2.rng(505);
   console.log('fill pieces', n);
 }
 
+stage('life: pigeon');
 // ---------------------------------------------------------------------------------------------------------------
 // life: pigeons, kites, steam, boats, movers, the crane, the bridge colours
 // ---------------------------------------------------------------------------------------------------------------
