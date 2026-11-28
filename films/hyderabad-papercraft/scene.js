@@ -53,7 +53,7 @@ const PI = Math.PI;
 const H = createHarness({
   ground: C.ground, bounds: { x0: -135, x1: 145, z0: -135, z1: 105 }, autoOpen: false, roam: true, crossTurn: 40,
   view: { pitch: 48, dist: 70, target: [0, 2, 4] }, subject: [0, 0],
-  lens: { haze: '#d9c08f', hazeStart: 40, hazeEnd: 130, hazeAmount: 0.28, aoTint: '#5a3214', shadowTint: '#3a200c' },
+  lens: { haze: '#d9c08f', hazeStart: 40, hazeEnd: 130, hazeAmount: 0.25, aoTint: '#5a3214', shadowTint: '#3a200c', saturation: 1.06, tint: [1.0, 0.99, 0.985], greenDesat: 0.12, exposure: 0.86 },
 });
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -428,7 +428,6 @@ within('golconda', () => {
   for (const [x, z] of [[gx + 22, gz + 14], [gx - 28, gz + 16], [gx + 3, gz + 19]]) put(...palm(), { x, z, cross: true, scale: 0.85, sway: 0.4 });
   // the clap: two hands at the gate, then sound arcs climbing to the top
   const hands = P2.drawnPiece((g, ink) => { for (const s of [-1, 1]) { g.fillStyle = ink('#c58a5c'); D.poly(g, [[-s * 0.08, 0], [s * 0.7, 0.1], [s * 0.9, 1.6], [s * 0.6, 2.4], [s * 0.15, 2.2]]); g.fillStyle = ink('#9a6440', 'print'); for (let k = 0; k < 3; k++) D.rect(g, s * 0.25 + (s < 0 ? -0.5 : 0), 1.3 + k * 0.3, 0.5, 0.05); } g.fillStyle = ink(C.gold, 'print'); for (const a of [-0.6, 0, 0.6]) D.rect(g, Math.sin(a) * 0.5 - 0.07, 1.6, 0.14, 0.5); }, { w: 2.6, h: 3.6, name: 'clap' });
-  GK.hands = put(...hands, { x: gx + 2.5, z: gz + 11, scale: 1.4, group: 'clap' });
   const arcCard = (r) => { const pts = []; for (let i = 0; i <= 24; i++) { const a = PI * i / 24; pts.push([Math.cos(a) * r, Math.sin(a) * r]); } for (let i = 24; i >= 0; i--) { const a = PI * i / 24; pts.push([Math.cos(a) * (r - 0.55), Math.max(0, Math.sin(a) * (r - 0.55))]); } return pts; };
   const arcPaint = (P) => { P.gradient('#f6e3a8', C.gold, 0.5); P.marks('dot', { color: C.cream, alpha: 0.6, size: 0.06, density: 0.5 }); P.glow((g) => { g.fillRect(P.box.x0, P.box.y0, P.box.w, P.box.h); }); };
   for (let i = 0; i < 4; i++) GK.arcs.push(put(arcCard(2.2 + i * 1.3), arcPaint, { x: gx + 2.5 + i * 0.3, z: gz + 8 - i * 3.6, yaw: 0.25, group: 'arcs' }));
@@ -536,7 +535,6 @@ within('food', () => {
   }, { w: 6.8, h: 4.6, name: 'chai table' });
   FD.table = put(...table, { x: fx + 9, z: fz - 4.5, scale: 1.05, yaw: -0.05, group: 'chai' });
   const kettle = P2.drawnPiece((g, ink) => { g.fillStyle = ink('#9a948a'); D.ell(g, 0, 1.2, 1.1, 1.1); D.poly(g, [[0.8, 1.4], [1.9, 2.4], [1.7, 2.6], [0.6, 1.8]]); g.fillStyle = ink('#6a645a'); D.rect(g, -0.4, 2.1, 0.8, 0.4, 0.1); g.fillStyle = ink('#4a443c'); D.rect(g, -1.2, 0, 2.4, 0.3, 0.1); g.fillStyle = ink('#c8c2b6', 'print'); D.ell(g, -0.4, 1.5, 0.25, 0.4); }, { w: 4, h: 2.8, name: 'kettle' });
-  FD.kettle = put(...kettle, { x: fx + 14.5, z: fz - 6, scale: 1.2, group: 'chai' });
   FD.vendor = put(...person(PEOPLE[5]), { x: fx + 16, z: fz - 7.5, scale: 1.05, group: 'chai' });
   FD.steam = [[fx - 3, 9.6, fz - 2.3], [fx + 6.8, 4.9, fz - 4.5], [fx + 7.8, 4.9, fz - 4.5], [fx + 10.7, 4.9, fz - 4.5], [fx + 16.5, 3.3, fz - 6]];
   // street-food dressing: a mirchi bajji cart, people, neem shade
@@ -598,12 +596,18 @@ within('durgam', () => {
   HT.deck = put(deck, deckPaint, { x: dx, z: dz + 0.6, yaw: 0 });
   const pylon = P2.fromDrawing((g) => {
     D.poly(g, [[-1.6, 0], [1.6, 0], [0.4, 22], [-0.4, 22]]); D.rect(g, -0.6, 21.6, 1.2, 1.6, 0.3);
-    g.lineCap = 'round';
-    for (let k = 0; k < 7; k++) for (const s of [-1, 1]) { const ty = 21 - k * 1.3, bx = s * (3 + k * 1.75); g.beginPath(); const dxx = bx - 0, dyy = 1.7 - ty, L = Math.hypot(dxx, dyy), nx = -dyy / L * 0.13, ny = dxx / L * 0.13; g.moveTo(nx, ty + ny); g.lineTo(bx + nx, 1.7 + ny); g.lineTo(bx - nx, 1.7 - ny); g.lineTo(-nx, ty - ny); g.closePath(); g.fill(); }
     D.rect(g, -14.5, 1.3, 29, 0.5);
   }, { w: 30, h: 23.4, name: 'pylon', res: 60 });
-  const pylonPaint = (P) => { const { box } = P; P.gradient('#e2ded2', '#bdb8ab', 0.4); P.felt(0.3); P.glow((g) => { g.fillRect(box.x0, box.y0, box.w, box.h); }); P.marks('dot', { color: '#8a8478', alpha: 0.3, size: 0.02, density: 0.3 }); };
+  const pylonPaint = (P) => { P.gradient('#e2ded2', '#bdb8ab', 0.4); P.felt(0.3); P.marks('dot', { color: '#8a8478', alpha: 0.3, size: 0.02, density: 0.3 }); };
   HT.pylon = put(pylon, pylonPaint, { x: dx, z: dz - 0.4, yaw: 0, edge: 0.05 });
+  // the stay cables: thin lit strips fanned from the pylon to the deck (they change colour at night)
+  HT.cableMat = new THREE.MeshBasicMaterial({ color: '#f0e6d0', toneMapped: false, side: THREE.DoubleSide });
+  HT.cables = new THREE.Group(); HT.cables.position.set(dx, 0, dz - 0.4); HT.cables.visible = false; H.scene.add(HT.cables);
+  for (let k = 0; k < 7; k++) for (const sgn of [-1, 1]) {
+    const ty = 21 - k * 1.5, bx = sgn * (3.5 + k * 1.75), by = 1.8, L = Math.hypot(bx, ty - by);
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(L, 0.13), HT.cableMat);
+    m.position.set(bx / 2, (ty + by) / 2, 0.05); m.rotation.z = Math.atan2(by - ty, bx); HT.cables.add(m);
+  }
   // granite boulders round the lake, the rock faces it is famous for
   for (const [x, z, s] of [[dx - 20, dz - 5, 1.2], [dx + 19, dz - 6, 1.3], [dx - 17, dz + 7, 0.9], [dx + 16, dz + 7, 1.0], [dx - 8, dz - 10, 1.1], [dx + 6, dz - 11, 1.2], [dx - 24, dz + 3, 0.9], [dx + 24, dz + 2, 1.0]]) { put(...boulders(Math.floor(x * 3 + z * 5)), { x, z, cross: 'half', scale: s }); mark(x, z, 3); }
   for (let k = 0; k < 3; k++) H.lamp(dx - 10 + k * 10, 3, dz + 3, 0.7, 12);
@@ -672,6 +676,16 @@ within('lanes', () => {
   const walkers = [[0, 0.0, 0.9], [2, 0.18, 0.8], [4, 0.35, 1.0], [1, 0.52, 0.85], [6, 0.7, 0.95], [3, 0.86, 0.9]];
   for (const [k, off, sp] of walkers) MOVERS.push({ h: put(...person(PEOPLE[k]), { x: 0, z: 0, yaw: 0 }), path: lane, speed: sp * 1.2, offset: off, side: (k % 2 ? 1 : -1) * 0.9 });
   MOVERS.push({ h: put(...scooter(), { x: 0, z: 0, yaw: 0 }), path: lane, speed: 4.2, offset: 0.3, side: -0.5 });
+  for (const [k, off, sp] of [[5, 0.1, 0.7], [3, 0.44, 1.1], [0, 0.62, 0.75], [4, 0.94, 0.9]]) MOVERS.push({ h: put(...person(PEOPLE[k]), { x: 0, z: 0, yaw: 0 }), path: lane, speed: sp, offset: off, side: (k % 2 ? -1 : 1) * 1.1 });
+  // the old-city rows: houses shoulder to shoulder on both sides of the lane, a fruit cart and a chai stall between
+  const P = lane.pts;
+  for (let i = 4; i < P.length - 4; i += 11) for (const side of [-1, 1]) {
+    const [ax, az] = P[i], [bx, bz] = P[Math.min(P.length - 1, i + 2)], dir = Math.atan2(bx - ax, bz - az), nx = Math.cos(dir), nz = -Math.sin(dir);
+    const x = ax + nx * side * 6.2, z = az + nz * side * 6.2;
+    if (!free(x, z, -0.5)) continue;
+    house(x, z, { w: between(4.6, 5.6), d: between(3.8, 4.6), h: between(5.5, 8.5), yaw: dir + (side > 0 ? -PI / 2 : PI / 2) + PI });
+  }
+  put(...person(PEOPLE[5]), { x: -26, z: 17 }); bougainvillea(-17, 33, 0.85); bougainvillea(-31, 27, 0.8);
 });
 // autos on the main roads (part of the city: up from the first shot)
 for (const [ri, off, sp] of [[0, 0.1, 5], [0, 0.6, 4.4], [1, 0.2, 5.5], [1, 0.7, 4.8], [2, 0.4, 4.6], [3, 0.3, 5.2], [4, 0.5, 4.6], [6, 0.2, 5]]) MOVERS.push({ h: put(...autoRickshaw(), { x: 0, z: 0, yaw: 0, group: 'city' }), path: ROADS[ri], speed: sp, offset: off, side: 0.9 });
@@ -682,43 +696,58 @@ stage('8. the city ');
 // ---------------------------------------------------------------------------------------------------------------
 const nearest = (x, z) => { let best = 'city', bd = 1e9; for (const [k, r] of [['charminar', 30], ['lanes', 22], ['golconda', 30], ['lake', 30], ['food', 22], ['hitec', 34], ['durgam', 22], ['ramoji', 30]]) { const [ax, az] = k === 'durgam' ? [DURGAM.x, DURGAM.z] : AT[k]; const d = Math.hypot(x - ax, z - az); if (d < r && d < bd) { bd = d; best = k === 'charminar' ? 'oldcity' : k; } } return best; };
 rnd = P2.rng(505);
-{
+const NOFILL = /nofill/.test(location.search);
+// print once, stamp many: a dozen house designs (folded once, then cloned open: each clone rises whole on its hinge),
+// six neem / four palm / five boulder prints and four bougainvillea cards shared by the whole fill
+const PROTO = { houses: [], neem: [], palm: [], rock: [], bush: [] };
+if (!NOFILL) {
+  for (let k = 0; k < 12; k++) {
+    const w = between(4.2, 6.2), d = between(3.6, 5), h = between(4.6, 8), col = C.walls[k % C.walls.length], seed = 300 + k, fl = h > 6.4 ? 3 : 2, doorCol = C.doors[k % C.doors.length];
+    const node = prismFold([[-w / 2, 0], [w / 2, 0], [w / 2, -d], [-w / 2, -d]], { h, roof: 'flat', paper: H.paper, center: true, print: { ...H.cardOpts(0, 0), pxPerUnit: 26 },
+      paints: { wall: [paintHouseWall(col, { door: true, floors: fl, doorCol, seed, balcony: k % 3 === 0 }), paintHouseWall(shade(col, -0.04), { floors: fl, seed: seed + 1 }), paintHouseWall(col, { floors: fl, seed: seed + 2 }), paintHouseWall(shade(col, -0.04), { floors: fl, seed: seed + 3 })], roof: paintTerrace('#cbbd9e', k % 4 !== 0) } });
+    PROTO.houses.push({ node, w, d, h });
+  }
+  for (let k = 0; k < 6; k++) { const [pts, paint] = neemTree(); PROTO.neem.push({ pts, paint, materials: H.printed(pts, paint, { cross: true }) }); }
+  for (let k = 0; k < 3; k++) { const [pts, paint] = palm(); PROTO.palm.push({ pts, paint, materials: H.printed(pts, paint, { cross: true }) }); }
+  for (let k = 0; k < 5; k++) { const [pts, paint] = boulders(700 + k * 37); PROTO.rock.push({ pts, paint, materials: H.printed(pts, paint, { cross: true }) }); }
+}
+const stamp = (list, x, z, o) => { const v = list[Math.floor(rnd() * list.length) % list.length]; return put(v.pts, v.paint, { ...o, x, z, materials: v.materials }); };
+if (!NOFILL) {
   let n = 0;
   for (let gz = -128; gz < 100; gz += 8.6) for (let gx = -130; gx < 140; gx += 8.8) {
     const x = gx + (rnd() - 0.5) * 4.5, z = gz + (rnd() - 0.5) * 4.5;
     if (!free(x, z, 1.2)) continue;
     const g = nearest(x, z), roll = rnd();
-    // near Golconda, HITEC and Durgam the ground is rocky and open: fewer houses
     const rocky = g === 'golconda' || g === 'durgam' || g === 'ramoji';
     within(g, () => {
-      if (roll < (rocky ? 0.2 : 0.62)) house(x, z);
-      else if (roll < 0.74) { put(...neemTree(), { x, z, cross: true, scale: between(0.75, 1.0), sway: 0.4 }); mark(x, z, 2.4); }
-      else if (roll < 0.82) { put(...palm(), { x, z, cross: true, scale: between(0.7, 0.9), sway: 0.4 }); mark(x, z, 2.2); }
-      else if (roll < 0.9) { bougainvillea(x, z, between(0.7, 0.9)); mark(x, z, 2.4); }
-      else { put(...boulders(Math.floor(rnd() * 9999)), { x, z, cross: 'half', scale: between(0.7, 1.1) }); mark(x, z, 2.6); }
+      if (roll < (rocky ? 0.2 : 0.62)) {
+        const v = PROTO.houses[Math.floor(rnd() * PROTO.houses.length)], s = between(0.9, 1.1);
+        const node = v.node.clone(true);
+        putNode(node, { x, z, height: v.h * s, scale: s, yaw: (rnd() - 0.5) * 0.5 }); mark(x, z, Math.max(v.w, v.d) * 0.62 * s);
+      }
+      else if (roll < 0.74) { stamp(PROTO.neem, x, z, { cross: true, scale: between(0.75, 1.0), sway: 0.4 }); mark(x, z, 2.4); }
+      else if (roll < 0.82) { stamp(PROTO.palm, x, z, { cross: true, scale: between(0.7, 0.9), sway: 0.4 }); mark(x, z, 2.2); }
+      else if (roll < 0.88) { bougainvillea(x, z, between(0.7, 0.9)); mark(x, z, 2.4); }
+      else { stamp(PROTO.rock, x, z, { cross: 'half', scale: between(0.7, 1.1) }); mark(x, z, 2.6); }
     });
     n++;
   }
   console.log('fill pieces', n);
 }
-
-stage('life: pigeon');
-// ---------------------------------------------------------------------------------------------------------------
-// life: pigeons, kites, steam, boats, movers, the crane, the bridge colours
-// ---------------------------------------------------------------------------------------------------------------
+stage('fill done');
 const life = createLife({ scene: H.scene, camera: H.camera, heroHeight: 3.6, seed: 9, box: { w: 70, d: 60, h: 14 } });
 life.flock({ size: 9, every: 7, cross: 5, height: 5, span: 80, colors: ['#a8a4a0', '#c9c4bc', '#8e8a86'], night: 0.2 });
-const steam = life.puffs({ at: FD.steam, perEmitter: 4, life: 3.5, rise: 0.6, size: [0.3, 0.55], colors: ['#f6efe2', '#ece2d0'] });
+const steam = life.puffs({ at: FD.steam, perEmitter: 3, life: 3.0, rise: 0.55, size: [0.14, 0.26], colors: ['#f6efe2', '#ece2d0'] });
 life.motes({ count: 40, colors: ['#f6e6b8', '#f0d9a0'], size: [0.05, 0.08], height: [1, 8] });
 void steam;
 // kites: diamond cards with tails, hung in the air over the old city and the lanes, bobbing on the wind
 const KITES = [];
-for (const [i, [x, y, z, col]] of [[-20, 17, 18, C.red], [-30, 21, 24, C.saffron], [-12, 19, 30, '#2f5d7c'], [-34, 15, 10, C.pink], [6, 22, 18, '#3f7a70'], [-4, 18, -12, '#7a4a8a'], [12, 20, 2, C.gold]].entries()) {
+for (const [i, [x, y, z, col]] of [[-24, 11, 20, C.red], [-30, 13, 15, C.saffron], [-14, 12, 22, '#2f5d7c'], [-36, 10, 22, C.pink], [-8, 13, 14, '#3f7a70'], [-4, 18, -12, '#7a4a8a'], [12, 20, 2, C.gold], [-20, 14, 10, '#c33b4d']].entries()) {
   const kp = P2.fromDrawing((g) => { D.poly(g, [[0, 0], [0.9, 1.3], [0, 2.8], [-0.9, 1.3]]); }, { w: 2, h: 2.9, name: 'kite' });
   const k = makeCard(kp, { paper: H.paper, thickness: 0.05, edgeWidth: 0.05, pxPerUnit: 40, seed: 1200 + i, folds: [], paint: (P) => { P.gradient(shade(col, 0.1), shade(col, -0.1), 0.5); P.layer((g) => { g.beginPath(); g.moveTo(0, 0); g.lineTo(0.9, 1.3); g.lineTo(0, 1.3); g.closePath(); g.fill(); }, mix(col, C.cream, 0.5), { lip: 0.5 }); P.draw((g) => { g.strokeStyle = '#3a2414'; g.lineWidth = 0.06; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, 2.8); g.moveTo(-0.9, 1.3); g.lineTo(0.9, 1.3); g.stroke(); }); } });
   const tail = makeCard(P2.fromDrawing((g) => { D.rect(g, -0.08, 0, 0.16, 2.4); for (let q = 0; q < 3; q++) D.poly(g, [[-0.35, 0.4 + q * 0.7], [0.35, 0.4 + q * 0.7], [0, 0.75 + q * 0.7]]); }, { w: 0.8, h: 2.5, name: 'tail' }), { paper: H.paper, thickness: 0.04, edgeWidth: 0.04, pxPerUnit: 40, seed: 1300 + i, folds: [], paint: (P) => P.fill(shade(col, 0.15)) });
   tail.position.set(0, -2.4, -0.05);
-  const kg = new THREE.Group(); kg.add(k, tail); kg.position.set(x, y, z); kg.visible = false; H.scene.add(kg);
+  const kg = new THREE.Group(); kg.add(k, tail); kg.scale.setScalar(1.8); kg.position.set(x, y, z); kg.visible = false; H.scene.add(kg);
   KITES.push({ g: kg, x, y, z, ph: i * 1.7 });
 }
 
@@ -731,12 +760,12 @@ const smoothIn = (u) => (u < 0 ? 0 : u > 1 ? 1 : 0.5 - 0.5 * Math.cos(u * PI));
 const SHOTS = [
   { t0: 0.0, t1: 6.9, from: { t: [-2, 1, 10], a: -0.35, p: 54, d: 118 }, to: { t: [0, 3, 2], a: -0.12, p: 47, d: 72 }, band: 0.32 },                 // 1 hook: crane down over the old city
   { t0: 6.9, t1: 15.5, from: { t: [0, 7, 0], a: -0.55, p: 40, d: 54 }, to: { t: [-6, 6, 3], a: 0.35, p: 43, d: 50 }, band: 0.3 },                   // 2 Charminar orbit, bazaar
-  { t0: 15.5, t1: 22.9, from: { t: [-63, 5, -6], a: 0.45, p: 41, d: 62 }, to: { t: [-63, 9, -12], a: 0.1, p: 47, d: 58 }, band: 0.32 },              // 3 Golconda: crane up the terraces
+  { t0: 15.5, t1: 22.9, from: { t: [-62, 4, 0], a: 0.4, p: 44, d: 80 }, to: { t: [-62, 8, -8], a: 0.12, p: 48, d: 74 }, band: 0.34 },              // 3 Golconda: crane up the terraces
   { t0: 22.9, t1: 29.7, from: { t: [40, 4, -4], a: -0.35, p: 42, d: 58 }, to: { t: [56, 5, -8], a: 0.15, p: 44, d: 52 }, band: 0.3 },                // 4 Hussain Sagar truck, dusk
-  { t0: 29.7, t1: 38.1, from: { t: [-6, 5, 41], a: -0.3, p: 42, d: 40 }, to: { t: [-1, 5, 39], a: 0.12, p: 44, d: 36 }, band: 0.3 },                 // 5a the handi, the rosette
-  { t0: 38.1, t1: 42.0, from: { t: [9, 3.5, 36], a: 0.3, p: 42, d: 32 }, to: { t: [12, 3.5, 37], a: 0.05, p: 44, d: 28 }, band: 0.32 },              // 5b chai and Osmania biscuits
+  { t0: 29.7, t1: 38.1, from: { t: [-7, 4.5, 41], a: -0.22, p: 42, d: 44 }, to: { t: [-3, 4.5, 40], a: 0.08, p: 44, d: 42 }, band: 0.32 },                 // 5a the handi, the rosette
+  { t0: 38.1, t1: 42.0, from: { t: [5, 3, 39.5], a: 0.25, p: 42, d: 30 }, to: { t: [6.5, 3, 39], a: 0.0, p: 44, d: 26 }, band: 0.34 },              // 5b chai and Osmania biscuits
   { t0: 42.0, t1: 47.2, from: { t: [90, 8, -56], a: -0.25, p: 38, d: 74 }, to: { t: [90, 13, -62], a: 0.12, p: 44, d: 72 }, band: 0.32 },           // 6a HITEC City rises
-  { t0: 47.2, t1: 50.9, from: { t: [58, 6, -64], a: -0.3, p: 40, d: 52 }, to: { t: [66, 7, -64], a: 0.1, p: 42, d: 48 }, band: 0.3 },                // 6b Durgam Cheruvu at night
+  { t0: 47.2, t1: 50.9, from: { t: [58, 9, -64], a: -0.28, p: 36, d: 78 }, to: { t: [65, 9, -64], a: 0.08, p: 38, d: 72 }, band: 0.36 },                // 6b Durgam Cheruvu at night
   { t0: 50.9, t1: 57.8, from: { t: [-68, 5, -70], a: -0.25, p: 41, d: 58 }, to: { t: [-54, 5, -74], a: 0.25, p: 44, d: 54 }, band: 0.32 },         // 7 Ramoji truck
   { t0: 57.8, t1: 66.7, from: { t: [-30, 4, 22], a: 0.3, p: 44, d: 50 }, to: { t: [-14, 4, 28], a: -0.1, p: 46, d: 48 }, band: 0.32 },              // 8 the lanes, people, kites
   { t0: 66.7, t1: 74.2, from: { t: [0, 5, 2], a: -0.2, p: 45, d: 60 }, to: { t: [10, 4, -16], a: 0.12, p: 54, d: 205 }, band: 0.36 },                // 9 pull back over the whole city
@@ -753,13 +782,13 @@ const camAt = (t) => {
 const check = checkContinuity(camAt, { duration: 74.2, fps: 30, cuts: CUTS, maxPosStep: 3, maxDistStep: 3 });
 if (!check.ok) console.warn('camera path jumps', JSON.stringify(check.issues.slice(0, 6)));
 const moodAt = (t) => {                     // [a, b, k]
-  if (t < 22.9) return ['day', 'golden', 0.25];
+  if (t < 22.9) return ['day', 'golden', 0.08];
   if (t < 29.7) return ['golden', 'dusk', smoothIn((t - 23.5) / 5)];
-  if (t < 42.0) return ['day', 'golden', 0.35];
-  if (t < 47.2) return ['day', 'golden', 0.2];
+  if (t < 42.0) return ['day', 'golden', 0.15];
+  if (t < 47.2) return ['day', 'golden', 0.0];
   if (t < 50.9) return ['dusk', 'night', 0.85];
-  if (t < 57.8) return ['day', 'golden', 0.2];
-  if (t < 66.7) return ['day', 'golden', 0.6];
+  if (t < 57.8) return ['day', 'golden', 0.05];
+  if (t < 66.7) return ['day', 'golden', 0.3];
   return ['golden', 'dusk', smoothIn((t - 68) / 5.5) * 0.85];
 };
 H.setCameraController((t, dt, ctx) => {
@@ -783,7 +812,6 @@ raise('charminar', 7.25, { stagger: 0.035, max: 2.6, first: CH.body });
 H.cue(7.5, () => CH.minarets.forEach((h, i) => H.fold(h, true, i * 0.12)));
 raise('golconda', 15.75, { stagger: 0.03, max: 2.2 });
 H.cue(15.75, () => GK.terraces.slice().reverse().forEach((h, i) => H.fold(h, true, i * 0.22)));
-H.cue(17.6, () => H.fold(GK.hands, true, 0));
 GK.arcs.forEach((h, i) => { H.cue(18.3 + i * 0.42, () => H.fold(h, true, 0)); H.cue(21.2 + i * 0.12, () => H.fold(h, false, 0)); });
 raise('lake', 23.1, { stagger: 0.03, max: 2.0, first: HS.buddha });
 raise('food', 29.9, { stagger: 0.03, max: 1.6 });
@@ -818,8 +846,9 @@ H.onStep((t, dt) => {
   for (const k of KITES) { k.g.visible = kitesOn; k.g.position.set(k.x + Math.sin(t * 0.7 + k.ph) * 0.9, k.y + Math.sin(t * 1.3 + k.ph) * 0.6, k.z + Math.cos(t * 0.5 + k.ph) * 0.5); k.g.rotation.set(Math.sin(t * 1.1 + k.ph) * 0.15, Math.atan2(H.camera.position.x - k.x, H.camera.position.z - k.z), Math.sin(t * 0.9 + k.ph) * 0.3); }
   HT.jib.visible = t > 42.8; HT.jib.rotation.y = 0.6 + t * 0.18;
   // the cable bridge changes colour at night
-  const hue = (t * 0.12) % 1; _c.setHSL(hue, 0.7, 0.6);
-  for (const h of [HT.pylon, HT.deck]) h.group.traverse((o) => { if (o.isMesh && o.material && o.material[0]?.emissiveMap) { o.material[0].emissive.copy(_c); o.material[0].emissiveIntensity = t > 47.2 && t < 50.9 ? 1.6 : 0.0; } });
+  const hue = (t * 0.12) % 1; _c.setHSL(hue, 0.85, 0.5);
+  HT.cables.visible = t > 1.2; HT.cableMat.color.copy(t > 47.2 && t < 50.9 ? _c : new THREE.Color('#d9d2c2'));
+  for (const h of [HT.deck]) h.group.traverse((o) => { if (o.isMesh && o.material && o.material[0]?.emissiveMap) { o.material[0].emissive.copy(_c); o.material[0].emissiveIntensity = t > 47.2 && t < 50.9 ? 0.32 : 0.0; } });
   // the clapper: open, then snap shut on "film city" and once more
   const ct = t - 52.2; RJ.stick.rotation.z = ct < 0 ? 0.5 : ct < 0.12 ? 0.5 * (1 - ct / 0.12) : ct < 1.6 ? 0 : ct < 2.4 ? 0.45 * Math.sin((ct - 1.6) / 0.8 * PI / 2) : ct < 2.52 ? 0.45 * (1 - (ct - 2.4) / 0.12) : 0;
   if (ct >= 0 && ct - dt < 0) H.recordFlap({ size: 0.4, up: false, key: 9001, pan: 0, distance: 0.3 });
@@ -827,7 +856,8 @@ H.onStep((t, dt) => {
 });
 H.onRestart(() => { life.reset(H.target); RJ.stick.rotation.z = 0.5; });
 // windows glow with the mood (night lights up the panes)
-for (const name of ['hitec', 'oldcity', 'lanes', 'lake', 'city', 'food', 'cafe', 'charminar']) for (const h of GROUPS[name] || []) H.glowing(h.group);
+// panes glow only where the night comes (HITEC City, the lake): elsewhere the printed windows stay printed
+for (const [name, hs] of Object.entries(GROUPS)) for (const h of hs) { if (['hitec', 'lake'].includes(name)) H.glowing(h.group); else h.group.traverse((o) => { if (!o.isMesh) return; for (const m of [].concat(o.material)) if (m && m.emissiveMap) m.emissiveIntensity = 0; }); }
 
 // ---------------------------------------------------------------------------------------------------------------
 // the score: a soft felt-piano bed in D, 84 bpm (it sits under the voice)
@@ -846,4 +876,4 @@ const SCORE = { bpm: 84, gain: 0.5, wet: 0.36, reverbDuration: 2.6, seed: 23, ba
 H.setMusicRenderer((sec, sr, from) => renderScoreOffline(SCORE, sec, { sampleRate: sr, from }));
 
 window.__hyd = { GROUPS, SHOTS, camAt, check };
-H.start();
+stage('before start'); H.start(); stage('after start');

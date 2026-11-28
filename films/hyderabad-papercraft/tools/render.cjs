@@ -14,11 +14,11 @@ const http = require('node:http'), fs = require('node:fs'), path = require('node
   p.on('console', (m) => { const t = m.text(); if (!/GPU stall|willReadFrequently|GL Driver/.test(t)) console.log('  page:', t.slice(0, 400)); });
   p.on('pageerror', (e) => console.log('  ERROR:', e.stack));
   const t0 = Date.now();
-  await p.goto(`http://localhost:8766/index.html?capture&size=${W}x${Hh}`);
+  await p.goto(`http://localhost:8766/index.html?capture&size=${W}x${Hh}${process.env.Q || ""}`);
   await p.waitForFunction('window.__papercraft && window.__papercraft.ready', null, { timeout: 1800000, polling: 2000 });
   console.log('ready after', ((Date.now() - t0) / 1000).toFixed(1), 's');
   fs.mkdirSync('frames', { recursive: true });
-  const grab = () => p.evaluate(() => document.querySelector('canvas').toDataURL('image/jpeg', 0.93).split(',')[1]);
+  const grab = async () => (await p.screenshot({ type: 'jpeg', quality: 93 })).toString('base64');
   if (mode === 'stills') {
     for (const t of rest.map(Number)) {
       const s = Date.now();
@@ -33,7 +33,7 @@ const http = require('node:http'), fs = require('node:fs'), path = require('node
     await p.evaluate(() => window.__papercraft.restart());
     const s = Date.now();
     for (let i = 0; i < n; i++) {
-      const b64 = await p.evaluate((fps) => { const H = window.__papercraft; H.step(1 / fps, fps); return document.querySelector('canvas').toDataURL('image/jpeg', 0.94).split(',')[1]; }, fps);
+      await p.evaluate((fps) => { window.__papercraft.step(1 / fps, fps); }, fps); const b64 = await grab();
       if (!ff.stdin.write(Buffer.from(b64, 'base64'))) await new Promise((r) => ff.stdin.once('drain', r));
       if (i % 150 === 0) console.log(`frame ${i}/${n}  ${((Date.now() - s) / 1000).toFixed(0)} s`);
     }
